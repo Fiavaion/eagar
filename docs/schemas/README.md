@@ -1,6 +1,6 @@
 # eagar schemas
 
-Canonical JSON Schema 2020-12 files for the shared `eagar-rules` format (PRD Appendix F, BD-22). Eagar (Swift) and Mark's Windows mail app both read and write these formats. This folder is the source of truth. `Packages/EagarRules/Sources/EagarRules/Resources/` holds byte-identical copies, and a test fails if they drift. After editing a schema here, copy it there.
+Canonical JSON Schema 2020-12 files for the shared `eagar-rules` format (PRD Appendix F, BD-22). Eagar (Swift) and Mark's Windows mail app both read and write these formats. This folder is the source of truth. `Packages/EagarRules/Sources/EagarRules/Schemas/` holds byte-identical copies, and a test fails if they drift. After editing a schema here, copy it there.
 
 | File | What it describes |
 |---|---|

@@ -14,7 +14,7 @@ let package = Package(
         .target(
             name: "EagarRules",
             dependencies: [.product(name: "EagarCore", package: "EagarCore")],
-            resources: [.copy("Resources")],
+            resources: [.copy("Schemas")],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
         .testTarget(

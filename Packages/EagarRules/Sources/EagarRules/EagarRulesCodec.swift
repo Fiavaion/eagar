@@ -42,7 +42,7 @@ public enum EagarRulesCodec {
 
     /// The bundled schema text, byte for byte.
     public static func schemaData(named name: String) throws(RulesError) -> Data {
-        guard let url = Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "Resources") else {
+        guard let url = Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "Schemas") else {
             throw .schemaUnavailable("\(name).json is missing from the bundle")
         }
         do {
