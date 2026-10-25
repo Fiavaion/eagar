@@ -1,14 +1,24 @@
 import EagarAI
-import EagarTestSupport
+import EagarSecurity
 import Foundation
+import Synchronization
 import Testing
 @testable import Eagar
+
+/// Local fake. The app tests deliberately don't link EagarTestSupport: it would load a second
+/// copy of EagarAI (and its SwiftData models) beside the host app's copy.
+final class MemorySecrets: SecretStore {
+    private let values = Mutex<[String: String]>([:])
+    func set(_ secret: Secret, for key: SecretKey) throws(SecurityError) { values.withLock { $0[key.account] = secret.reveal() } }
+    func get(_ key: SecretKey) throws(SecurityError) -> Secret? { values.withLock { $0[key.account] }.map(Secret.init) }
+    func delete(_ key: SecretKey) throws(SecurityError) { _ = values.withLock { $0.removeValue(forKey: key.account) } }
+}
 
 @MainActor
 struct AppModelTests {
     private func makeModel() throws -> AppModel {
         let defaults = UserDefaults(suiteName: "eagar.tests.\(UUID().uuidString)")!
-        return AppModel(services: try AppServices.make(inMemory: true, secrets: InMemorySecretStore()), defaults: defaults)
+        return AppModel(services: try AppServices.make(inMemory: true, secrets: MemorySecrets()), defaults: defaults)
     }
 
     @Test func savedKeyIsOnlyShownMasked() throws {

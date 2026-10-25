@@ -8,10 +8,9 @@ final class LaunchTests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
 
-        // A tab is a button on iOS and a radio button on macOS; iPadOS may show it twice (tab bar and sidebar).
-        let button = app.buttons["Privacy ledger"].firstMatch
-        let ledgerTab = button.exists ? button : app.radioButtons["Privacy ledger"].firstMatch
-        ledgerTab.tap()
+        // The tab's element type differs by platform and OS (button, radio button, tab), and
+        // iPadOS may show it twice, so look it up by label regardless of type.
+        app.descendants(matching: .any)["Privacy ledger"].firstMatch.tap()
         let summary = app.descendants(matching: .any)["ledger.summary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 15))
         XCTAssertTrue(summary.label.contains("Blocked attempts: 0"), summary.label)

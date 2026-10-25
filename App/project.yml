@@ -72,7 +72,6 @@ targets:
       - path: EagarTests
     dependencies:
       - target: Eagar
-      - package: EagarTestSupport
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar.tests
