@@ -13,11 +13,12 @@ let package = Package(
     dependencies: [
         .package(path: "../EagarCore"),
         .package(path: "../EagarStore"),
+        .package(path: "../EagarSync"),
     ],
     targets: [
         .target(
             name: "EagarCalendar",
-            dependencies: ["EagarCore", "EagarStore"],
+            dependencies: ["EagarCore", "EagarStore", "EagarSync"],
             resources: [.process("Resources")],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
@@ -28,7 +29,7 @@ let package = Package(
         ),
         .testTarget(
             name: "EagarCalendarTests",
-            dependencies: ["EagarCalendar", "EagarCalendarTestSupport", "EagarCore", "EagarStore"],
+            dependencies: ["EagarCalendar", "EagarCalendarTestSupport", "EagarCore", "EagarStore", "EagarSync"],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
     ],
