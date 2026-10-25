@@ -1,6 +1,7 @@
 import EagarCore
 import Foundation
 import SwiftData
+import Synchronization
 
 /// Where the stores live.
 public enum StoreLocation: Sendable {
@@ -44,6 +45,11 @@ public final class EagarStores: Sendable {
         try await target.insert(record)
     }
 
+    /// Serialises container creation. Loading several containers for the same model types at
+    /// once crashes inside Core Data (shared entity metadata is mutated while SQLite triggers
+    /// are generated), so creation is one at a time, process-wide.
+    private static let containerCreation = Mutex(())
+
     /// The college store's directory; `nil` in memory.
     public static func collegeDirectory(in location: StoreLocation) -> URL? {
         guard case let .directory(root) = location else { return nil }
@@ -74,7 +80,9 @@ public final class EagarStores: Sendable {
                     cloudKitDatabase: .none
                 )
             }
-            return try ModelContainer(for: schema, configurations: configuration)
+            return try containerCreation.withLock { _ in
+                try ModelContainer(for: schema, configurations: configuration)
+            }
         } catch {
             EagarLog(.store).fault("could not open \(kind) store")
             throw .setupFailed(kind)
