@@ -20,7 +20,12 @@ public struct AppleOnDeviceProvider: LLMProvider {
     }
 
     public func reachability() async -> Reachability {
-        if case .available = SystemLanguageModel.default.availability { .reachable } else { .unreachable }
+        Self.isAvailable ? .reachable : .unreachable
+    }
+
+    /// Whether Apple Intelligence's on-device model can run here now.
+    public static var isAvailable: Bool {
+        if case .available = SystemLanguageModel.default.availability { true } else { false }
     }
 
     public func encodeRequest(_ request: AIRequest, model: ModelID) throws(AIError) -> Data? {

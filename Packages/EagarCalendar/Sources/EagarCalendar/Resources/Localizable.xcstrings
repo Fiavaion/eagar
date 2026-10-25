@@ -1,0 +1,76 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "A college deadline is due in %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á çóllégé déádlíñé ís dúé íñ %@ ············]"
+          }
+        }
+      }
+    },
+    "A college deadline is due now": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á çóllégé déádlíñé ís dúé ñów ············]"
+          }
+        }
+      }
+    },
+    "College deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé déádlíñé ······]"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dóñé ··]"
+          }
+        }
+      }
+    },
+    "Due in %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dúé íñ %@ ····]"
+          }
+        }
+      }
+    },
+    "Due now": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dúé ñów ···]"
+          }
+        }
+      }
+    },
+    "Snooze": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé ··]"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

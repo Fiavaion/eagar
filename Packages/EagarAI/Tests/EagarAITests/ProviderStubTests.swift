@@ -1,7 +1,6 @@
 import EagarAITestSupport
 import EagarCore
 import Foundation
-import FoundationModels
 import Testing
 @testable import EagarAI
 
@@ -34,7 +33,7 @@ struct ProviderStubTests {
     }
 
     /// A real on-device call, run only where Apple Intelligence is available (e.g. Mark's Mac).
-    @Test(.enabled(if: { if case .available = SystemLanguageModel.default.availability { true } else { false } }(), "Apple Intelligence not available"))
+    @Test(.enabled(if: AppleOnDeviceProvider.isAvailable, "Apple Intelligence not available"))
     func appleOnDeviceLiveCall() async throws {
         let provider = AppleOnDeviceProvider()
         let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("Reply with the single word OK.", dataClass: .publicContent)], maxOutputTokens: 16)
