@@ -44,7 +44,7 @@ targets:
       - package: EagarRules
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp
         # Eagar.entitlements unsigned/CI; EagarSigned.entitlements (adds Keychain Sharing) when
         # Local.xcconfig supplies a team. The macOS data-protection keychain needs it (D-011).
         CODE_SIGN_ENTITLEMENTS: $(EAGAR_ENTITLEMENTS)
@@ -74,7 +74,7 @@ targets:
       - target: Eagar
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar.tests
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp.tests
         GENERATE_INFOPLIST_FILE: YES
         # One path for both platforms: Contents/MacOS on macOS, the bundle root on iOS.
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Eagar.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Eagar"
@@ -88,7 +88,7 @@ targets:
       - target: Eagar
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Eagar
 schemes:

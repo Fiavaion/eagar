@@ -178,6 +178,13 @@ Alternatives: None.
 Consequences: M1 work starts on `m1/<topic>` branches, after an M1 plan is agreed.
 Refs: PRD §10 M0, CLAUDE.md "How to work"
 
+## D-016  App ID com.fiavaion.eagarapp; iCloud container and App Group  (2026-10-25, M1)
+Context: Registering `com.fiavaion.eagar` failed: Apple reports it is registered to a different developer team. The earlier Mac build had used a wildcard profile, which hid this.
+Decision: Mark chose `com.fiavaion.eagarapp`. Created under team 9RWD38STJV with Mark's approval: App ID `com.fiavaion.eagarapp` with iCloud (CloudKit container `iCloud.com.fiavaion.eagarapp`) and App Group `group.com.fiavaion.eagarapp`; Mark's iPad Pro 12.9" (5th gen, iPadOS 27.0.1) registered. The entitlements are in `EagarSigned.entitlements` only, so unsigned CI builds carry none. Eagar was installed and launched on the iPad.
+Alternatives: Use the other team, if it is Mark's; he chose the new ID.
+Consequences: Supersedes the bundle ID in D-011. Extensions will be `com.fiavaion.eagarapp.<name>`. CloudKit stays in the development environment until M6.
+Refs: D-011, BD-02, PRD §10 M1
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
