@@ -45,7 +45,7 @@ Package dependencies follow the layer list in PRD §7.2 (downward only: `EagarCo
 
 ## Build and test
 
-The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Verified with Xcode 27.1 and the iOS 26.5 simulator runtime (D-009); update the simulator names whenever Xcode changes them. The project is generated (D-001): run `xcodegen generate --spec App/project.yml` first and after any change to `project.yml`. Unsigned local builds can pass `CODE_SIGN_IDENTITY=-`; macOS Keychain access needs `DEVELOPMENT_TEAM` in `App/Config/Local.xcconfig`.
+The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Verified with Xcode 27.1 and the iOS 26.5 simulator runtime (D-009); update the simulator names whenever Xcode changes them. The project is generated (D-001): run `xcodegen generate --spec App/project.yml` first and after any change to `project.yml`. Unsigned local builds can pass `CODE_SIGN_IDENTITY=-`. macOS Keychain access needs a team-signed build: `App/Config/Local.xcconfig` (git-ignored) sets `DEVELOPMENT_TEAM` and `EAGAR_ENTITLEMENTS = Eagar/EagarSigned.entitlements`, and the first signed build needs `-allowProvisioningUpdates` (D-011).
 
 ```sh
 # Unit tests for one package (fast; run constantly)

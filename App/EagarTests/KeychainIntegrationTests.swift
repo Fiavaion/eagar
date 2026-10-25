@@ -3,13 +3,23 @@ import Foundation
 import Security
 import Testing
 
-/// Reads back real Keychain attributes (invariant 6, M0 acceptance). Runs on the iOS simulator,
-/// where the hosted test app has Keychain access without a signing team; on macOS the
-/// data-protection keychain needs a signed build, so the attribute dictionaries are covered by
-/// EagarSecurity's unit tests and this check runs on Mark's signed build.
-#if os(iOS)
+/// Reads back real Keychain attributes (invariant 6, M0 acceptance). Always runs on the iOS
+/// simulator. On macOS the data-protection keychain needs the Keychain Sharing entitlement,
+/// which only team-signed builds carry (D-011), so the test runs there when it is present.
+enum KeychainEntitlement {
+    static var available: Bool {
+        #if os(macOS)
+        guard let task = SecTaskCreateFromSelf(nil) else { return false }
+        return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
+        #else
+        return true
+        #endif
+    }
+}
+
 struct KeychainIntegrationTests {
-    @Test func storedKeyIsThisDeviceOnlyAndNotSynchronizable() throws {
+    @Test(.enabled(if: KeychainEntitlement.available, "needs a team-signed build on macOS"))
+    func storedKeyIsThisDeviceOnlyAndNotSynchronizable() throws {
         let keychain = Keychain(service: "app.eagar.tests.\(UUID().uuidString)")
         defer { try? keychain.delete(.anthropicAPIKey) }
         try keychain.set(Secret("test-canary-key-ios-0001"), for: .anthropicAPIKey)
@@ -33,4 +43,3 @@ struct KeychainIntegrationTests {
         #expect((attributes[kSecAttrSynchronizable as String] as? NSNumber)?.boolValue != true)
     }
 }
-#endif

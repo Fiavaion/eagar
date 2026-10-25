@@ -1,6 +1,8 @@
-// Bundle prefix and team for Eagar (PRD M0). Placeholders until Mark supplies his company's values.
+// Bundle prefix (Mark's company, Fiavaion) and team for Eagar (PRD M0).
 // Put real values in Config/Local.xcconfig (git-ignored); it overrides these.
-EAGAR_BUNDLE_PREFIX = app.eagar.placeholder
+EAGAR_BUNDLE_PREFIX = com.fiavaion
 DEVELOPMENT_TEAM =
+// Unsigned builds (CI) use plain entitlements; Local.xcconfig switches to EagarSigned.entitlements.
+EAGAR_ENTITLEMENTS = Eagar/Eagar.entitlements
 
 #include? "Local.xcconfig"

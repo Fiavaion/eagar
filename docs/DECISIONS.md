@@ -139,6 +139,13 @@ Alternatives: Keep `macos-26` and drop to Xcode 26.6; rejected, because the PRD 
 Consequences: CI's iOS tests run on the iOS 27.0 simulator runtime (deployment target stays 26.0); local runs use 26.5.
 Refs: D-005, D-009, BD-07
 
+## D-011  Signing, bundle ID and the macOS Keychain  (2026-10-25, M0)
+Context: On a team-signed Mac build the Keychain returned -34018 (missing entitlement): the macOS data-protection keychain needs an application identifier, which only a provisioning profile supplies. Separately, a team-signed Debug test build crashed at launch because hardened runtime rejected the separately signed local-package frameworks Xcode links in test builds.
+Decision: Bundle prefix `com.fiavaion` (Mark, 2026-10-25), so the App ID is `com.fiavaion.eagar`. Team-signed builds use `EagarSigned.entitlements`, which adds Keychain Sharing (`keychain-access-groups` = `$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)`) and makes Xcode create a Mac development profile. `App/Config/Local.xcconfig` (git-ignored) sets `DEVELOPMENT_TEAM` and `EAGAR_ENTITLEMENTS`; unsigned and CI builds keep the plain `Eagar.entitlements`. Hardened runtime is on for Release only. Mark's MacBook Pro was registered to team 9RWD38STJV with his approval. The real-Keychain attribute test now also runs on macOS whenever the entitlement is present.
+Alternatives: The legacy file-based macOS keychain needs no entitlement, but it does not honour `WhenUnlockedThisDeviceOnly` (invariant 6); rejected.
+Consequences: Each new Mac or device used for development must be registered to the team. Release builds keep hardened runtime for notarisation.
+Refs: D-009, invariant 6, BD-07
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

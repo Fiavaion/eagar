@@ -42,15 +42,12 @@ targets:
       - package: EagarAI
         product: EagarAI
       - package: EagarRules
-    entitlements:
-      path: Eagar/Eagar.entitlements
-      properties:
-        com.apple.security.app-sandbox: true
-        com.apple.security.network.client: true
-        com.apple.security.files.user-selected.read-write: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar
+        # Eagar.entitlements unsigned/CI; EagarSigned.entitlements (adds Keychain Sharing) when
+        # Local.xcconfig supplies a team. The macOS data-protection keychain needs it (D-011).
+        CODE_SIGN_ENTITLEMENTS: $(EAGAR_ENTITLEMENTS)
         PRODUCT_NAME: Eagar
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -62,8 +59,12 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Eagar asks for Face ID before erasing ledger entries and, later, before sending each email."
         TARGETED_DEVICE_FAMILY: "1,2"
-        ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_STYLE: Automatic
+      configs:
+        # Hardened runtime only for Release: in Debug/test builds Xcode links local packages as
+        # separately signed frameworks, which library validation rejects (launch crash).
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
   EagarTests:
     type: bundle.unit-test
     supportedDestinations: [iOS, macOS]
