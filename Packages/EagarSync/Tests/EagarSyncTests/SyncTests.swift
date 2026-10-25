@@ -3,6 +3,7 @@ import EagarCore
 import EagarStore
 import Foundation
 import SwiftData
+import Synchronization
 import Testing
 @testable import EagarSync
 
@@ -13,6 +14,7 @@ final class Note: Classified {
     var count: Int = 0
     var done: Bool = false
     var secret: String = ""
+    var tags: [Int] = []
     var dataClassRaw: String = DataClass.personal.rawValue
 
     init(_ title: String, dataClass: DataClass = .personal, uuid: UUID = UUID()) {
@@ -27,16 +29,20 @@ final class Note: Classified {
 
 struct NoteAdapter: SyncAdapter {
     let recordType = "Note"
-    let fieldNames: Set<String> = ["title", "count", "done", "secret"]
+    let fieldKinds: [String: SyncFieldKind] = ["title": .string, "count": .int, "done": .bool, "secret": .string, "tags": .ints]
     let encryptedFieldNames: Set<String> = ["secret"]
-    let boolFieldNames: Set<String> = ["done"]
+    /// Lookups of these record names throw, to exercise the inbound retry queue. Scoped to
+    /// names so parallel tests are unaffected.
+    static let failingNames = Mutex<Set<String>>([])
+    struct InjectedFailure: Error {}
 
     func recordName(of model: Note) -> String { model.noteUUID.uuidString }
     func fields(of model: Note) -> SyncFields {
-        ["title": .string(model.title), "count": .int(Int64(model.count)), "done": .bool(model.done), "secret": .string(model.secret)]
+        ["title": .string(model.title), "count": .int(Int64(model.count)), "done": .bool(model.done), "secret": .string(model.secret), "tags": .ints(model.tags.map(Int64.init))]
     }
     func all(in context: ModelContext) throws -> [Note] { try context.fetch(FetchDescriptor<Note>()) }
     func find(recordName: String, in context: ModelContext) throws -> Note? {
+        if Self.failingNames.withLock({ $0.contains(recordName) }) { throw InjectedFailure() }
         guard let uuid = UUID(uuidString: recordName) else { return nil }
         return try context.fetch(FetchDescriptor<Note>(predicate: #Predicate { $0.noteUUID == uuid })).first
     }
@@ -50,6 +56,7 @@ struct NoteAdapter: SyncAdapter {
         if case let .int(v)? = fields["count"] { model.count = Int(v) }
         if case let .bool(v)? = fields["done"] { model.done = v }
         if case let .string(v)? = fields["secret"] { model.secret = v }
+        if case let .ints(v)? = fields["tags"] { model.tags = v.map { Int($0) } }
     }
 }
 
@@ -81,11 +88,11 @@ private func titles(_ stores: EagarStores) async throws -> [String] {
 struct RecordCodecTests {
     @Test func roundTripWithEncryptedFields() throws {
         let record = CKRecord(recordType: "Note", recordID: CKRecord.ID(recordName: "n", zoneID: SyncZone.id))
-        let fields: SyncFields = ["title": .string("Car tax"), "count": .int(3), "done": .bool(true), "secret": .string("note")]
+        let fields: SyncFields = ["title": .string("Car tax"), "count": .int(3), "done": .bool(true), "secret": .string("note"), "tags": .ints([])]
         try RecordCodec.write(fields, dataClass: .personal, encrypted: ["secret"], into: record)
         #expect(record["secret"] == nil) // only in encryptedValues
         #expect(record.encryptedValues["secret"] as? String == "note")
-        let read = try RecordCodec.read(record, names: ["title", "count", "done", "secret"], encrypted: ["secret"], bools: ["done"])
+        let read = try RecordCodec.read(record, kinds: NoteAdapter().fieldKinds, encrypted: ["secret"])
         #expect(read.fields == fields)
         #expect(read.dataClass == .personal)
     }
@@ -99,19 +106,23 @@ struct RecordCodecTests {
         #expect(record["title"] == nil)
         let unlabelled = CKRecord(recordType: "Note", recordID: CKRecord.ID(recordName: "m", zoneID: SyncZone.id))
         unlabelled["title"] = "no class"
-        #expect(throws: SyncError.collegeRecordRefused) { try RecordCodec.read(unlabelled, names: ["title"], encrypted: []) }
+        #expect(throws: SyncError.collegeRecordRefused) { try RecordCodec.read(unlabelled, kinds: ["title": .string], encrypted: []) }
     }
 
-    @Test func valueConversions() {
-        #expect(SyncValue.from(nil, hint: nil) == .null)
-        #expect(SyncValue.from(NSNumber(value: 2.5), hint: nil) == .double(2.5))
-        #expect(SyncValue.from(NSNumber(value: 7), hint: nil) == .int(7))
-        #expect(SyncValue.from(NSNumber(value: 1), hint: .bool(false)) == .bool(true))
-        #expect(SyncValue.from(["a"], hint: nil) == .strings(["a"]))
-        #expect(SyncValue.from([Int64(1)], hint: nil) == .ints([1]))
-        #expect(SyncValue.from(Data([1]), hint: nil) == .data(Data([1])))
-        #expect(SyncValue.from(Date(timeIntervalSince1970: 5), hint: nil) == .date(Date(timeIntervalSince1970: 5)))
-        #expect(SyncValue.from(NSObject(), hint: nil) == .null)
+    @Test func valueConversionsFollowTheDeclaredKind() {
+        #expect(SyncValue.from(nil, kind: .string) == .null)
+        #expect(SyncValue.from(NSNumber(value: 2.5), kind: .double) == .double(2.5))
+        #expect(SyncValue.from(NSNumber(value: 7), kind: .int) == .int(7))
+        #expect(SyncValue.from(NSNumber(value: 1), kind: .bool) == .bool(true))
+        #expect(SyncValue.from(["a"], kind: .strings) == .strings(["a"]))
+        #expect(SyncValue.from([Int64(1)], kind: .ints) == .ints([1]))
+        #expect(SyncValue.from(Data([1]), kind: .data) == .data(Data([1])))
+        #expect(SyncValue.from(Date(timeIntervalSince1970: 5), kind: .date) == .date(Date(timeIntervalSince1970: 5)))
+        #expect(SyncValue.from("wrong kind", kind: .int) == .null)
+        // Verify finding: an empty list, or a missing one, reads as an empty list of the right kind.
+        #expect(SyncValue.from([String](), kind: .ints) == .ints([]))
+        #expect(SyncValue.from(nil, kind: .ints) == .ints([]))
+        #expect(SyncValue.from(nil, kind: .strings) == .strings([]))
     }
 }
 
@@ -240,8 +251,9 @@ struct SyncCoordinatorTests {
         #expect(upload["count"] as? Int64 == 9)
     }
 
-    /// B-8: a college record arriving from CloudKit is refused and never inserted.
-    @Test func Boundary_B8_collegeRecordFromCloudIsRefused() async throws {
+    /// B-4 (sync half, partial; the full B-8 end-to-end test arrives with cdbooking in M2): a
+    /// college record arriving from CloudKit is refused and never inserted.
+    @Test func Boundary_B4_collegeRecordFromCloudIsRefused() async throws {
         let (stores, coordinator) = try setUp()
         await #expect(throws: SyncError.collegeRecordRefused) {
             try await coordinator.apply(fetched: serverRecord(UUID(), title: "NCAD meeting", dataClass: .college))
@@ -273,5 +285,96 @@ struct SyncCoordinatorTests {
         #expect(await second.recordState(name)?.systemFields != nil)
         await second.reset()
         #expect(try await second.scanLocalChanges().count == 1)
+    }
+}
+
+/// Regression tests for the M1 sync review findings.
+@Suite(.serialized)
+struct SyncReviewRegressionTests {
+    /// An empty list must settle after a save, not re-upload forever.
+    @Test func emptyListSettles() async throws {
+        let (stores, coordinator) = try setUp()
+        let note = Note("No tags")
+        let name = note.noteUUID.uuidString
+        try await stores.personal.insert(note)
+        _ = try await coordinator.scanLocalChanges()
+        let record = try #require(await coordinator.record(for: name))
+        record["tags"] = nil // CloudKit may return an empty list as missing
+        await coordinator.didSave(record)
+        #expect(try await coordinator.scanLocalChanges().isEmpty)
+    }
+
+    /// After an account change or lost state, a fetched record must not overwrite a local edit.
+    @Test func noHistoryMergeKeepsLocalEdits() async throws {
+        let (stores, coordinator) = try setUp()
+        let note = Note("New local edit")
+        let uuid = note.noteUUID
+        try await stores.personal.insert(note)
+        await coordinator.reset()
+        let pending = try await coordinator.apply(fetched: serverRecord(uuid, title: "Old"))
+        #expect(pending)
+        #expect(try await titles(stores) == ["New local edit"])
+        #expect(try await coordinator.scanLocalChanges() == [.save(recordName: uuid.uuidString)])
+    }
+
+    /// A deletion made here is not undone by an older edit arriving from the server.
+    @Test func deletedRecordIsNotResurrected() async throws {
+        let (stores, coordinator) = try setUp()
+        let note = Note("To delete")
+        let uuid = note.noteUUID
+        try await stores.personal.insert(note)
+        _ = try await coordinator.scanLocalChanges()
+        await coordinator.didSave(try #require(await coordinator.record(for: uuid.uuidString)))
+        try await stores.personal.perform { context in try context.fetch(FetchDescriptor<Note>()).forEach(context.delete) }
+        #expect(try await coordinator.scanLocalChanges() == [.delete(recordName: uuid.uuidString, recordType: "Note")])
+
+        // An offline record has no modification date, so it can't be newer than the deletion.
+        let pending = try await coordinator.apply(fetched: serverRecord(uuid, title: "Edited elsewhere"))
+        #expect(!pending)
+        #expect(try await titles(stores).isEmpty)
+        #expect(await coordinator.record(for: uuid.uuidString) == nil)
+        #expect(try await coordinator.scanLocalChanges() == [.delete(recordName: uuid.uuidString, recordType: "Note")])
+    }
+
+    @Test func corruptStateFileIsKeptAsideNotOverwritten() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: "eagar-sync-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "state.json")
+        try Data("not json".utf8).write(to: url)
+        let stores = try EagarStores(location: .inMemory, models: [Note.self])
+        _ = try SyncCoordinator(store: stores.personal, adapters: [AnySyncAdapter(NoteAdapter())], stateURL: url)
+        let files = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        #expect(files.contains { $0.hasPrefix("state.json.corrupt-") })
+        #expect(!files.contains("state.json"))
+    }
+
+    @Test func unreadableStateFileStopsSync() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: "eagar-sync-\(UUID().uuidString)")
+        let url = directory.appending(path: "state.json")
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true) // a directory can't be read as data
+        defer { try? FileManager.default.removeItem(at: directory) }
+        #expect(throws: SyncError.stateFailed) { try SyncCoordinator.loadState(from: url) }
+    }
+
+    /// A fetched change whose local write fails is queued and applied on the next scan.
+    @Test func failedInboundApplyIsRetried() async throws {
+        let (stores, coordinator) = try setUp()
+        let uuid = UUID()
+        NoteAdapter.failingNames.withLock { _ = $0.insert(uuid.uuidString) }
+        await #expect(throws: SyncError.storeFailed) { try await coordinator.apply(fetched: serverRecord(uuid, title: "From iPad")) }
+        #expect(await coordinator.pendingInboundCount == 1)
+        NoteAdapter.failingNames.withLock { _ = $0.remove(uuid.uuidString) }
+        _ = try await coordinator.scanLocalChanges()
+        #expect(try await titles(stores) == ["From iPad"])
+        #expect(await coordinator.pendingInboundCount == 0)
+    }
+
+    @Test func accountChangePausesSyncUntilConfirmed() async throws {
+        let (_, coordinator) = try setUp()
+        await coordinator.accountChanged()
+        #expect(await coordinator.isPausedForAccountChange)
+        await coordinator.confirmAccount()
+        #expect(await !coordinator.isPausedForAccountChange)
     }
 }

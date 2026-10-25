@@ -18,7 +18,7 @@ struct DeadlineSyncAdapterTests {
 
         let record = CKRecord(recordType: adapter.recordType, recordID: CKRecord.ID(recordName: adapter.recordName(of: deadline), zoneID: SyncZone.id))
         try RecordCodec.write(fields, dataClass: .personal, encrypted: adapter.encryptedFieldNames, into: record)
-        let read = try RecordCodec.read(record, names: adapter.fieldNames, encrypted: adapter.encryptedFieldNames, bools: adapter.boolFieldNames)
+        let read = try RecordCodec.read(record, kinds: adapter.fieldKinds, encrypted: adapter.encryptedFieldNames)
         #expect(read.fields == fields)
 
         let copy = adapter.make(recordName: adapter.recordName(of: deadline), fields: read.fields, dataClass: read.dataClass)
@@ -31,7 +31,7 @@ struct DeadlineSyncAdapterTests {
         let adapter = DeadlineSyncAdapter()
         let deadline = Deadline(title: "x", dueAt: Date(), dataClass: .personal, createdAt: Date())
         deadline.snooze(until: Date())
-        adapter.apply(["snoozedUntil": .null, "completedAt": .null, "source": .null, "offsets": .null], to: deadline)
+        adapter.apply(["snoozedUntil": .null, "completedAt": .null, "source": .null, "offsets": .ints([])], to: deadline)
         #expect(deadline.snoozedUntil == nil && deadline.completedAt == nil && deadline.sourceUUID == nil)
         #expect(deadline.reminderOffsetsMinutes.isEmpty)
     }

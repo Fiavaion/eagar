@@ -1,6 +1,7 @@
 import EagarCore
 import EagarLedger
 import Foundation
+import Synchronization
 
 /// The single gateway to every model (BD-06, invariant 2).
 ///
@@ -21,6 +22,8 @@ public actor AIRouter {
     private var halted = false
     /// Provider calls in progress, so `halt()` can cancel them.
     private var inFlight: [UUID: Task<LLMResponse, any Error>] = [:]
+    /// The race each in-flight call is waiting on; `halt()` ends them all at once.
+    private var haltWaiters: [UUID: RaceOnce] = [:]
 
     public init(providers: [any LLMProvider], ledger: any PrivacyLedgerWriting, policy: any PolicySource, catalog: ModelCatalog) {
         self.providers = providers
@@ -35,6 +38,7 @@ public actor AIRouter {
         guard !halted else { return }
         halted = true
         let cancelled = inFlight.count
+        haltWaiters.values.forEach { $0.finish(.halted) }
         inFlight.values.forEach { $0.cancel() }
         log.notice("kill switch engaged; cancelled \(cancelled) calls")
         do {
@@ -50,6 +54,7 @@ public actor AIRouter {
         log.notice("kill switch released")
     }
 
+    /// Whether the kill switch is engaged.
     public var isHalted: Bool { halted }
 
     public func run(_ request: AIRequest) async throws(AIError) -> LLMResponse {
@@ -143,23 +148,41 @@ public actor AIRouter {
 
     // MARK: - Steps
 
-    /// Runs the provider call as a cancellable task registered with the router, so the kill
-    /// switch can stop it mid-flight.
+    /// Runs the provider call as a task registered with the router and races it against the
+    /// kill switch and the caller's cancellation, whichever comes first. A provider that ignores
+    /// cancellation is abandoned, and its late result is discarded (FR-CORE-07).
     private func dispatch(_ call: RoutedCall, to provider: any LLMProvider) async throws(AIError) -> LLMResponse {
         let id = UUID()
-        let task = Task { () throws -> LLMResponse in try await provider.complete(call) }
-        inFlight[id] = task
-        defer { inFlight[id] = nil }
-        do {
-            return try await withTaskCancellationHandler {
-                try await task.value
-            } onCancel: {
-                task.cancel()
+        let work = Task { () throws -> LLMResponse in try await provider.complete(call) }
+        let race = RaceOnce()
+        inFlight[id] = work
+        haltWaiters[id] = race
+        defer {
+            inFlight[id] = nil
+            haltWaiters[id] = nil
+        }
+        Task {
+            do { race.finish(.answered(.success(try await work.value))) } catch { race.finish(.answered(.failure(error))) }
+        }
+        let outcome = await withTaskCancellationHandler {
+            await race.wait()
+        } onCancel: {
+            race.finish(.cancelled)
+            work.cancel()
+        }
+        switch outcome {
+        case .halted:
+            work.cancel()
+            throw .halted
+        case .cancelled:
+            throw .cancelled
+        case let .answered(result):
+            guard !halted else { throw .halted }
+            switch result {
+            case let .success(response): return response
+            case let .failure(error as AIError): throw error
+            case .failure: throw .provider(.unavailable)
             }
-        } catch let error as AIError {
-            throw halted ? .halted : error
-        } catch {
-            throw halted || error is CancellationError ? .halted : .provider(.unavailable)
         }
     }
 
@@ -214,6 +237,43 @@ public actor AIRouter {
             try await ledger.complete(id, with: completion)
         } catch {
             log.fault("ledger completion failed for \(id): \(error)")
+        }
+    }
+}
+
+/// Resolves once, with whichever happens first: the provider's answer, a halt, or cancellation.
+final class RaceOnce: Sendable {
+    enum Outcome: Sendable {
+        case answered(Result<LLMResponse, any Error>)
+        case halted
+        case cancelled
+    }
+
+    private struct State {
+        var outcome: Outcome?
+        var waiter: CheckedContinuation<Outcome, Never>?
+    }
+
+    private let state = Mutex(State())
+
+    func finish(_ outcome: Outcome) {
+        let waiter: CheckedContinuation<Outcome, Never>? = state.withLock { state in
+            guard state.outcome == nil else { return nil }
+            state.outcome = outcome
+            defer { state.waiter = nil }
+            return state.waiter
+        }
+        waiter?.resume(returning: outcome)
+    }
+
+    func wait() async -> Outcome {
+        await withCheckedContinuation { continuation in
+            let ready: Outcome? = state.withLock { state in
+                if let outcome = state.outcome { return outcome }
+                state.waiter = continuation
+                return nil
+            }
+            if let ready { continuation.resume(returning: ready) }
         }
     }
 }

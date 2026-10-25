@@ -196,6 +196,22 @@ Alternatives: Phrase whole sections, which would force any mixed section to loca
 Consequences: B-6 and the counts-only egress test cover these paths.
 Refs: FR-CAL-02..04, FR-DL-02/03, FR-BRIEF-01..08, BD-04, BD-21
 
+## D-018  Sync and kill-switch rules after review  (2026-10-25, M1)
+Context: A fresh-context review of EagarSync and the kill switch found no boundary breach but 5 high and 7 medium issues, each confirmed by a probe test. All are fixed, with regression tests.
+Decision:
+- **Kill switch:** each provider call races the kill switch through a one-shot continuation, so a halt returns within the 50 ms response budget even when a provider ignores cancellation; late answers are discarded. Caller cancellation is reported as `.cancelled`, not as a halt.
+- **Sync decoding:** adapters declare every field's kind; a missing list equals an empty list (CloudKit may return either), so nothing re-uploads forever.
+- **Sync merging:** read, merge and write of a fetched record happen in one store operation. A fetched record with no history (after an account change or lost state) is merged, not taken over, so unsynced local edits survive. "Later edit wins" compares when this device first saw the local edit against the server's modification time (models carry no per-field edit stamps yet). Lists merge last-writer-wins; set-union for tags and queue membership (§7.5) arrives with the first such field.
+- **Deletions:** a local deletion is kept as a tombstone until the server confirms it; an older server edit does not resurrect the record.
+- **Failures:** a fetched change that fails to apply is queued and retried on the next scan. Every CloudKit save and delete failure ends in a retry or a logged decision (unknown item, missing zone and encrypted-key reset clear the change tag and re-upload; zone deletion re-uploads everything). Pending saves with nothing to send are dropped from the engine queue.
+- **State file:** a missing file is a fresh start, an unreadable one stops sync, and a corrupt one is moved aside, never overwritten.
+- **Account change [Mark to confirm]:** on iCloud sign-out or account switch, local data is kept, bookkeeping is cleared and sync pauses until Mark confirms the account in Settings. Personal data is never uploaded to a different Apple ID automatically. (Apple's sample deletes local data instead.)
+- **Not synced:** `CalendarRef` (EventKit identifiers differ between devices) and reminder-mirror IDs.
+- **Not yet wired:** neither the kill switch nor `PersonalSyncEngine` is connected to the app at this point; the M1 criteria for them are not claimed until they are.
+Alternatives: Delete local data on account switch (Apple's sample); rejected pending Mark's decision.
+Consequences: `PersonalSyncEngine` itself has no unit tests (CKSyncEngine events can't be constructed); it is verified by the two-device test in M1 acceptance.
+Refs: BD-02, PRD §7.5, FR-CORE-07, D-006
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

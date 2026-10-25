@@ -34,17 +34,17 @@ public enum RecordCodec {
         }
     }
 
-    /// Reads the fields named in `names` from `record`. `bools` names the boolean fields.
+    /// Reads the declared fields from `record`, decoding each as its kind.
     public static func read(
-        _ record: CKRecord, names: Set<String>, encrypted: Set<String>, bools: Set<String> = []
+        _ record: CKRecord, kinds: [String: SyncFieldKind], encrypted: Set<String>
     ) throws(SyncError) -> (fields: SyncFields, dataClass: DataClass) {
         // A record without a class, or with an unknown one, reads as college and is refused.
         let dataClass = (record[syncDataClassField] as? String).flatMap(DataClass.init(rawValue:)) ?? .college
         guard dataClass != .college else { throw .collegeRecordRefused }
         var fields: SyncFields = [:]
-        for name in names {
+        for (name, kind) in kinds {
             let raw: Any? = encrypted.contains(name) ? record.encryptedValues[name] : record[name]
-            fields[name] = SyncValue.from(raw, hint: bools.contains(name) ? .bool(false) : nil)
+            fields[name] = SyncValue.from(raw, kind: kind)
         }
         return (fields, dataClass)
     }

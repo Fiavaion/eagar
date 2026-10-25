@@ -9,12 +9,10 @@ public protocol SyncAdapter: Sendable {
 
     /// CloudKit record type, e.g. `Deadline`.
     var recordType: String { get }
-    /// Every synced field name.
-    var fieldNames: Set<String> { get }
+    /// Every synced field and its kind.
+    var fieldKinds: [String: SyncFieldKind] { get }
     /// Fields stored in CloudKit `encryptedValues` (relationship notes, profile lines, payloads).
     var encryptedFieldNames: Set<String> { get }
-    /// Boolean fields. CloudKit stores booleans as integers, so they must be declared to decode.
-    var boolFieldNames: Set<String> { get }
 
     /// The stable record name: the model's own UUID string.
     func recordName(of model: Model) -> String
@@ -29,13 +27,15 @@ public protocol SyncAdapter: Sendable {
     func apply(_ fields: SyncFields, to model: Model)
 }
 
+extension SyncAdapter {
+    public var fieldNames: Set<String> { Set(fieldKinds.keys) }
+}
+
 /// A type-erased adapter, so the engine can hold adapters for many model types.
 public struct AnySyncAdapter: Sendable {
     public let recordType: String
-    public let fieldNames: Set<String>
+    public let fieldKinds: [String: SyncFieldKind]
     public let encryptedFieldNames: Set<String>
-    public let boolFieldNames: Set<String>
-    let snapshot: @Sendable (any PersistentModel) -> (recordName: String, fields: SyncFields, dataClass: DataClass)?
     let upsert: @Sendable (String, SyncFields, DataClass, ModelContext) throws -> Void
     let delete: @Sendable (String, ModelContext) throws -> Void
     let localFields: @Sendable (String, ModelContext) throws -> SyncFields?
@@ -43,13 +43,8 @@ public struct AnySyncAdapter: Sendable {
 
     public init<A: SyncAdapter>(_ adapter: A) {
         recordType = adapter.recordType
-        fieldNames = adapter.fieldNames
+        fieldKinds = adapter.fieldKinds
         encryptedFieldNames = adapter.encryptedFieldNames
-        boolFieldNames = adapter.boolFieldNames
-        snapshot = { model in
-            guard let model = model as? A.Model else { return nil }
-            return (adapter.recordName(of: model), adapter.fields(of: model), model.dataClass)
-        }
         upsert = { name, fields, dataClass, context in
             if let existing = try adapter.find(recordName: name, in: context) {
                 adapter.apply(fields, to: existing)

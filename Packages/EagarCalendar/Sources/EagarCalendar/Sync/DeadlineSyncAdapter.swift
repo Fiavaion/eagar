@@ -12,12 +12,12 @@ import SwiftData
 /// differ between devices, so each device keeps its own tags.
 public struct DeadlineSyncAdapter: SyncAdapter {
     public let recordType = "Deadline"
-    public let fieldNames: Set<String> = [
-        "title", "dueAt", "isAllDay", "origin", "offsets", "source", "status", "snoozedUntil",
-        "completedAt", "createdAt", "mirrorOverride",
+    public let fieldKinds: [String: SyncFieldKind] = [
+        "title": .string, "dueAt": .date, "isAllDay": .bool, "origin": .string, "offsets": .ints,
+        "source": .string, "status": .string, "snoozedUntil": .date, "completedAt": .date,
+        "createdAt": .date, "mirrorOverride": .bool,
     ]
     public let encryptedFieldNames: Set<String> = []
-    public let boolFieldNames: Set<String> = ["isAllDay", "mirrorOverride"]
 
     public init() {}
 
@@ -67,7 +67,6 @@ public struct DeadlineSyncAdapter: SyncAdapter {
             case let ("isAllDay", .bool(v)): model.isAllDay = v
             case let ("origin", .string(v)): model.originRaw = v
             case let ("offsets", .ints(v)): model.reminderOffsetsMinutes = v.map { Int($0) }
-            case ("offsets", .null): model.reminderOffsetsMinutes = []
             case let ("source", .string(v)): model.sourceUUID = UUID(uuidString: v)
             case ("source", .null): model.sourceUUID = nil
             case let ("status", .string(v)): model.statusRaw = v

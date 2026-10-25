@@ -20,7 +20,51 @@ struct SlowProvider: LLMProvider {
     }
 }
 
+/// A provider that ignores cancellation entirely and answers after 3 seconds.
+struct StubbornProvider: LLMProvider {
+    let id = ProviderID("stubborn")
+    func capabilities() async -> ProviderCapabilities { ProviderCapabilities(locality: .onDevice, defaultModel: ModelID("stubborn"), maxContextTokens: 4096) }
+    func reachability() async -> Reachability { .reachable }
+    func encodeRequest(_ request: AIRequest, model: ModelID) throws(AIError) -> Data? { nil }
+    func complete(_ call: RoutedCall) async throws(AIError) -> LLMResponse {
+        let end = ContinuousClock.now + .seconds(3)
+        while ContinuousClock.now < end { _ = try? await Task.sleep(for: .milliseconds(20)) } // swallows cancellation
+        return LLMResponse(text: "late", model: call.model)
+    }
+}
+
 struct KillSwitchTests {
+    /// Verify finding: a provider that ignores cancellation must still be cut off within 1 s,
+    /// and its late answer discarded.
+    @Test func haltStopsProvidersThatIgnoreCancellation() async throws {
+        let ledger = InMemoryLedger()
+        let router = makeRouter([StubbornProvider()], ledger: ledger)
+        let request = self.request
+        let call = Task { () -> Result<LLMResponse, AIError> in
+            do throws(AIError) { return .success(try await router.run(request)) } catch { return .failure(error) }
+        }
+        try await Task.sleep(for: .milliseconds(100))
+        let started = ContinuousClock.now
+        await router.halt()
+        let result = await call.value as Result<LLMResponse, AIError>
+        #expect(ContinuousClock.now - started < .seconds(1))
+        guard case .failure(.halted) = result else { Issue.record("expected .halted, got \(result)"); return }
+        #expect(ledger.entries.first { $0.draft.kind == .modelCall }?.completion?.outcome == .failed)
+    }
+
+    @Test func callerCancellationWithoutHaltIsNotReportedAsHalted() async throws {
+        let router = makeRouter([SlowProvider()])
+        let request = self.request
+        let call = Task { () -> Result<LLMResponse, AIError> in
+            do throws(AIError) { return .success(try await router.run(request)) } catch { return .failure(error) }
+        }
+        try await Task.sleep(for: .milliseconds(100))
+        call.cancel()
+        let result = await call.value as Result<LLMResponse, AIError>
+        guard case .failure(.cancelled) = result else { Issue.record("expected .cancelled, got \(result)"); return }
+        #expect(await !router.isHalted)
+    }
+
     private let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("x", dataClass: .publicContent)])
 
     /// FR-CORE-07 / M1 acceptance: the kill switch stops AI within 1 second, and is ledgered.

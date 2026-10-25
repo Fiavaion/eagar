@@ -322,6 +322,8 @@ public enum AIError: Error, Sendable, Equatable, LogSafe {
     case modelNotOffered
     /// The kill switch is engaged, or it cancelled this call (FR-CORE-07).
     case halted
+    /// The caller cancelled the request.
+    case cancelled
     case provider(ProviderFailure)
 
     public var logDescription: String {
@@ -331,6 +333,7 @@ public enum AIError: Error, Sendable, Equatable, LogSafe {
         case .ledgerWriteFailed: "ledgerWriteFailed"
         case .modelNotOffered: "modelNotOffered"
         case .halted: "halted"
+        case .cancelled: "cancelled"
         case let .provider(failure): "provider(\(failure.logDescription))"
         }
     }

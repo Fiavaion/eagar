@@ -2,6 +2,12 @@ import CloudKit
 import EagarCore
 import Foundation
 
+/// The declared kind of a synced field. Decoding uses it, because CloudKit stores booleans as
+/// integers and cannot tell an empty string list from an empty integer list.
+public enum SyncFieldKind: String, Sendable, Hashable, Codable {
+    case string, int, double, bool, date, data, strings, ints
+}
+
 /// A field value that can travel in a CloudKit record. Covers what Eagar's models use.
 public enum SyncValue: Sendable, Hashable, Codable {
     case string(String)
@@ -29,20 +35,23 @@ public enum SyncValue: Sendable, Hashable, Codable {
         }
     }
 
-    /// Reads a CloudKit value, using `hint` (the local field's current kind) to recover bools.
-    static func from(_ value: Any?, hint: SyncValue?) -> SyncValue {
-        switch value {
-        case nil: return .null
-        case let value as String: return .string(value)
-        case let value as Date: return .date(value)
-        case let value as Data: return .data(value)
-        case let value as [String]: return .strings(value)
-        case let value as [Int64]: return .ints(value)
-        case let value as NSNumber:
-            if case .bool = hint { return .bool(value.boolValue) }
-            if case .double = hint { return .double(value.doubleValue) }
-            if CFNumberIsFloatType(value) { return .double(value.doubleValue) }
-            return .int(value.int64Value)
+    /// Reads a CloudKit value as the declared `kind`. A missing list reads as an empty list (CloudKit
+    /// may return either), so an empty list never looks like a change. Anything that doesn't fit
+    /// the kind reads as `.null`.
+    static func from(_ value: Any?, kind: SyncFieldKind) -> SyncValue {
+        switch kind {
+        case .strings: return .strings((value as? [String]) ?? [])
+        case .ints: return .ints((value as? [Any])?.compactMap { ($0 as? NSNumber)?.int64Value } ?? [])
+        default: break
+        }
+        guard let value else { return .null }
+        switch (kind, value) {
+        case let (.string, value as String): return .string(value)
+        case let (.date, value as Date): return .date(value)
+        case let (.data, value as Data): return .data(value)
+        case let (.bool, value as NSNumber): return .bool(value.boolValue)
+        case let (.int, value as NSNumber): return .int(value.int64Value)
+        case let (.double, value as NSNumber): return .double(value.doubleValue)
         default: return .null
         }
     }
