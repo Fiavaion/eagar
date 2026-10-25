@@ -35,25 +35,16 @@ public struct BriefNotificationContent: Sendable, Hashable {
     }
 }
 
-/// Widget snapshot data (FR-BRIEF-06): counts for college items, titles only for others.
-public struct BriefWidgetSnapshot: Sendable, Hashable, Codable {
-    public struct Line: Sendable, Hashable, Codable {
-        /// `nil` for college lines, which show as a count instead.
-        public let title: String?
-        public let start: Date?
-    }
+/// Widget snapshot data (FR-BRIEF-06), shared with the widget extension through EagarCore.
+public typealias BriefWidgetSnapshot = WidgetSnapshot
 
-    public let generatedAt: Date
-    public let lines: [Line]
-    public let collegeCount: Int
-    public let nextDeadline: Date?
-
-    /// Builds the snapshot. College items never contribute a title.
-    public static func make(for brief: Brief, maxLines: Int = 4) -> BriefWidgetSnapshot {
+extension WidgetSnapshot {
+    /// Builds the snapshot. College items never contribute a title, only to `collegeCount`.
+    public static func make(for brief: Brief, maxLines: Int = 4) -> WidgetSnapshot {
         let items = brief.allItems
         let personal = items.filter { $0.dataClass != .college }
         let nextDeadline = items.filter { $0.kind == .deadline }.compactMap(\.start).min()
-        return BriefWidgetSnapshot(
+        return WidgetSnapshot(
             generatedAt: brief.generatedAt,
             lines: personal.prefix(maxLines).map { Line(title: $0.title, start: $0.start) },
             collegeCount: items.count - personal.count,

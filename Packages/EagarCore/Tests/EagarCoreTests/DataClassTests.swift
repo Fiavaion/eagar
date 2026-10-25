@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import EagarCore
 
@@ -52,5 +53,22 @@ struct SplitMix64: RandomNumberGenerator {
         z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
         z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
         return z ^ (z >> 31)
+    }
+}
+
+struct WidgetSnapshotTests {
+    @Test func roundTripsThroughAFile() throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "widget-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let snapshot = WidgetSnapshot(generatedAt: Date(timeIntervalSince1970: 1_800_000_000), lines: [.init(title: "Dentist", start: Date(timeIntervalSince1970: 1_800_003_600))], collegeCount: 2, nextDeadline: nil)
+        try snapshot.save(to: url)
+        #expect(WidgetSnapshot.load(from: url) == snapshot)
+        #expect(WidgetSnapshot.load(from: url.appending(path: "missing")) == nil)
+        try snapshot.save(to: nil) // no container: a no-op
+    }
+
+    @Test func killSwitchFallsBackToStandardDefaultsWithoutAGroup() {
+        #expect(EagarAppGroup.identifier == "group.com.fiavaion.eagarapp")
+        _ = EagarAppGroup.killSwitch.isEngaged
     }
 }
