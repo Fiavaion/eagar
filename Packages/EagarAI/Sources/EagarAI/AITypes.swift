@@ -109,7 +109,8 @@ public struct ClassifiedPayload: Sendable, Classified {
     public var sourceID: SourceID?
     public var kind: ContentKind
 
-    public init(_ text: String, dataClass: DataClass, sourceID: SourceID? = nil, kind: ContentKind = .derivedItem) {
+    /// `kind` defaults to `.rawBody`, the more restrictive kind; pass `.derivedItem` for minimised items.
+    public init(_ text: String, dataClass: DataClass, sourceID: SourceID? = nil, kind: ContentKind = .rawBody) {
         self.text = text
         self.dataClass = dataClass
         self.sourceID = sourceID
@@ -151,14 +152,19 @@ public enum Effort: String, Codable, Sendable {
 
 /// A JSON Schema for structured output. The same schema is used for Claude and for
 /// client-side validation of local models (PRD §7.4).
+///
+/// A schema is sent to the provider, so it is classified like any input and takes part in the
+/// taint rule: a schema whose enum values or descriptions were built from college data is college.
 public struct JSONSchema: Sendable, Equatable {
     public let name: String
     /// The schema document, UTF-8 JSON.
     public let json: Data
+    public let dataClass: DataClass
 
-    public init(name: String, json: Data) {
+    public init(name: String, json: Data, dataClass: DataClass) {
         self.name = name
         self.json = json
+        self.dataClass = dataClass
     }
 }
 
@@ -172,6 +178,9 @@ public struct AIRequest: Sendable {
     /// Ask for a specific tier. If policy forbids it the router refuses and ledgers a blocked
     /// attempt rather than silently choosing another tier.
     public var preferredTier: Tier?
+    /// When set with `preferredTier`, the router never falls back to another tier if the
+    /// preferred one is unreachable (e.g. the key test must reach Claude or fail).
+    public var requiresPreferredTier: Bool
     /// Override the default model for the chosen provider (e.g. Mark selects Opus).
     public var model: ModelID?
     public var maxOutputTokens: Int
@@ -183,6 +192,7 @@ public struct AIRequest: Sendable {
         system: ClassifiedPayload? = nil,
         outputSchema: JSONSchema? = nil,
         preferredTier: Tier? = nil,
+        requiresPreferredTier: Bool = false,
         model: ModelID? = nil,
         maxOutputTokens: Int = 1024,
         effort: Effort? = nil
@@ -192,14 +202,21 @@ public struct AIRequest: Sendable {
         self.system = system
         self.outputSchema = outputSchema
         self.preferredTier = preferredTier
+        self.requiresPreferredTier = requiresPreferredTier
         self.model = model
         self.maxOutputTokens = maxOutputTokens
         self.effort = effort
     }
 
-    /// Every classified piece of the request.
+    /// Every classified piece of the request: inputs, system prompt and output schema. All
+    /// of them reach the provider, so all of them take part in the taint rule and the policy.
     public var allPayloads: [ClassifiedPayload] {
-        inputs + (system.map { [$0] } ?? [])
+        var all = inputs
+        if let system { all.append(system) }
+        if let outputSchema {
+            all.append(ClassifiedPayload(String(decoding: outputSchema.json, as: UTF8.self), dataClass: outputSchema.dataClass))
+        }
+        return all
     }
 }
 
@@ -268,6 +285,8 @@ public enum BlockReason: String, Sendable, Codable, LogSafe {
 /// Provider failures, content-free.
 public enum ProviderFailure: Sendable, Equatable, LogSafe {
     case missingAPIKey
+    /// The Keychain could not be read.
+    case keychain(status: Int32)
     case http(status: Int)
     case network
     case timedOut
@@ -278,6 +297,7 @@ public enum ProviderFailure: Sendable, Equatable, LogSafe {
     public var logDescription: String {
         switch self {
         case .missingAPIKey: "missingAPIKey"
+        case let .keychain(status): "keychain(\(status))"
         case let .http(status): "http(\(status))"
         case .network: "network"
         case .timedOut: "timedOut"

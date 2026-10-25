@@ -202,7 +202,7 @@ struct AnthropicProviderTests {
 
 struct AnthropicEncodingTests {
     @Test func encodesMessagesSystemSchemaAndEffortDeterministically() throws {
-        let schema = JSONSchema(name: "Brief", json: Data(#"{"type":"object","additionalProperties":false,"properties":{"line":{"type":"string"}},"required":["line"]}"#.utf8))
+        let schema = JSONSchema(name: "Brief", json: Data(#"{"type":"object","additionalProperties":false,"properties":{"line":{"type":"string"}},"required":["line"]}"#.utf8), dataClass: .publicContent)
         let request = AIRequest(
             purpose: .briefPhrase,
             inputs: [ClassifiedPayload("one", dataClass: .publicContent), ClassifiedPayload("two", dataClass: .publicContent)],

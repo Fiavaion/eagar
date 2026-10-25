@@ -20,12 +20,14 @@ public enum KeyTester {
             purpose: .keyTest,
             inputs: [ClassifiedPayload(prompt, dataClass: .publicContent)],
             preferredTier: .anthropicCloud,
+            requiresPreferredTier: true,
             model: model,
             maxOutputTokens: 64,
             effort: .low
         )
         do {
             let response = try await router.run(request)
+            guard response.tier == .anthropicCloud else { return .failed(.provider(.misconfigured)) }
             return .valid(model: response.model, costMicroUSD: response.costMicroUSD)
         } catch .provider(.http(status: 401)), .provider(.http(status: 403)) {
             return .invalidKey

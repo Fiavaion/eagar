@@ -74,7 +74,11 @@ public struct Keychain: SecretStore {
 
     public func set(_ secret: Secret, for key: SecretKey) throws(SecurityError) {
         let data = Data(secret.reveal().utf8)
-        let status = backend.update(identity(key), [kSecValueData as String: data])
+        // Re-assert accessibility on update so an older item can never keep weaker attributes.
+        let status = backend.update(identity(key), [
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+        ])
         switch status {
         case errSecSuccess:
             return

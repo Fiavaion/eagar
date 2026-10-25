@@ -48,7 +48,13 @@ public struct AnthropicProvider: LLMProvider {
 
     /// Reachable when a key is stored; network reachability shows up as a call failure.
     public func reachability() async -> Reachability {
-        (try? secrets.get(.anthropicAPIKey)).flatMap { $0 }.map { $0.isEmpty ? .unreachable : .reachable } ?? .unreachable
+        do {
+            guard let key = try secrets.get(.anthropicAPIKey), !key.isEmpty else { return .unreachable }
+            return .reachable
+        } catch {
+            log.error("Claude key unreadable: \(error)")
+            return .unreachable
+        }
     }
 
     public func encodeRequest(_ request: AIRequest, model: ModelID) throws(AIError) -> Data? {
@@ -90,13 +96,15 @@ public struct AnthropicProvider: LLMProvider {
             log.fault("refused a routed call that violates the Claude preconditions")
             throw .provider(.misconfigured)
         }
-        let key: Secret
+        let stored: Secret?
         do {
-            guard let stored = try secrets.get(.anthropicAPIKey), !stored.isEmpty else { throw AIError.provider(.missingAPIKey) }
-            key = stored
+            stored = try secrets.get(.anthropicAPIKey)
+        } catch let .keychain(status) {
+            throw .provider(.keychain(status: status))
         } catch {
-            throw .provider(.missingAPIKey)
+            throw .provider(.keychain(status: 0))
         }
+        guard let key = stored, !key.isEmpty else { throw .provider(.missingAPIKey) }
 
         var urlRequest = URLRequest(url: Self.endpoint, timeoutInterval: 60)
         urlRequest.httpMethod = "POST"
@@ -130,7 +138,11 @@ public struct AnthropicProvider: LLMProvider {
                 throw .provider(failure)
             }
             log.notice("Claude request failed (\(failure)); retry \(attempt + 1)")
-            try? await Task.sleep(for: retryAfter ?? retryDelays[attempt])
+            do {
+                try await Task.sleep(for: retryAfter ?? retryDelays[attempt])
+            } catch {
+                throw .provider(.network) // cancelled while waiting to retry
+            }
             attempt += 1
         }
     }
@@ -139,7 +151,7 @@ public struct AnthropicProvider: LLMProvider {
         switch failure {
         case let .http(status): status == 429 || status >= 500
         case .network, .timedOut: true
-        case .missingAPIKey, .decoding, .unavailable, .misconfigured: false
+        case .missingAPIKey, .keychain, .decoding, .unavailable, .misconfigured: false
         }
     }
 

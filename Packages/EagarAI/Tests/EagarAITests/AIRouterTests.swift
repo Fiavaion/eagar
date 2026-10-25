@@ -80,6 +80,7 @@ struct AIRouterTests {
     /// B-14 (router): a rulesOnly source makes zero provider calls, even with consent and a preference.
     @Test(arguments: [nil, Tier.onDevice, .anthropicCloud])
     func Boundary_B14_rulesOnlySourceMakesNoCalls(preferred: Tier?) async throws {
+        let expected: AIError = preferred.map { .boundaryViolation(requested: $0, reason: .rulesOnlySource) } ?? .noPermittedProvider
         let providers = RecordingProvider.oneOfEach()
         let ledger = InMemoryLedger()
         let source = SourceID()
@@ -92,9 +93,46 @@ struct AIRouterTests {
             inputs: [ClassifiedPayload("subject line", dataClass: .personal, sourceID: source)],
             preferredTier: preferred
         )
-        await #expect(throws: AIError.self) { try await router.run(request) }
+        await #expect(throws: expected) { try await router.run(request) }
         #expect(providers.allSatisfy { $0.recordedCalls.isEmpty })
-        #expect(ledger.entries.allSatisfy { $0.draft.kind == .blocked })
+        #expect(ledger.entries.count == (preferred == nil ? 0 : 1))
+        #expect(ledger.entries.allSatisfy { $0.draft.kind == .blocked && $0.draft.detail == "rulesOnlySource" })
+    }
+
+    /// The output schema reaches the provider, so it takes part in the taint rule (verify finding).
+    @Test func Boundary_B1_collegeTextInOutputSchemaNeverReachesCloud() async throws {
+        let providers = RecordingProvider.oneOfEach()
+        let ledger = InMemoryLedger()
+        let router = makeRouter(providers, ledger: ledger)
+        let schema = JSONSchema(
+            name: "Pick",
+            json: Data(#"{"type":"string","enum":["COLLEGE-ONLY-VALUE"]}"#.utf8),
+            dataClass: .college
+        )
+        let request = AIRequest(
+            purpose: .extraction,
+            inputs: [ClassifiedPayload("public", dataClass: .publicContent)],
+            outputSchema: schema,
+            preferredTier: .anthropicCloud
+        )
+        await #expect(throws: AIError.boundaryViolation(requested: .anthropicCloud, reason: .collegeBoundary)) {
+            try await router.run(request)
+        }
+        #expect(providers.allSatisfy { $0.recordedCalls.isEmpty })
+        #expect(ledger.entries.first?.draft.payloadClasses.contains(.college) == true)
+    }
+
+    /// The key test must reach Claude or fail; it never falls back to a local tier (verify finding).
+    @Test func keyTestNeverFallsBack() async throws {
+        let onDevice = RecordingProvider(.onDevice)
+        let claude = RecordingProvider(.anthropicCloud(region: "global"), reachable: false)
+        let outcome = await KeyTester.run(using: makeRouter([onDevice, claude]))
+        #expect(outcome == .noKey)
+        #expect(onDevice.recordedCalls.isEmpty)
+    }
+
+    @Test func rawBodyIsTheDefaultKind() {
+        #expect(ClassifiedPayload("x", dataClass: .personal).kind == .rawBody)
     }
 
     @Test func unknownSourceFailsClosed() async throws {

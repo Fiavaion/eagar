@@ -123,6 +123,15 @@ struct PrivacyLedgerTests {
         #expect(remaining.first?.detail == "2")
     }
 
+    @Test func earlierErasuresSurviveLaterErasures() async throws {
+        let ledger = try makeLedger()
+        _ = try await ledger.record(LedgerDraft(kind: .modelCall, purpose: "x", payloadClasses: [.personal], tier: .onDevice))
+        #expect(try await ledger.erase(before: .distantFuture, reason: "first") == 1)
+        #expect(try await ledger.erase(before: .distantFuture, reason: "second") == 0)
+        let kinds = try await ledger.records().map(\.kind)
+        #expect(kinds == [.erase, .erase])
+    }
+
     @Test func exportOmitsPayloadsWhenAsked() async throws {
         let ledger = try makeLedger()
         _ = try await ledger.record(LedgerDraft(

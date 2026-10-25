@@ -47,7 +47,8 @@ public actor AIRouter {
             throw .boundaryViolation(requested: requested, reason: reason)
         }
 
-        guard let (provider, capabilities) = await choose(from: allowed, preferred: request.preferredTier) else {
+        let candidates = request.requiresPreferredTier ? allowed.intersection(request.preferredTier.map { [$0] } ?? []) : allowed
+        guard let (provider, capabilities) = await choose(from: candidates, preferred: request.preferredTier) else {
             log.notice("no permitted provider for \(request.purpose) (\(effectiveClass), \(allowed.count) tiers allowed)")
             throw .noPermittedProvider
         }

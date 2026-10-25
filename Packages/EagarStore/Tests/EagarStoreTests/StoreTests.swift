@@ -83,6 +83,20 @@ struct StoreTests {
         #expect(try await count(stores.personal) == 0)
     }
 
+    /// A throwing `perform` body leaves nothing pending that could poison the next save (verify finding).
+    @Test func throwingPerformRollsBack() async throws {
+        struct Abort: Error {}
+        let stores = try EagarStores(location: .inMemory, models: [TestNote.self])
+        await #expect(throws: Abort.self) {
+            try await stores.personal.perform { context in
+                context.insert(TestNote(.college))
+                throw Abort()
+            }
+        }
+        try await stores.personal.insert(TestNote(.personal))
+        #expect(try await count(stores.personal) == 1)
+    }
+
     @Test func unknownRawClassIsTreatedAsCollege() {
         let note = TestNote(.personal)
         note.dataClassRaw = "somethingNew"

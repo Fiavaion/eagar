@@ -105,8 +105,10 @@ public final class PrivacyLedger: PrivacyLedgerWriting {
 
     // MARK: Erasure
 
-    /// Deletes entries older than `cutoff` after device-owner authentication, then records the
-    /// erasure itself (FR-PRIV-08). This is the only way entries are ever removed.
+    /// Deletes entries older than `cutoff` after device-owner authentication (FR-PRIV-08). This
+    /// is the only way entries are ever removed. The erasure is ledgered **before** anything is
+    /// deleted, so an interrupted erase can over-report but never go unrecorded, and earlier
+    /// erase entries are kept so the history of erasures cannot itself be erased.
     public func erase(before cutoff: Date, reason: String) async throws(LedgerError) -> Int {
         do {
             _ = try await authenticator.authenticate(reason: reason)
@@ -114,19 +116,30 @@ public final class PrivacyLedger: PrivacyLedgerWriting {
             log.notice("ledger erase refused: \(error)")
             throw .authenticationFailed
         }
+        let eraseKind = LedgerEventKind.erase.rawValue
+        let toErase = #Predicate<LedgerEntry> { $0.at < cutoff && $0.kindRaw != eraseKind }
+        var count = 0
+        for store in [stores.personal, stores.college] {
+            do {
+                count += try await store.fetch(FetchDescriptor<LedgerEntry>(predicate: toErase)) { _ in 1 }.count
+            } catch {
+                throw .readFailed
+            }
+        }
+        _ = try await record(LedgerDraft(kind: .erase, purpose: "ledgerErase", payloadClasses: [], detail: count))
         var removed = 0
         for store in [stores.personal, stores.college] {
             do {
                 removed += try await store.perform { context in
-                    let old = try context.fetch(FetchDescriptor<LedgerEntry>(predicate: #Predicate { $0.at < cutoff }))
+                    let old = try context.fetch(FetchDescriptor<LedgerEntry>(predicate: toErase))
                     old.forEach(context.delete)
                     return old.count
                 }
             } catch {
+                log.error("ledger erase interrupted after \(removed) of \(count) entries")
                 throw .writeFailed
             }
         }
-        _ = try await record(LedgerDraft(kind: .erase, purpose: "ledgerErase", payloadClasses: [], detail: removed))
         log.notice("ledger erased \(removed) entries")
         return removed
     }

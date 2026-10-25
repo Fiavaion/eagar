@@ -34,7 +34,13 @@ public actor ClassifiedStore: ModelActor {
     /// Runs `body` against this store's context, then saves with the class check.
     /// Pending changes are rolled back if the check or the save fails.
     public func perform<R: Sendable>(_ body: (ModelContext) throws -> R) throws -> R {
-        let result = try body(modelContext)
+        let result: R
+        do {
+            result = try body(modelContext)
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
         try save()
         return result
     }
