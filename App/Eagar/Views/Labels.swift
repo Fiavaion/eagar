@@ -1,3 +1,4 @@
+import EagarBrief
 import EagarCore
 import EagarLedger
 import SwiftUI
@@ -69,6 +70,85 @@ enum LedgerLabels {
         case .failed: "Failed"
         case .blocked: "Blocked"
         case .notApplicable: "Recorded"
+        }
+    }
+}
+
+/// The boundary badge for college items (BD-04, NFR-A11Y-01): a house for "stays on your
+/// devices" plus text, so colour is never the only signal.
+struct BoundaryBadge: View {
+    var body: some View {
+        Label {
+            Text("College")
+        } icon: {
+            Image(systemName: "house.fill")
+        }
+        .font(.caption)
+        .labelStyle(.titleAndIcon)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .overlay(Capsule().strokeBorder(.secondary))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("College, stays on your devices"))
+        .accessibilityIdentifier("badge.college")
+    }
+}
+
+enum BriefLabels {
+    static func section(_ kind: BriefSectionKind) -> LocalizedStringResource {
+        switch kind {
+        case .overdue: "Overdue"
+        case .today: "Today"
+        case .deadlines: "Coming up"
+        case .loans: "Loans due"
+        case .trials: "Trials about to bill"
+        case .mail: "Mail"
+        case .approvals: "Waiting for approval"
+        case .waiting: "Waiting on others"
+        case .keepInTouch: "Keep in touch"
+        case .media: "Listening and watching"
+        }
+    }
+
+    static func slot(_ kind: BriefSlot.Kind) -> LocalizedStringResource {
+        switch kind {
+        case .morning: "Morning brief"
+        case .midday: "Midday brief"
+        case .endOfDay: "End-of-day brief"
+        }
+    }
+
+    static func phrasing(_ mode: BriefPhrasingMode) -> LocalizedStringResource {
+        switch mode {
+        case .off: "Off"
+        case .localOnly: "On your devices only"
+        case .claudeForPersonal: "Claude for personal items"
+        }
+    }
+
+    static func state(_ action: BriefAction) -> LocalizedStringResource {
+        switch action {
+        case .open: "Opened"
+        case .done: "Done"
+        case .snooze: "Snoozed"
+        case .reschedule: "Rescheduled"
+        case .dismiss: "Dismissed"
+        }
+    }
+
+    /// Reminder offsets offered for deadlines, in minutes before the due time.
+    static let offsetChoices = [0, 15, 60, 120, 1440, 2880, 10080]
+
+    static func offset(_ minutes: Int) -> LocalizedStringResource {
+        switch minutes {
+        case 0: "At the due time"
+        case 15: "15 minutes before"
+        case 60: "1 hour before"
+        case 120: "2 hours before"
+        case 1440: "1 day before"
+        case 2880: "2 days before"
+        case 10080: "1 week before"
+        default: "\(minutes) minutes before"
         }
     }
 }

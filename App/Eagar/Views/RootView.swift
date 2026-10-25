@@ -1,27 +1,51 @@
 import SwiftUI
 
 enum RootTab: String, Hashable {
-    case key, ledger, spending
+    case today, deadlines, settings, key, ledger, spending
 }
 
 struct RootView: View {
     let model: AppModel
     /// `-EagarInitialTab ledger` opens a given tab (UI tests, screenshots).
-    @State private var tab = UserDefaults.standard.string(forKey: "EagarInitialTab").flatMap(RootTab.init(rawValue:)) ?? .key
+    @State private var tab = UserDefaults.standard.string(forKey: "EagarInitialTab").flatMap(RootTab.init(rawValue:)) ?? .today
+    /// First run (FR-CORE-05). `-EagarSkipOnboarding YES` skips it for UI tests.
+    @State private var showingOnboarding = !UserDefaults.standard.bool(forKey: OnboardingView.completedKey)
+        && !UserDefaults.standard.bool(forKey: "EagarSkipOnboarding")
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
+        let planner = model.planner
         TabView(selection: $tab) {
-            Tab("Claude key", systemImage: "key", value: RootTab.key) {
-                NavigationStack { KeySetupView(model: model) }
+            Tab("Today", systemImage: "sun.max", value: RootTab.today) {
+                NavigationStack { TodayView(planner: planner) }
+            }
+            Tab("Deadlines", systemImage: "flag", value: RootTab.deadlines) {
+                NavigationStack { DeadlinesView(planner: planner) }
+            }
+            Tab("Settings", systemImage: "gearshape", value: RootTab.settings) {
+                NavigationStack { SettingsView(planner: planner) }
             }
             Tab("Privacy ledger", systemImage: "list.bullet.rectangle", value: RootTab.ledger) {
                 NavigationStack { LedgerView(model: model) }
+            }
+            Tab("Claude key", systemImage: "key", value: RootTab.key) {
+                NavigationStack { KeySetupView(model: model) }
             }
             Tab("Spending", systemImage: "chart.bar", value: RootTab.spending) {
                 NavigationStack { SpendView(model: model) }
             }
         }
-        .task { await model.refreshLedger() }
+        .task {
+            await model.refreshLedger()
+            await planner.appBecameActive()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Scene activation is the app-open breakpoint (FR-BRIEF-02).
+            if phase == .active { Task { await planner.appBecameActive() } }
+        }
+        .sheet(isPresented: $showingOnboarding, onDismiss: completeOnboarding) {
+            OnboardingView(planner: planner) { showingOnboarding = false }
+        }
         .alert(
             "Something went wrong",
             isPresented: Binding(get: { model.failure != nil }, set: { if !$0 { model.failure = nil } }),
@@ -31,5 +55,18 @@ struct RootView: View {
         } message: { failure in
             Text(failure.message)
         }
+        .alert(
+            "Something went wrong",
+            isPresented: Binding(get: { planner.failure != nil }, set: { if !$0 { planner.failure = nil } }),
+            presenting: planner.failure
+        ) { _ in
+            Button("OK", role: .cancel) {}
+        } message: { failure in
+            Text(failure.message)
+        }
+    }
+
+    private func completeOnboarding() {
+        UserDefaults.standard.set(true, forKey: OnboardingView.completedKey)
     }
 }

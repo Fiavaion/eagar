@@ -1,0 +1,249 @@
+import EagarCalendar
+import EagarCore
+import SwiftUI
+
+/// Deadlines, overdue first (FR-DL-01..04).
+struct DeadlinesView: View {
+    let planner: PlannerModel
+    @State private var editing: DeadlineDraft?
+    @State private var rescheduling: DeadlineRow?
+
+    var body: some View {
+        List {
+            if planner.deadlines.isEmpty {
+                ContentUnavailableView {
+                    Label("No deadlines", systemImage: "flag")
+                } description: {
+                    Text("Add a deadline and Eagar reminds you before it is due.")
+                } actions: {
+                    Button("Add deadline") { editing = planner.newDeadlineDraft() }
+                }
+            }
+            rows(planner.overdueDeadlines, header: "Overdue")
+            rows(planner.upcomingDeadlines, header: "Upcoming")
+            rows(Array(planner.completedDeadlines.prefix(20)), header: "Done")
+        }
+        .navigationTitle(Text("Deadlines"))
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    editing = planner.newDeadlineDraft()
+                } label: {
+                    Label("Add deadline", systemImage: "plus")
+                }
+                .accessibilityIdentifier("deadlines.add")
+            }
+        }
+        .sheet(item: $editing) { DeadlineEditor(planner: planner, draft: $0) }
+        .sheet(item: $rescheduling) { row in
+            RescheduleSheet(initial: row.snapshot.dueAt) { date in
+                Task { await planner.reschedule(row.id, to: date) }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func rows(_ rows: [DeadlineRow], header: LocalizedStringKey) -> some View {
+        if !rows.isEmpty {
+            Section {
+                ForEach(rows) { row in
+                    DeadlineRowView(
+                        planner: planner, row: row,
+                        onEdit: { editing = DeadlineDraft(row) },
+                        onReschedule: { rescheduling = row }
+                    )
+                }
+            } header: {
+                Text(header)
+            }
+        }
+    }
+}
+
+/// A deadline with its actions. Swipe actions have button equivalents in the row's menu.
+private struct DeadlineRowView: View {
+    let planner: PlannerModel
+    let row: DeadlineRow
+    let onEdit: () -> Void
+    let onReschedule: () -> Void
+
+    private var snapshot: DeadlineSnapshot { row.snapshot }
+    private var isOpen: Bool { snapshot.status == .open }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            Button(action: onEdit) {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(snapshot.title)
+                            .strikethrough(!isOpen)
+                        if snapshot.dataClass == .college { BoundaryBadge() }
+                    }
+                    Group {
+                        if snapshot.isAllDay {
+                            Text("Due \(snapshot.dueAt, format: .dateTime.weekday(.wide).day().month())")
+                        } else {
+                            Text("Due \(snapshot.dueAt, format: .dateTime.weekday(.wide).day().month().hour().minute())")
+                        }
+                        if let snoozed = snapshot.snoozedUntil, snoozed > Date(), isOpen {
+                            Text("Snoozed until \(snoozed, format: .dateTime.weekday().hour().minute())")
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("Edit deadline"))
+
+            if isOpen {
+                Button {
+                    Task { await planner.markDone(row.id) }
+                } label: {
+                    Image(systemName: "checkmark.circle").frame(minWidth: 44, minHeight: 44)
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(Text("Mark \(snapshot.title) done"))
+            }
+            Menu {
+                if isOpen {
+                    Button("Snooze for 1 hour") { Task { await planner.snooze(row.id, until: planner.snoozeInAnHour) } }
+                    Button("Snooze until tomorrow at 09:00") { Task { await planner.snooze(row.id, until: planner.snoozeTomorrowMorning) } }
+                    Button("Reschedule", action: onReschedule)
+                }
+                Button("Edit", action: onEdit)
+                Button("Delete", role: .destructive) { Task { await planner.delete(row.id) } }
+            } label: {
+                Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
+            }
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityLabel(Text("More actions for \(snapshot.title)"))
+        }
+        .swipeActions(edge: .leading) {
+            if isOpen {
+                Button("Done") { Task { await planner.markDone(row.id) } }
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            Button("Delete", role: .destructive) { Task { await planner.delete(row.id) } }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("deadline.row")
+    }
+}
+
+/// Add or edit a deadline (FR-DL-01, 02, 03).
+struct DeadlineEditor: View {
+    let planner: PlannerModel
+    @State private var draft: DeadlineDraft
+    @State private var confirmingDelete = false
+    @Environment(\.dismiss) private var dismiss
+
+    init(planner: PlannerModel, draft: DeadlineDraft) {
+        self.planner = planner
+        _draft = State(initialValue: draft)
+    }
+
+    private var isNew: Bool { draft.id == nil }
+    private var eligibleLists: [CalendarInfo] { planner.eligibleReminderLists(for: draft) }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Title", text: $draft.title)
+                        .accessibilityIdentifier("deadline.title")
+                    Toggle("All day", isOn: $draft.isAllDay)
+                    DatePicker("Due", selection: $draft.dueAt, displayedComponents: draft.isAllDay ? [.date] : [.date, .hourAndMinute])
+                }
+                Section {
+                    Picker("Data class", selection: $draft.dataClass) {
+                        Text("Personal").tag(DataClass.personal)
+                        Text("College").tag(DataClass.college)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Data class")
+                } footer: {
+                    if draft.dataClass == .college {
+                        Text("College deadlines stay on your devices. Their notifications say \"College deadline\" without the title.")
+                    } else {
+                        Text("Notifications for personal deadlines show the title.")
+                    }
+                }
+                Section {
+                    ForEach(BriefLabels.offsetChoices, id: \.self) { minutes in
+                        Toggle(isOn: Binding(
+                            get: { draft.offsetsMinutes.contains(minutes) },
+                            set: { on in
+                                if on { draft.offsetsMinutes.insert(minutes) } else { draft.offsetsMinutes.remove(minutes) }
+                            }
+                        )) {
+                            Text(BriefLabels.offset(minutes))
+                        }
+                    }
+                } header: {
+                    Text("Remind me")
+                }
+                if !planner.reminderLists.isEmpty {
+                    Section {
+                        Picker("Mirror to Reminders", selection: $draft.mirrorListID) {
+                            Text("Don't mirror").tag(String?.none)
+                            ForEach(eligibleLists) { list in
+                                Text(verbatim: list.title).tag(Optional(list.id))
+                            }
+                        }
+                        if draft.dataClass == .college {
+                            Toggle("Allow iCloud Reminders for this deadline", isOn: $draft.mirrorOverride)
+                        }
+                    } header: {
+                        Text("Reminders")
+                    } footer: {
+                        if draft.dataClass == .college {
+                            Text("College deadlines mirror only to lists tagged college or kept on this device, unless you allow iCloud for this one.")
+                        }
+                    }
+                }
+                if !isNew {
+                    Section {
+                        Button("Delete deadline", role: .destructive) { confirmingDelete = true }
+                    }
+                }
+            }
+            .navigationTitle(isNew ? Text("New deadline") : Text("Edit deadline"))
+            .onChange(of: eligibleLists) {
+                if let id = draft.mirrorListID, !eligibleLists.contains(where: { $0.id == id }) { draft.mirrorListID = nil }
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        Task {
+                            if await planner.save(draft) { dismiss() }
+                        }
+                    }
+                    .disabled(draft.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("deadline.save")
+                }
+            }
+            .confirmationDialog("Delete this deadline?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                Button("Delete", role: .destructive) {
+                    if let id = draft.id {
+                        Task {
+                            await planner.delete(id)
+                            dismiss()
+                        }
+                    }
+                }
+            }
+        }
+        #if os(macOS)
+        .frame(minWidth: 420, minHeight: 520)
+        #endif
+    }
+}

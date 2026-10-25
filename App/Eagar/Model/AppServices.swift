@@ -1,8 +1,10 @@
 import EagarAI
+import EagarCalendar
 import EagarCore
 import EagarLedger
 import EagarSecurity
 import EagarStore
+import EagarSuggest
 import Foundation
 import SwiftData
 import Synchronization
@@ -16,11 +18,25 @@ struct AppServices: Sendable {
     let secrets: any SecretStore
     let catalog: ModelCatalog
     let policy: AppPolicySource
+    /// EventKit, or the synthetic ``DemoEventStore`` under `-EagarFakeCalendar YES`.
+    let eventStore: any EventStoreAdapting
+    let calendarTags: CalendarTagStore
+    let eventLog: EventLog
+    let deadlineNotifications: any NotificationScheduling
+    let briefNotifications: any BriefNotificationScheduling
 
     /// Every SwiftData model in the app. Both stores share one schema; placement is per record.
-    static var models: [any PersistentModel.Type] { [LedgerEntry.self, ConsentRecord.self] }
+    static var models: [any PersistentModel.Type] {
+        [LedgerEntry.self, ConsentRecord.self, CalendarRef.self, Deadline.self, EventLogEntry.self]
+    }
 
-    static func make(inMemory: Bool, secrets: any SecretStore = Keychain()) throws -> AppServices {
+    static func make(
+        inMemory: Bool,
+        secrets: any SecretStore = Keychain(),
+        eventStore: any EventStoreAdapting = EventKitAdapter(),
+        deadlineNotifications: any NotificationScheduling = UserNotificationScheduler(),
+        briefNotifications: any BriefNotificationScheduling = UserBriefNotificationScheduler()
+    ) throws -> AppServices {
         let location: StoreLocation = inMemory
             ? .inMemory
             : .directory(URL.applicationSupportDirectory.appending(path: "Eagar", directoryHint: .isDirectory))
@@ -37,7 +53,9 @@ struct AppServices: Sendable {
         )
         return AppServices(
             stores: stores, ledger: ledger, consents: consents, router: router,
-            secrets: secrets, catalog: catalog, policy: policy
+            secrets: secrets, catalog: catalog, policy: policy,
+            eventStore: eventStore, calendarTags: CalendarTagStore(stores: stores), eventLog: EventLog(stores: stores),
+            deadlineNotifications: deadlineNotifications, briefNotifications: briefNotifications
         )
     }
 }

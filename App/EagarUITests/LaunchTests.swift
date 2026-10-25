@@ -1,8 +1,9 @@
 import XCTest
 
+@MainActor
 private func launch(_ arguments: [String] = []) -> XCUIApplication {
     let app = XCUIApplication()
-    app.launchArguments += ["-EagarInMemoryStores", "YES", "-AppleLanguages", "(en-GB)"] + arguments
+    app.launchArguments += ["-EagarInMemoryStores", "YES", "-EagarSkipOnboarding", "YES", "-AppleLanguages", "(en-GB)"] + arguments
     app.launch()
     return app
 }
@@ -23,7 +24,7 @@ private func expectSummary(in app: XCUIApplication) {
 final class LaunchTests: XCTestCase {
     @MainActor
     func testLaunchShowsKeySetup() throws {
-        let app = launch()
+        let app = launch(["-EagarInitialTab", "key"])
         XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
     }
 
@@ -37,10 +38,43 @@ final class LaunchTests: XCTestCase {
     /// active, so clicks on toolbar tabs do not switch them (it works on a real Mac).
     @MainActor
     func testTappingLedgerTabShowsSummary() throws {
-        let app = launch()
+        let app = launch(["-EagarInitialTab", "key"])
         XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
         app.buttons["Privacy ledger"].firstMatch.tap()
         expectSummary(in: app)
+    }
+    #endif
+
+    /// Today is the default tab: the brief shows the fake calendar's items, with the boundary
+    /// badge on college items (FR-BRIEF-01, BD-04).
+    @MainActor
+    func testTodayShowsBriefAndCollegeBadge() throws {
+        let app = launch(["-EagarFakeCalendar", "YES"])
+        let item = app.descendants(matching: .any).matching(identifier: "brief.item").firstMatch
+        guard item.waitForExistence(timeout: 15) else {
+            XCTFail("no brief item; element tree:\n\(app.debugDescription)")
+            return
+        }
+        let badge = app.descendants(matching: .any).matching(identifier: "badge.college").firstMatch
+        XCTAssertTrue(badge.waitForExistence(timeout: 5))
+        XCTAssertEqual(badge.label, "College, stays on your devices")
+    }
+
+    #if os(iOS)
+    /// The first-run flow appears without `-EagarSkipOnboarding` and can be skipped (FR-CORE-05).
+    /// iOS only, like the tab test above: clicks are unreliable on the macOS 27 CI runner.
+    @MainActor
+    func testFirstRunFlowCanBeSkipped() throws {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-EagarInMemoryStores", "YES", "-EagarFakeCalendar", "YES", "-AppleLanguages", "(en-GB)",
+            "-onboarding.completed", "NO",
+        ]
+        app.launch()
+        let skip = app.descendants(matching: .any)["onboarding.skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 15))
+        skip.firstMatch.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "brief.item").firstMatch.waitForExistence(timeout: 15))
     }
     #endif
 }
@@ -50,7 +84,10 @@ final class IrishPseudoLocaleTests: XCTestCase {
     @MainActor
     func testIrishPseudoLocaleLoads() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-EagarInMemoryStores", "YES", "-AppleLanguages", "(ga)", "-AppleLocale", "ga_IE"]
+        app.launchArguments += [
+            "-EagarInMemoryStores", "YES", "-EagarSkipOnboarding", "YES", "-EagarInitialTab", "key",
+            "-AppleLanguages", "(ga)", "-AppleLocale", "ga_IE",
+        ]
         app.launch()
         // The first line is always on screen; longer pseudo strings push later rows out of the lazy Form.
         let intro = app.descendants(matching: .any)["key.intro"]

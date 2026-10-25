@@ -1,12 +1,232 @@
 {
   "sourceLanguage": "en-GB",
   "strings": {
+    "%lld minutes before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%lld míñútés béfóré ········]"
+          }
+        }
+      }
+    },
+    "1 day before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[1 dáý béfóré ·····]"
+          }
+        }
+      }
+    },
+    "1 hour before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[1 hóúr béfóré ·····]"
+          }
+        }
+      }
+    },
+    "1 week before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[1 wéék béfóré ·····]"
+          }
+        }
+      }
+    },
+    "1. Open the Settings app.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[1. Ópéñ thé Séttíñgs ápp. ··········]"
+          }
+        }
+      }
+    },
+    "15 minutes before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[15 míñútés béfóré ·······]"
+          }
+        }
+      }
+    },
+    "2 days before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[2 dáýs béfóré ·····]"
+          }
+        }
+      }
+    },
+    "2 hours before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[2 hóúrs béfóré ······]"
+          }
+        }
+      }
+    },
+    "2. Choose Apps, then Calendar, then Calendar Accounts.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[2. Çhóósé Ápps, théñ Çáléñdár, théñ Çáléñdár Áççóúñts. ······················]"
+          }
+        }
+      }
+    },
+    "3. Choose Add Account, then Google, and sign in with your NCAD address.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[3. Çhóósé Ádd Áççóúñt, théñ Góóglé, áñd sígñ íñ wíth ýóúr ÑÇÁD áddréss. ····························]"
+          }
+        }
+      }
+    },
+    "4. Turn on Calendars for that account, then come back to Eagar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[4. Túrñ óñ Çáléñdárs fór thát áççóúñt, théñ çómé báçk tó Éágár. ·························]"
+          }
+        }
+      }
+    },
+    "A college deadline can only be mirrored to a college or local reminder list.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á çóllégé déádlíñé çáñ óñlý bé mírróréd tó á çóllégé ór lóçál rémíñdér líst. ······························]"
+          }
+        }
+      }
+    },
+    "A short summary is written on this device or your Mac. Nothing is sent anywhere.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á shórt súmmárý ís wríttéñ óñ thís dévíçé ór ýóúr Máç. Ñóthíñg ís séñt áñýwhéré. ································]"
+          }
+        }
+      }
+    },
+    "AI phrasing": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ phrásíñg ····]"
+          }
+        }
+      }
+    },
+    "AI summary": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ súmmárý ····]"
+          }
+        }
+      }
+    },
+    "Add a deadline and Eagar reminds you before it is due.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd á déádlíñé áñd Éágár rémíñds ýóú béfóré ít ís dúé. ······················]"
+          }
+        }
+      }
+    },
+    "Add deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd déádlíñé ·····]"
+          }
+        }
+      }
+    },
     "All": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Áll ··]"
+          }
+        }
+      }
+    },
+    "All day": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áll dáý ···]"
+          }
+        }
+      }
+    },
+    "Allow brief and deadline notifications": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Állów bríéf áñd déádlíñé ñótífíçátíóñs ···············]"
+          }
+        }
+      }
+    },
+    "Allow calendar access": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Állów çáléñdár áççéss ········]"
+          }
+        }
+      }
+    },
+    "Allow iCloud Reminders for this deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Állów íÇlóúd Rémíñdérs fór thís déádlíñé ················]"
+          }
+        }
+      }
+    },
+    "Always first": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Álwáýs fírst ·····]"
           }
         }
       }
@@ -21,12 +241,32 @@
         }
       }
     },
+    "Apple offers only full access, so Eagar asks for it. Events from calendars you tag as college stay on your devices.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ápplé ófférs óñlý fúll áççéss, só Éágár ásks fór ít. Évéñts fróm çáléñdárs ýóú tág ás çóllégé stáý óñ ýóúr dévíçés. ··············································]"
+          }
+        }
+      }
+    },
     "Approved profile": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Áppróvéd prófílé ······]"
+          }
+        }
+      }
+    },
+    "At the due time": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Át thé dúé tímé ······]"
           }
         }
       }
@@ -81,12 +321,72 @@
         }
       }
     },
+    "Brief times": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bríéf tímés ····]"
+          }
+        }
+      }
+    },
     "Calculated from the token counts Claude reports and the price table below.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çálçúlátéd fróm thé tókéñ çóúñts Çláúdé répórts áñd thé príçé táblé bélów. ······························]"
+          }
+        }
+      }
+    },
+    "Calendar": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdár ···]"
+          }
+        }
+      }
+    },
+    "Calendar access": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdár áççéss ······]"
+          }
+        }
+      }
+    },
+    "Calendar access is turned off. To turn it on, open the Settings app, choose Apps, then Eagar, and allow full access to Calendars and Reminders.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdár áççéss ís túrñéd óff. Tó túrñ ít óñ, ópéñ thé Séttíñgs ápp, çhóósé Ápps, théñ Éágár, áñd állów fúll áççéss tó Çáléñdárs áñd Rémíñdérs. ·························································]"
+          }
+        }
+      }
+    },
+    "Calendars": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdárs ····]"
+          }
+        }
+      }
+    },
+    "Calendars on an ncad.ie account are proposed as college. College events stay on your devices: they are never sent to Claude, synced or shown in notifications.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdárs óñ áñ ñçád.íé áççóúñt áré própóséd ás çóllégé. Çóllégé évéñts stáý óñ ýóúr dévíçés: théý áré ñévér séñt tó Çláúdé, sýñçéd ór shówñ íñ ñótífíçátíóñs. ·······························································]"
           }
         }
       }
@@ -111,12 +411,32 @@
         }
       }
     },
+    "Check your calendars": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çhéçk ýóúr çáléñdárs ········]"
+          }
+        }
+      }
+    },
     "Claude": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çláúdé ··]"
+          }
+        }
+      }
+    },
+    "Claude for personal items": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çláúdé fór pérsóñál ítéms ··········]"
           }
         }
       }
@@ -181,6 +501,46 @@
         }
       }
     },
+    "College data stays on your devices.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé dátá stáýs óñ ýóúr dévíçés. ··············]"
+          }
+        }
+      }
+    },
+    "College deadlines can be mirrored only to lists tagged college or kept on this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé déádlíñés çáñ bé mírróréd óñlý tó lísts tággéd çóllégé ór képt óñ thís dévíçé. ··································]"
+          }
+        }
+      }
+    },
+    "College deadlines mirror only to lists tagged college or kept on this device, unless you allow iCloud for this one.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé déádlíñés mírrór óñlý tó lísts tággéd çóllégé ór képt óñ thís dévíçé, úñléss ýóú állów íÇlóúd fór thís óñé. ··············································]"
+          }
+        }
+      }
+    },
+    "College deadlines stay on your devices. Their notifications say \"College deadline\" without the title.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé déádlíñés stáý óñ ýóúr dévíçés. Théír ñótífíçátíóñs sáý \"Çóllégé déádlíñé\" wíthóút thé títlé. ········································]"
+          }
+        }
+      }
+    },
     "College entries record metadata only, never content.": {
       "localizations": {
         "ga": {
@@ -191,12 +551,52 @@
         }
       }
     },
+    "College, stays on your devices": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé, stáýs óñ ýóúr dévíçés ············]"
+          }
+        }
+      }
+    },
+    "Coming up": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çómíñg úp ····]"
+          }
+        }
+      }
+    },
+    "Confirm tags": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóñfírm tágs ·····]"
+          }
+        }
+      }
+    },
     "Confirm that you want to erase privacy ledger entries.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóñfírm thát ýóú wáñt tó érásé príváçý lédgér éñtríés. ······················]"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóñtíñúé ···]"
           }
         }
       }
@@ -231,6 +631,56 @@
         }
       }
     },
+    "Deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Déádlíñé ···]"
+          }
+        }
+      }
+    },
+    "Deadlines": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Déádlíñés ····]"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Délété ··]"
+          }
+        }
+      }
+    },
+    "Delete deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Délété déádlíñé ······]"
+          }
+        }
+      }
+    },
+    "Delete this deadline?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Délété thís déádlíñé? ········]"
+          }
+        }
+      }
+    },
     "Destination": {
       "localizations": {
         "ga": {
@@ -251,12 +701,112 @@
         }
       }
     },
+    "Dismiss": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dísmíss ···]"
+          }
+        }
+      }
+    },
+    "Dismiss %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dísmíss %@ ····]"
+          }
+        }
+      }
+    },
+    "Dismissed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dísmísséd ····]"
+          }
+        }
+      }
+    },
+    "Don't mirror": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dóñ't mírrór ·····]"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dóñé ··]"
+          }
+        }
+      }
+    },
+    "Due": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dúé ··]"
+          }
+        }
+      }
+    },
+    "Due %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dúé %@ ··]"
+          }
+        }
+      }
+    },
     "Duration": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Dúrátíóñ ···]"
+          }
+        }
+      }
+    },
+    "Each brief arrives at the first natural break after its time: the end of an event, a free gap of 15 minutes or opening Eagar. It is never more than 45 minutes late.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éáçh bríéf árrívés át thé fírst ñátúrál bréák áftér íts tímé: thé éñd óf áñ évéñt, á fréé gáp óf 15 míñútés ór ópéñíñg Éágár. Ít ís ñévér móré tháñ 45 míñútés láté. ··································································]"
+          }
+        }
+      }
+    },
+    "Eagar could not add the reminder.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót ádd thé rémíñdér. ·············]"
+          }
+        }
+      }
+    },
+    "Eagar could not ask for calendar access.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót ásk fór çáléñdár áççéss. ················]"
           }
         }
       }
@@ -291,6 +841,46 @@
         }
       }
     },
+    "Eagar could not read your calendars.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád ýóúr çáléñdárs. ··············]"
+          }
+        }
+      }
+    },
+    "Eagar could not read your deadlines.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád ýóúr déádlíñés. ··············]"
+          }
+        }
+      }
+    },
+    "Eagar could not save the calendar tag.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thé çáléñdár tág. ···············]"
+          }
+        }
+      }
+    },
+    "Eagar could not save the deadline.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thé déádlíñé. ··············]"
+          }
+        }
+      }
+    },
     "Eagar could not update the privacy ledger.": {
       "localizations": {
         "ga": {
@@ -311,12 +901,82 @@
         }
       }
     },
+    "Eagar did not find a calendar from an ncad.ie account. To add it:": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár díd ñót fíñd á çáléñdár fróm áñ ñçád.íé áççóúñt. Tó ádd ít: ··························]"
+          }
+        }
+      }
+    },
+    "Eagar gathers your calendars and deadlines into one brief, delivered at a natural break in your day.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár gáthérs ýóúr çáléñdárs áñd déádlíñés íñtó óñé bríéf, délívéréd át á ñátúrál bréák íñ ýóúr dáý. ········································]"
+          }
+        }
+      }
+    },
+    "Eagar proposes college for calendars on an ncad.ie account and personal for the rest. Change any that are wrong.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár própósés çóllégé fór çáléñdárs óñ áñ ñçád.íé áççóúñt áñd pérsóñál fór thé rést. Çháñgé áñý thát áré wróñg. ·············································]"
+          }
+        }
+      }
+    },
+    "Eagar reads your calendars to build your brief and find free time, and reads your reminder lists so you can mirror deadlines to them. It adds events and reminders only when you ask.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár réáds ýóúr çáléñdárs tó búíld ýóúr bríéf áñd fíñd fréé tímé, áñd réáds ýóúr rémíñdér lísts só ýóú çáñ mírrór déádlíñés tó thém. Ít ádds évéñts áñd rémíñdérs óñlý whéñ ýóú ásk. ········································································]"
+          }
+        }
+      }
+    },
     "Eagar uses your own Claude API key for personal data you choose to send to Claude. College data never leaves your devices.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár úsés ýóúr ówñ Çláúdé ÁPÍ kéý fór pérsóñál dátá ýóú çhóósé tó séñd tó Çláúdé. Çóllégé dátá ñévér léávés ýóúr dévíçés. ·················································]"
+          }
+        }
+      }
+    },
+    "Edit": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Édít ··]"
+          }
+        }
+      }
+    },
+    "Edit deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Édít déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "End-of-day brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éñd-óf-dáý bríéf ······]"
           }
         }
       }
@@ -401,6 +1061,16 @@
         }
       }
     },
+    "Every call off this device is in the privacy ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý çáll óff thís dévíçé ís íñ thé príváçý lédgér. ·····················]"
+          }
+        }
+      }
+    },
     "Exact payload sent": {
       "localizations": {
         "ga": {
@@ -481,6 +1151,16 @@
         }
       }
     },
+    "Get started": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Gét stártéd ····]"
+          }
+        }
+      }
+    },
     "How to create an API key": {
       "localizations": {
         "ga": {
@@ -497,6 +1177,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Hów tó sét úp á wórkspáçé áñd spéñd límít ················]"
+          }
+        }
+      }
+    },
+    "In 1 hour": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñ 1 hóúr ····]"
+          }
+        }
+      }
+    },
+    "Include in brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñçlúdé íñ bríéf ······]"
           }
         }
       }
@@ -527,6 +1227,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Íñpúts ··]"
+          }
+        }
+      }
+    },
+    "Keep in touch": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Kéép íñ tóúçh ·····]"
           }
         }
       }
@@ -601,12 +1311,42 @@
         }
       }
     },
+    "Listening and watching": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lístéñíñg áñd wátçhíñg ·········]"
+          }
+        }
+      }
+    },
     "Loading the ledger…": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Lóádíñg thé lédgér… ········]"
+          }
+        }
+      }
+    },
+    "Loans due": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé ····]"
+          }
+        }
+      }
+    },
+    "Location": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóçátíóñ ···]"
           }
         }
       }
@@ -621,12 +1361,52 @@
         }
       }
     },
+    "Mail": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Máíl ··]"
+          }
+        }
+      }
+    },
+    "Mark %@ done": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Márk %@ dóñé ·····]"
+          }
+        }
+      }
+    },
     "Meitheal (NCAD)": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Méíthéál (ÑÇÁD) ······]"
+          }
+        }
+      }
+    },
+    "Midday brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Míddáý bríéf ·····]"
+          }
+        }
+      }
+    },
+    "Mirror to Reminders": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Mírrór tó Rémíñdérs ········]"
           }
         }
       }
@@ -671,6 +1451,116 @@
         }
       }
     },
+    "More actions for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móré áçtíóñs fór %@ ········]"
+          }
+        }
+      }
+    },
+    "More not shown: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móré ñót shówñ: %lld ········]"
+          }
+        }
+      }
+    },
+    "Morning brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Mórñíñg bríéf ·····]"
+          }
+        }
+      }
+    },
+    "Move %@ down": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móvé %@ dówñ ·····]"
+          }
+        }
+      }
+    },
+    "Move %@ up": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móvé %@ úp ····]"
+          }
+        }
+      }
+    },
+    "NCAD IT may block Apple's Calendar app from your college account. If sign-in is refused, ask IT whether Apple Calendar is allowed.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÑÇÁD ÍT máý blóçk Ápplé's Çáléñdár ápp fróm ýóúr çóllégé áççóúñt. Íf sígñ-íñ ís réfúséd, ásk ÍT whéthér Ápplé Çáléñdár ís állówéd. ····················································]"
+          }
+        }
+      }
+    },
+    "NCAD calendar not found": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÑÇÁD çáléñdár ñót fóúñd ·········]"
+          }
+        }
+      }
+    },
+    "New deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéw déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "New due time": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéw dúé tímé ·····]"
+          }
+        }
+      }
+    },
+    "No calendars found.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó çáléñdárs fóúñd. ········]"
+          }
+        }
+      }
+    },
+    "No deadlines": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó déádlíñés ·····]"
+          }
+        }
+      }
+    },
     "No entries yet. Every call to a model, and every blocked attempt, appears here.": {
       "localizations": {
         "ga": {
@@ -701,12 +1591,112 @@
         }
       }
     },
+    "Not now": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñót ñów ···]"
+          }
+        }
+      }
+    },
+    "Not useful": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñót úséfúl ····]"
+          }
+        }
+      }
+    },
+    "Nothing needs you right now.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóthíñg ñééds ýóú ríght ñów. ···········]"
+          }
+        }
+      }
+    },
+    "Nothing needs you right now. Your brief fills up as you add deadlines and events.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóthíñg ñééds ýóú ríght ñów. Ýóúr bríéf fílls úp ás ýóú ádd déádlíñés áñd évéñts. ································]"
+          }
+        }
+      }
+    },
+    "Nothing on your timeline today.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóthíñg óñ ýóúr tímélíñé tódáý. ············]"
+          }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñótífíçátíóñs ·····]"
+          }
+        }
+      }
+    },
+    "Notifications for personal deadlines show the title.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñótífíçátíóñs fór pérsóñál déádlíñés shów thé títlé. ·····················]"
+          }
+        }
+      }
+    },
+    "Notifications show counts only. College deadlines say \"College deadline\" without a title.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñótífíçátíóñs shów çóúñts óñlý. Çóllégé déádlíñés sáý \"Çóllégé déádlíñé\" wíthóút á títlé. ····································]"
+          }
+        }
+      }
+    },
+    "Notify me when my brief is ready": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñótífý mé whéñ mý bríéf ís réádý ·············]"
+          }
+        }
+      }
+    },
     "OK": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[ÓK ··]"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óff ··]"
           }
         }
       }
@@ -731,6 +1721,46 @@
         }
       }
     },
+    "On your devices only": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óñ ýóúr dévíçés óñlý ········]"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ ··]"
+          }
+        }
+      }
+    },
+    "Open %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ %@ ···]"
+          }
+        }
+      }
+    },
+    "Opened": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñéd ··]"
+          }
+        }
+      }
+    },
     "Outcome": {
       "localizations": {
         "ga": {
@@ -747,6 +1777,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Óútpút tókéñs ·····]"
+          }
+        }
+      }
+    },
+    "Overdue": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé ···]"
+          }
+        }
+      }
+    },
+    "Overdue deadlines always come first. Thumbs up and down on brief items help Eagar learn what matters to you.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé déádlíñés álwáýs çómé fírst. Thúmbs úp áñd dówñ óñ bríéf ítéms hélp Éágár léárñ whát máttérs tó ýóú. ···········································]"
           }
         }
       }
@@ -777,6 +1827,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Pérsóñál ···]"
+          }
+        }
+      }
+    },
+    "Personal items may be summarised by Claude, using your Claude key, once you have given consent for it. College items are always summarised on your devices only. Every call appears in the privacy ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñál ítéms máý bé súmmáríséd bý Çláúdé, úsíñg ýóúr Çláúdé kéý, óñçé ýóú hávé gívéñ çóñséñt fór ít. Çóllégé ítéms áré álwáýs súmmáríséd óñ ýóúr dévíçés óñlý. Évérý çáll áppéárs íñ thé príváçý lédgér. ·················································································]"
+          }
+        }
+      }
+    },
+    "Phrasing": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Phrásíñg ···]"
           }
         }
       }
@@ -817,6 +1887,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Próçésséd: %@ ·····]"
+          }
+        }
+      }
+    },
+    "Proposed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Própóséd ···]"
+          }
+        }
+      }
+    },
+    "Proposed tag, not yet confirmed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Própóséd tág, ñót ýét çóñfírméd ············]"
           }
         }
       }
@@ -891,6 +1981,36 @@
         }
       }
     },
+    "Remind me": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémíñd mé ····]"
+          }
+        }
+      }
+    },
+    "Reminder lists": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémíñdér lísts ······]"
+          }
+        }
+      }
+    },
+    "Reminders": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémíñdérs ····]"
+          }
+        }
+      }
+    },
     "Remove key from this device": {
       "localizations": {
         "ga": {
@@ -911,6 +2031,46 @@
         }
       }
     },
+    "Reschedule": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Résçhédúlé ····]"
+          }
+        }
+      }
+    },
+    "Reschedule %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Résçhédúlé %@ ·····]"
+          }
+        }
+      }
+    },
+    "Rescheduled": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Résçhédúléd ····]"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sávé ··]"
+          }
+        }
+      }
+    },
     "Save key to this device": {
       "localizations": {
         "ga": {
@@ -927,6 +2087,126 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Sávé límít ····]"
+          }
+        }
+      }
+    },
+    "Sections": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Séçtíóñs ···]"
+          }
+        }
+      }
+    },
+    "Selected": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Séléçtéd ···]"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Séttíñgs ···]"
+          }
+        }
+      }
+    },
+    "Setup takes a couple of minutes.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sétúp tákés á çóúplé óf míñútés. ·············]"
+          }
+        }
+      }
+    },
+    "Show up to %lld items": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Shów úp tó %lld ítéms ········]"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Skíp ··]"
+          }
+        }
+      }
+    },
+    "Snooze": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé ··]"
+          }
+        }
+      }
+    },
+    "Snooze %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé %@ ····]"
+          }
+        }
+      }
+    },
+    "Snooze for 1 hour": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé fór 1 hóúr ·······]"
+          }
+        }
+      }
+    },
+    "Snooze until tomorrow at 09:00": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé úñtíl tómórrów át 09:00 ············]"
+          }
+        }
+      }
+    },
+    "Snoozed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózéd ···]"
+          }
+        }
+      }
+    },
+    "Snoozed until %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózéd úñtíl %@ ······]"
           }
         }
       }
@@ -961,6 +2241,16 @@
         }
       }
     },
+    "Start using Eagar": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stárt úsíñg Éágár ·······]"
+          }
+        }
+      }
+    },
     "Stored key": {
       "localizations": {
         "ga": {
@@ -991,6 +2281,16 @@
         }
       }
     },
+    "Tag for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tág fór %@ ····]"
+          }
+        }
+      }
+    },
     "Test key": {
       "localizations": {
         "ga": {
@@ -1007,6 +2307,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Téstíñg kéý ····]"
+          }
+        }
+      }
+    },
+    "The brief shows plain lists, with no AI.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé bríéf shóws pláíñ lísts, wíth ñó ÁÍ. ················]"
           }
         }
       }
@@ -1091,6 +2401,36 @@
         }
       }
     },
+    "Time for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tímé fór %@ ····]"
+          }
+        }
+      }
+    },
+    "Timeline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tímélíñé ···]"
+          }
+        }
+      }
+    },
+    "Title": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Títlé ··]"
+          }
+        }
+      }
+    },
     "To": {
       "localizations": {
         "ga": {
@@ -1111,12 +2451,82 @@
         }
       }
     },
+    "Tomorrow at 09:00": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tómórrów át 09:00 ·······]"
+          }
+        }
+      }
+    },
+    "Trials about to bill": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tríáls ábóút tó bíll ········]"
+          }
+        }
+      }
+    },
+    "Upcoming": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úpçómíñg ···]"
+          }
+        }
+      }
+    },
     "Usage": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Úságé ··]"
+          }
+        }
+      }
+    },
+    "Useful": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úséfúl ··]"
+          }
+        }
+      }
+    },
+    "Waiting for approval": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wáítíñg fór áppróvál ········]"
+          }
+        }
+      }
+    },
+    "Waiting on others": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wáítíñg óñ óthérs ·······]"
+          }
+        }
+      }
+    },
+    "Welcome to Eagar": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wélçómé tó Éágár ······]"
           }
         }
       }
@@ -1131,6 +2541,16 @@
         }
       }
     },
+    "You choose what, if anything, goes to Claude.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóú çhóósé whát, íf áñýthíñg, góés tó Çláúdé. ··················]"
+          }
+        }
+      }
+    },
     "You will be asked to authenticate. The erasure itself is recorded in the ledger.": {
       "localizations": {
         "ga": {
@@ -1141,12 +2561,32 @@
         }
       }
     },
+    "Your first brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr fírst bríéf ······]"
+          }
+        }
+      }
+    },
     "Your key": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ýóúr kéý ···]"
+          }
+        }
+      }
+    },
+    "Your morning brief arrives after 08:00, at the first natural break. You can change the times in Settings.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr mórñíñg bríéf árrívés áftér 08:00, át thé fírst ñátúrál bréák. Ýóú çáñ çháñgé thé tímés íñ Séttíñgs. ··········································]"
           }
         }
       }

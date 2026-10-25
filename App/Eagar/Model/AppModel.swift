@@ -5,7 +5,8 @@ import EagarSecurity
 import Foundation
 import Observation
 
-/// UI state for M0: the BYOK key, the key test, the privacy ledger and the spend meter.
+/// UI state: the BYOK key, the key test, the privacy ledger and the spend meter (M0), and the
+/// calendars, deadlines and Brief through ``planner`` (M1).
 @MainActor
 @Observable
 final class AppModel {
@@ -16,6 +17,7 @@ final class AppModel {
     }
 
     let services: AppServices
+    let planner: PlannerModel
     private(set) var maskedKey: String?
     private(set) var keyTestState: KeyTestState = .idle
     private(set) var records: [LedgerRecord] = []
@@ -28,9 +30,10 @@ final class AppModel {
     private let log = EagarLog(.app)
     private static let capKey = "spend.monthlyCapMicroUSD"
 
-    init(services: AppServices, defaults: UserDefaults = .standard) {
+    init(services: AppServices, defaults: UserDefaults = .standard, clock: any EagarClock = SystemClock(), calendar: Calendar = .current) {
         self.services = services
         self.defaults = defaults
+        planner = PlannerModel(services: services, defaults: defaults, clock: clock, calendar: calendar)
         let cap = defaults.object(forKey: Self.capKey) as? Int64
         services.policy.setMonthlyCap(microUSD: cap)
         loadKeyState()

@@ -28,6 +28,9 @@ packages:
   EagarAI: { path: ../Packages/EagarAI }
   EagarRules: { path: ../Packages/EagarRules }
   EagarTestSupport: { path: ../Packages/EagarTestSupport }
+  EagarCalendar: { path: ../Packages/EagarCalendar }
+  EagarBrief: { path: ../Packages/EagarBrief }
+  EagarSuggest: { path: ../Packages/EagarSuggest }
 targets:
   Eagar:
     type: application
@@ -42,6 +45,10 @@ targets:
       - package: EagarAI
         product: EagarAI
       - package: EagarRules
+      - package: EagarCalendar
+        product: EagarCalendar
+      - package: EagarBrief
+      - package: EagarSuggest
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp
@@ -57,6 +64,9 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        # FR-CAL-01: EventKit offers no read-only mode, so the strings justify full access.
+        INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Eagar reads your calendars to build your brief and find free time. It adds or changes events only when you ask."
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Eagar reads your reminder lists so you can choose where deadlines are mirrored. It adds or changes reminders only when you ask."
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Eagar asks for Face ID before erasing ledger entries and, later, before sending each email."
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic

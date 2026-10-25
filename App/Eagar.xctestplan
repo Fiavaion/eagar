@@ -74,6 +74,27 @@
         "identifier": "EagarTestSupportTests",
         "name": "EagarTestSupportTests"
       }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarCalendar",
+        "identifier": "EagarCalendarTests",
+        "name": "EagarCalendarTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarSuggest",
+        "identifier": "EagarSuggestTests",
+        "name": "EagarSuggestTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarBrief",
+        "identifier": "EagarBriefTests",
+        "name": "EagarBriefTests"
+      }
     }
   ],
   "version": 1

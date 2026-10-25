@@ -1,3 +1,4 @@
+import EagarCalendar
 import SwiftUI
 
 @main
@@ -6,8 +7,11 @@ struct EagarApp: App {
 
     init() {
         let inMemory = UserDefaults.standard.bool(forKey: "EagarInMemoryStores")
+        // `-EagarFakeCalendar YES`: synthetic calendars for UI tests and screenshots.
+        let eventStore: any EventStoreAdapting = UserDefaults.standard.bool(forKey: "EagarFakeCalendar") ? DemoEventStore() : EventKitAdapter()
         do {
-            _startup = State(initialValue: .success(AppModel(services: try AppServices.make(inMemory: inMemory))))
+            let services = try AppServices.make(inMemory: inMemory, eventStore: eventStore)
+            _startup = State(initialValue: .success(AppModel(services: services)))
         } catch {
             _startup = State(initialValue: .failure(StartupFailure()))
         }
