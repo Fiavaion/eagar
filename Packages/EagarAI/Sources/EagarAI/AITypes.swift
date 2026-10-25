@@ -320,6 +320,8 @@ public enum AIError: Error, Sendable, Equatable, LogSafe {
     case ledgerWriteFailed
     /// The requested model is not in the catalogue or not offered.
     case modelNotOffered
+    /// The kill switch is engaged, or it cancelled this call (FR-CORE-07).
+    case halted
     case provider(ProviderFailure)
 
     public var logDescription: String {
@@ -328,6 +330,7 @@ public enum AIError: Error, Sendable, Equatable, LogSafe {
         case .noPermittedProvider: "noPermittedProvider"
         case .ledgerWriteFailed: "ledgerWriteFailed"
         case .modelNotOffered: "modelNotOffered"
+        case .halted: "halted"
         case let .provider(failure): "provider(\(failure.logDescription))"
         }
     }

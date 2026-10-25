@@ -17,6 +17,10 @@ public actor AIRouter {
     private let policy: any PolicySource
     private let catalog: ModelCatalog
     private let log = EagarLog(.ai)
+    /// Set by the global kill switch (FR-CORE-07): no call starts while halted.
+    private var halted = false
+    /// Provider calls in progress, so `halt()` can cancel them.
+    private var inFlight: [UUID: Task<LLMResponse, any Error>] = [:]
 
     public init(providers: [any LLMProvider], ledger: any PrivacyLedgerWriting, policy: any PolicySource, catalog: ModelCatalog) {
         self.providers = providers
@@ -25,7 +29,31 @@ public actor AIRouter {
         self.catalog = catalog
     }
 
+    /// Engages the kill switch: cancels every call in progress and refuses new ones until
+    /// `resume()`. Ledgered (FR-CORE-07, FR-PRIV-04).
+    public func halt() async {
+        guard !halted else { return }
+        halted = true
+        let cancelled = inFlight.count
+        inFlight.values.forEach { $0.cancel() }
+        log.notice("kill switch engaged; cancelled \(cancelled) calls")
+        do {
+            _ = try await ledger.record(LedgerDraft(kind: .killSwitch, purpose: "killSwitch", payloadClasses: [], detail: cancelled))
+        } catch {
+            log.fault("kill switch could not be ledgered: \(error)")
+        }
+    }
+
+    /// Releases the kill switch.
+    public func resume() {
+        halted = false
+        log.notice("kill switch released")
+    }
+
+    public var isHalted: Bool { halted }
+
     public func run(_ request: AIRequest) async throws(AIError) -> LLMResponse {
+        guard !halted else { throw .halted }
         let payloads = request.allPayloads
         let effectiveClass = Taint.derive(.aiRequestPayload, from: payloads.map(\.dataClass))
 
@@ -85,8 +113,12 @@ public actor AIRouter {
             model: model, tier: tier, wirePayload: wirePayload
         )
         let started = ContinuousClock.now
+        guard !halted else {
+            await complete(entryID, LedgerCompletion(outcome: .failed, duration: ContinuousClock.now - started))
+            throw .halted
+        }
         do {
-            var response = try await provider.complete(call)
+            var response = try await dispatch(call, to: provider)
             let cost = response.usage.flatMap { tier == .anthropicCloud ? catalog.costMicroUSD(model: response.model, usage: $0) : nil }
             await complete(entryID, LedgerCompletion(
                 outcome: .succeeded,
@@ -110,6 +142,26 @@ public actor AIRouter {
     }
 
     // MARK: - Steps
+
+    /// Runs the provider call as a cancellable task registered with the router, so the kill
+    /// switch can stop it mid-flight.
+    private func dispatch(_ call: RoutedCall, to provider: any LLMProvider) async throws(AIError) -> LLMResponse {
+        let id = UUID()
+        let task = Task { () throws -> LLMResponse in try await provider.complete(call) }
+        inFlight[id] = task
+        defer { inFlight[id] = nil }
+        do {
+            return try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: {
+                task.cancel()
+            }
+        } catch let error as AIError {
+            throw halted ? .halted : error
+        } catch {
+            throw halted || error is CancellationError ? .halted : .provider(.unavailable)
+        }
+    }
 
     private func choose(from allowed: Set<Tier>, preferred: Tier?) async -> (any LLMProvider, ProviderCapabilities)? {
         let order = (preferred.map { [$0] } ?? []) + Self.tierPreference.filter { $0 != preferred }
