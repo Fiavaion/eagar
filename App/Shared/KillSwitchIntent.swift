@@ -1,5 +1,6 @@
 import AppIntents
 import EagarCore
+import WidgetKit
 
 /// Sets the global kill switch (FR-CORE-07). Compiled into both the app and the widget
 /// extension: the Control Centre control runs it in the extension, Shortcuts in the app.
@@ -19,6 +20,7 @@ struct SetKillSwitchIntent: SetValueIntent {
 
     func perform() async throws -> some IntentResult {
         EagarAppGroup.killSwitch.set(engaged: value)
+        ControlCenter.shared.reloadControls(ofKind: "app.eagar.killSwitch")
         return .result()
     }
 }

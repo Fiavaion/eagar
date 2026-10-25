@@ -1,4 +1,5 @@
 import EagarBrief
+import EagarCore
 import Foundation
 import UserNotifications
 
@@ -52,5 +53,23 @@ struct UserBriefNotificationScheduler: BriefNotificationScheduling {
 
     func remove(identifiers: [String]) async {
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+}
+
+/// A notification-centre error as logs may show it: the `UNError` code, or "other".
+enum NotificationFailureKind: LogSafe {
+    case notifications(code: Int)
+    case other
+
+    init(_ error: any Error) {
+        let error = error as NSError
+        self = error.domain == UNErrorDomain ? .notifications(code: error.code) : .other
+    }
+
+    var logDescription: String {
+        switch self {
+        case let .notifications(code): "UNError(\(code))"
+        case .other: "other"
+        }
     }
 }

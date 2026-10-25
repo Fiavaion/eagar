@@ -31,7 +31,8 @@ struct CalendarAccessExplanation: View {
     }
 }
 
-/// One calendar or reminder list with its college/personal tag and brief toggle (FR-CAL-02).
+/// One calendar or reminder list with its college/personal tag, where its data may be processed
+/// and its brief toggle (FR-CAL-02, FR-CORE-06).
 struct CalendarTagRow: View {
     let planner: PlannerModel
     let calendar: CalendarInfo
@@ -58,8 +59,9 @@ struct CalendarTagRow: View {
                         .overlay(Capsule().strokeBorder(.secondary))
                         .accessibilityLabel(Text("Proposed tag, not yet confirmed"))
                 }
-                if tag.dataClass == .college { BoundaryBadge() }
             }
+            // Class, processing mode and boundary icon (FR-CORE-06).
+            ProcessingModeLabel(dataClass: tag.dataClass)
             Picker(selection: Binding(
                 get: { tag.dataClass },
                 set: { new in Task { await planner.setTag(calendar, dataClass: new, includeInBrief: tag.includeInBrief) } }

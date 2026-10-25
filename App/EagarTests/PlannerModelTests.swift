@@ -84,7 +84,15 @@ struct PlannerModelTests {
         #expect(planner.tag(for: ncad).confirmed == false)
         let items = try #require(planner.brief?.allItems)
         #expect(items.first { $0.title == "Studio crit" }?.dataClass == .college)
-        #expect(items.first { $0.title == "Lunch with Sam" }?.dataClass == .personal)
+        // Fail closed (D-017, review finding): until Mark confirms "Home" as personal, its events
+        // are treated as college even though Eagar proposes personal.
+        #expect(items.first { $0.title == "Lunch with Sam" }?.dataClass == .college)
+        let home = try #require(planner.eventCalendars.first { $0.id == DemoEventStore.homeID })
+        #expect(planner.tag(for: home).dataClass == .personal)
+        #expect(planner.tag(for: home).confirmed == false)
+        await planner.setTag(home, dataClass: .personal, includeInBrief: true)
+        let confirmed = try #require(planner.brief?.allItems)
+        #expect(confirmed.first { $0.title == "Lunch with Sam" }?.dataClass == .personal)
         #expect(planner.isCollegeCalendarMissing == false)
     }
 
@@ -174,8 +182,9 @@ struct PlannerModelTests {
         let id = BriefNotificationID.make(slot: .morning, day: morning, calendar: calendar)
         #expect(id == "brief.morning.2026-10-27")
         let scheduled = try #require(briefs.scheduled.withLock { $0[id] })
-        // Nothing ends between 08:00 and 08:45 in the fake day, so the brief waits the full 45 minutes.
-        #expect(scheduled.date == calendar.date(bySettingHour: 8, minute: 45, second: 0, of: morning))
+        // The fake day is free from the start of the day until 09:30, so Mark is already free at
+        // 08:00 and the brief comes at the slot time (review finding: not 45 minutes late).
+        #expect(scheduled.date == calendar.date(bySettingHour: 8, minute: 0, second: 0, of: morning))
         #expect(scheduled.content.threadIdentifier == "brief")
         for title in ["Studio crit", "Submission week", "Printmaking", "Lunch"] {
             #expect(!scheduled.content.body.contains(title))

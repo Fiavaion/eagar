@@ -7,13 +7,13 @@ import Testing
 @testable import Eagar
 
 /// Records donations instead of sending them to the system.
+/// Records every call, with no filtering of its own: the planner itself must never ask to
+/// donate a college deadline (review finding: a filtering spy made B-7 unfalsifiable).
 private final class SpyDonor: IntentDonating {
     let donated = Mutex<[DeadlineSnapshot]>([])
-    func donateAddedDeadline(_ snapshot: DeadlineSnapshot) {
-        // Mirror SystemIntentDonor's rule so the test checks the planner and the rule together.
-        guard snapshot.dataClass != .college else { return }
-        donated.withLock { $0.append(snapshot) }
-    }
+    let withdrawn = Mutex<[UUID]>([])
+    func donateAddedDeadline(_ snapshot: DeadlineSnapshot) { donated.withLock { $0.append(snapshot) } }
+    func withdrawDonations(for deadlineID: UUID) { withdrawn.withLock { $0.append(deadlineID) } }
 }
 
 /// Records widget snapshots.
@@ -70,6 +70,21 @@ struct EgressTests {
         personal.title = "Renew passport"
         #expect(await model.planner.save(personal))
         #expect(donor.donated.withLock { $0.map(\.title) } == ["Renew passport"])
+        #expect(donor.donated.withLock { $0.allSatisfy { $0.dataClass != .college } })
+
+        // Moving the personal deadline to college withdraws its donation.
+        let saved = try #require(model.planner.deadlines.first { $0.snapshot.title == "Renew passport" })
+        var moved = DeadlineDraft(saved)
+        moved.dataClass = .college
+        #expect(await model.planner.save(moved))
+        #expect(donor.withdrawn.withLock { $0 } == [saved.id])
+        #expect(donor.donated.withLock { $0.count } == 1)
+    }
+
+    /// The system donor refuses college deadlines on its own as well (defence in depth).
+    @Test func systemDonorRefusesCollege() {
+        // Nothing observable is donated in tests; this checks the guard compiles and returns.
+        SystemIntentDonor().donateAddedDeadline(DeadlineSnapshot(title: "x", dueAt: .now, dataClass: .college))
     }
 
     /// FR-BRIEF-06: the widget snapshot the app publishes holds no college titles.

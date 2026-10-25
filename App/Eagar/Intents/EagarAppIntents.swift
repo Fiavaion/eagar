@@ -56,8 +56,13 @@ struct EagarShortcuts: AppShortcutsProvider {
 
 /// Donates intents so the system can suggest them. College items are never donated: Spotlight
 /// and Siri suggestions are an egress path for college content (BD-04, B-7).
+///
+/// The planner must never call `donateAddedDeadline` for a college deadline; the system donor
+/// refuses one anyway (defence in depth).
 protocol IntentDonating: Sendable {
     func donateAddedDeadline(_ snapshot: DeadlineSnapshot)
+    /// Withdraws earlier donations for a deadline, e.g. when it becomes college.
+    func withdrawDonations(for deadlineID: UUID)
 }
 
 struct SystemIntentDonor: IntentDonating {
@@ -65,6 +70,18 @@ struct SystemIntentDonor: IntentDonating {
         guard snapshot.dataClass != .college else { return }
         let intent = AddDeadlineIntent(title: snapshot.title, due: snapshot.dueAt)
         Task { _ = try? await IntentDonationManager.shared.donate(intent: intent) }
+    }
+
+    /// Donations can't be deleted one by one, so every "Add a deadline" donation is withdrawn.
+    /// Suggestions are rebuilt from later personal additions.
+    func withdrawDonations(for deadlineID: UUID) {
+        Task {
+            do {
+                try await IntentDonationManager.shared.deleteDonations(matching: .intentType(AddDeadlineIntent.self))
+            } catch {
+                EagarLog(.app).error("intent donations could not be withdrawn")
+            }
+        }
     }
 }
 

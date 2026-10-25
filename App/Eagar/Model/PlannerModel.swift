@@ -110,6 +110,8 @@ final class PlannerModel {
     private var sessionItemIDs: Set<String> = []
     private var phrasedSections: [BriefSection]?
     private var phrasingTask: Task<Void, Never>?
+    /// The Today tab asked to log an open before the first brief was composed (cold launch).
+    private var openPending = false
 
     static let notificationsRequestedKey = "notifications.authorisationRequested"
 
@@ -134,8 +136,13 @@ final class PlannerModel {
 
     func refresh() async {
         await loadCalendars()
+        await retryPendingReminderRemovals()
         await loadDeadlines()
         composeBrief()
+        if openPending, session != nil {
+            openPending = false
+            await briefOpened()
+        }
     }
 
     private var today: DateInterval { day(containing: clock.now()) }
@@ -325,30 +332,73 @@ final class PlannerModel {
                     deadline.reminderOffsetsMinutes = offsets
                     deadline.mirrorOverride = draft.mirrorOverride
                 }
+            } else if let existing {
+                // The class changed: the record moves to the store its class belongs in.
+                let dueChanged = existing.snapshot.dueAt != draft.dueAt
+                try await move(id, from: existing.snapshot.dataClass, to: draft.dataClass) { fields in
+                    fields.title = title
+                    if dueChanged {
+                        fields.dueAt = draft.dueAt
+                        fields.snoozedUntil = nil
+                    }
+                    fields.isAllDay = draft.isAllDay
+                    fields.reminderOffsetsMinutes = offsets
+                    fields.mirrorOverride = draft.mirrorOverride
+                }
             } else {
-                // New, or the class changed: the record moves to the store its class belongs in.
-                if let existing { try await remove(id, in: existing.snapshot.dataClass) }
                 let deadline = Deadline(
                     deadlineUUID: id, title: title, dueAt: draft.dueAt, isAllDay: draft.isAllDay,
                     reminderOffsetsMinutes: offsets, dataClass: draft.dataClass,
                     createdAt: clock.now()
                 )
                 deadline.mirrorOverride = draft.mirrorOverride
-                if let existing, existing.snapshot.dueAt == draft.dueAt { deadline.snoozedUntil = existing.snapshot.snoozedUntil }
                 try await services.stores.insert(deadline)
             }
         } catch {
-            log.error("saving a deadline failed: \(error as? StoreError)")
+            log.error("saving a deadline failed: \(StoreFailureKind(error))")
             failure = .deadlineSave
             return false
         }
         await loadDeadlines()
         if let saved = row(for: id), mirrorNeedsUpdate(old: existing, new: saved, wantedList: draft.mirrorListID) {
-            await updateMirror(saved, listID: draft.mirrorListID, previousReminderID: existing?.mirroredReminderID)
+            await updateMirror(saved, listID: draft.mirrorListID, previousReminderID: saved.mirroredReminderID)
         }
-        if let saved = row(for: id), existing == nil { services.donations.donateAddedDeadline(saved.snapshot) }
+        updateDonations(old: existing, saved: row(for: id))
         await deadlinesChanged(requestAuthorisation: true)
         return true
+    }
+
+    /// Copies every field of the deadline into the store for `newClass`, applying `edit`, then
+    /// deletes the old record. A failed insert leaves the old record untouched; a failed delete
+    /// removes the new copy again, so the deadline is never lost or duplicated.
+    private func move(_ id: UUID, from oldClass: DataClass, to newClass: DataClass, edit: (inout DeadlineFields) -> Void) async throws {
+        guard var fields = try await repository.fields(of: id, in: oldClass) else { throw StoreFailureKind.missingRecord }
+        fields.dataClass = newClass
+        edit(&fields)
+        try await services.stores.insert(fields.makeDeadline())
+        do {
+            try await remove(id, in: oldClass)
+        } catch {
+            do {
+                try await remove(id, in: newClass)
+            } catch {
+                log.error("removing the copy of a moved deadline failed: \(StoreFailureKind(error))")
+            }
+            throw error
+        }
+    }
+
+    /// Donates only personal deadlines (BD-04, B-7), and withdraws the earlier donation of a
+    /// deadline that has just become college.
+    private func updateDonations(old: DeadlineRow?, saved: DeadlineRow?) {
+        guard let saved else { return }
+        if let old {
+            if old.snapshot.dataClass != .college, saved.snapshot.dataClass == .college {
+                services.donations.withdrawDonations(for: saved.id)
+            }
+        } else if saved.snapshot.dataClass != .college {
+            services.donations.donateAddedDeadline(saved.snapshot)
+        }
     }
 
     private func mirrorNeedsUpdate(old: DeadlineRow?, new: DeadlineRow, wantedList: String?) -> Bool {
@@ -361,13 +411,7 @@ final class PlannerModel {
 
     /// Replaces the mirrored reminder: removes the old one, then mirrors to `listID` if set.
     private func updateMirror(_ row: DeadlineRow, listID: String?, previousReminderID: String?) async {
-        if let previousReminderID {
-            do {
-                try await services.eventStore.removeReminder(id: previousReminderID)
-            } catch {
-                log.error("removing a mirrored reminder failed: \(error)")
-            }
-        }
+        if let previousReminderID { await removeMirroredReminder(previousReminderID) }
         var reminderID: String?
         if let listID, let list = reminderLists.first(where: { $0.id == listID }) {
             do {
@@ -387,41 +431,113 @@ final class PlannerModel {
                 deadline.mirrorListID = savedList
             }
         } catch {
-            log.error("recording a reminder mirror failed: \(error as? StoreError)")
+            log.error("recording a reminder mirror failed: \(StoreFailureKind(error))")
             failure = .deadlineSave
         }
         await loadDeadlines()
     }
 
-    func markDone(_ id: UUID) async {
-        let now = clock.now()
-        await change(id) { $0.markDone(at: now) }
+    static let pendingReminderRemovalsKey = "reminders.pendingRemoval"
+
+    /// Reminder identifiers whose removal failed, retried on every refresh (NFR-REL-01), so a
+    /// college-titled reminder never silently stays in iCloud. Opaque EventKit IDs only.
+    var pendingReminderRemovals: [String] {
+        defaults.stringArray(forKey: Self.pendingReminderRemovalsKey) ?? []
     }
 
+    private func setPendingReminderRemovals(_ ids: [String]) {
+        if ids.isEmpty {
+            defaults.removeObject(forKey: Self.pendingReminderRemovalsKey)
+        } else {
+            defaults.set(ids, forKey: Self.pendingReminderRemovalsKey)
+        }
+    }
+
+    /// Removes a mirrored reminder. On failure shows a visible error and keeps the ID for retry.
+    private func removeMirroredReminder(_ reminderID: String) async {
+        do {
+            try await services.eventStore.removeReminder(id: reminderID)
+            setPendingReminderRemovals(pendingReminderRemovals.filter { $0 != reminderID })
+        } catch {
+            log.error("removing a mirrored reminder failed: \(error)")
+            failure = .reminderRemove
+            if !pendingReminderRemovals.contains(reminderID) {
+                setPendingReminderRemovals(pendingReminderRemovals + [reminderID])
+            }
+        }
+    }
+
+    private func retryPendingReminderRemovals() async {
+        for reminderID in pendingReminderRemovals {
+            await removeMirroredReminder(reminderID)
+        }
+    }
+
+    /// Done removes the mirrored reminder (the adapter has no "complete" call, and a finished
+    /// deadline should leave no open reminder behind).
+    func markDone(_ id: UUID) async {
+        let now = clock.now()
+        await change(id, mirror: .remove) { $0.markDone(at: now) }
+    }
+
+    /// Snoozing leaves the mirrored reminder alone: the due date has not changed.
     func snooze(_ id: UUID, until date: Date) async {
         await change(id) { $0.snooze(until: date) }
     }
 
+    /// Rescheduling re-mirrors the reminder with the new due date.
     func reschedule(_ id: UUID, to date: Date) async {
-        await change(id) { $0.reschedule(to: date) }
+        await change(id, mirror: .refresh) { $0.reschedule(to: date) }
     }
 
     func delete(_ id: UUID) async {
         guard let existing = row(for: id) else { return }
-        if let reminderID = existing.mirroredReminderID {
-            do {
-                try await services.eventStore.removeReminder(id: reminderID)
-            } catch {
-                log.error("removing a mirrored reminder failed: \(error)")
-            }
-        }
+        if let reminderID = existing.mirroredReminderID { await removeMirroredReminder(reminderID) }
         do {
             try await remove(id, in: existing.snapshot.dataClass)
         } catch {
-            log.error("deleting a deadline failed: \(error as? StoreError)")
+            log.error("deleting a deadline failed: \(StoreFailureKind(error))")
             failure = .deadlineSave
         }
         await deadlinesChanged(requestAuthorisation: false)
+    }
+
+    /// A deadline notification's Done or Snooze button (FR-OS-05). The app may have been
+    /// launched in the background for it, so deadlines are loaded first if needed.
+    func handleNotificationAction(_ action: DeadlineNotificationAction, deadlineID: UUID) async {
+        if row(for: deadlineID) == nil { await loadDeadlines() }
+        switch action {
+        case .done: await markDone(deadlineID)
+        case .snooze: await snooze(deadlineID, until: snoozeInAnHour)
+        }
+    }
+
+    // MARK: Events (FR-CAL-04)
+
+    /// A new event starts at the next whole hour.
+    var newEventStart: Date {
+        let now = clock.now()
+        return calendar.dateInterval(of: .hour, for: now)?.end ?? now
+    }
+
+    /// Calendars a new event can be written to.
+    var modifiableEventCalendars: [CalendarInfo] {
+        eventCalendars.filter(\.allowsModification)
+    }
+
+    /// Saves an event Mark typed. It is derived from nothing, so any modifiable calendar may take
+    /// it; the writer still enforces the boundary. Returns the error to show, or `nil`.
+    func saveEvent(_ draft: EventDraft, to calendar: CalendarInfo) async -> CalendarError? {
+        guard calendar.allowsModification else { return .readOnlyCalendar }
+        guard let tag = tags[calendar.id] else { return .calendarNotFound }
+        do {
+            _ = try await CalendarWriter(store: services.eventStore).save(draft, derivedFrom: [], to: calendar, tag: tag)
+        } catch {
+            log.error("saving an event failed: \(error)")
+            return error
+        }
+        await refresh()
+        return nil
     }
 
     /// Snooze choices (FR-DL-04): an hour from now, or tomorrow at 09:00.
@@ -432,12 +548,29 @@ final class PlannerModel {
         return calendar.date(bySettingHour: 9, minute: 0, second: 0, of: tomorrow) ?? tomorrow
     }
 
-    private func change(_ id: UUID, _ body: @Sendable (Deadline) -> Void) async {
+    /// What a change does to the mirrored reminder (FR-DL-03).
+    private enum MirrorChange { case keep, remove, refresh }
+
+    private func change(_ id: UUID, mirror: MirrorChange = .keep, _ body: @Sendable (Deadline) -> Void) async {
         guard let existing = row(for: id) else { return }
         do {
             try await mutate(id, in: existing.snapshot.dataClass, body)
+            switch mirror {
+            case .keep:
+                break
+            case .remove:
+                if let reminderID = existing.mirroredReminderID {
+                    await loadDeadlines()
+                    if let row = row(for: id) { await updateMirror(row, listID: nil, previousReminderID: reminderID) }
+                }
+            case .refresh:
+                if let listID = existing.mirrorListID {
+                    await loadDeadlines()
+                    if let row = row(for: id) { await updateMirror(row, listID: listID, previousReminderID: existing.mirroredReminderID) }
+                }
+            }
         } catch {
-            log.error("updating a deadline failed: \(error as? StoreError)")
+            log.error("updating a deadline failed: \(StoreFailureKind(error))")
             failure = .deadlineSave
         }
         await deadlinesChanged(requestAuthorisation: false)
@@ -465,13 +598,16 @@ final class PlannerModel {
         await services.sync?.syncLocalChanges()
     }
 
+    /// Asks for notification permission; once granted, the brief notifications that were
+    /// skipped while it was missing are scheduled.
     func requestNotificationAuthorisation() async {
         defaults.set(true, forKey: Self.notificationsRequestedKey)
         do {
             let granted = try await services.deadlineNotifications.requestAuthorization()
             log.notice("notification authorisation: \(granted)")
+            if granted { await scheduleBriefNotifications() }
         } catch {
-            log.error("notification authorisation request failed: \(error as? StoreError)")
+            log.error("notification authorisation request failed: \(NotificationFailureKind(error))")
         }
     }
 
@@ -504,7 +640,7 @@ final class PlannerModel {
             ratings = [:]
         }
         brief = composed
-        services.widgets.publish(WidgetSnapshot.make(for: composed))
+        services.widgets.publish(WidgetSnapshot.make(for: composed, nextDeadline: nextDeadline(after: now)))
         startPhrasing(composed)
     }
 
@@ -529,10 +665,25 @@ final class PlannerModel {
         }
     }
 
-    /// Logs that the brief was opened (FR-BRIEF-08).
+    /// The earliest open, unsnoozed deadline still ahead, from every deadline (the widget's
+    /// "next deadline" is not limited to the brief's horizon).
+    private func nextDeadline(after now: Date) -> Date? {
+        deadlines
+            .filter { $0.snapshot.status == .open && $0.snapshot.dueAt > now && ($0.snapshot.snoozedUntil ?? .distantPast) <= now }
+            .map(\.snapshot.dueAt)
+            .min()
+    }
+
+    /// Logs that the brief was opened (FR-BRIEF-08). Called by the Today tab whenever the brief
+    /// it shows changes; before the first brief exists the open is remembered and logged as soon
+    /// as the brief is composed, so a cold launch still starts the SM2 timing.
     func briefOpened() async {
+        guard let session else {
+            openPending = true
+            return
+        }
         do {
-            try await session?.opened()
+            try await session.opened()
         } catch {
             log.error("event log write failed: \(error)")
         }
@@ -593,10 +744,30 @@ final class PlannerModel {
 
     // MARK: Delivery (FR-BRIEF-02, FR-BRIEF-05)
 
-    /// Schedules one notification per enabled slot at its delivery time: the first breakpoint at
-    /// or after the slot, at most 45 minutes late. A slot whose delivery time has passed today,
-    /// or which the app being open has delivered, is scheduled for tomorrow. Replaces stale
-    /// requests. The content is counts only.
+    static let deliveredInAppKey = "brief.deliveredInApp"
+
+    /// Slots the open app has already delivered today, keyed by the day's identifier date so a
+    /// stale entry from an earlier day is ignored (and dropped on the next write).
+    private func slotsDeliveredInApp(on day: Date) -> Set<String> {
+        let stored = defaults.dictionary(forKey: Self.deliveredInAppKey) as? [String: [String]] ?? [:]
+        return Set(stored[dayKey(day)] ?? [])
+    }
+
+    private func markDeliveredInApp(_ kind: BriefSlot.Kind, on day: Date) {
+        let key = dayKey(day)
+        defaults.set([key: (slotsDeliveredInApp(on: day).union([kind.rawValue])).sorted()], forKey: Self.deliveredInAppKey)
+    }
+
+    private func dayKey(_ day: Date) -> String {
+        let parts = calendar.dateComponents([.year, .month, .day], from: day)
+        return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
+    /// Schedules one notification per enabled slot at its delivery time: the slot time if Mark
+    /// is free then, otherwise the first breakpoint at or after the slot, at most 45 minutes
+    /// late. A slot whose delivery time has passed today, or which the app being open has
+    /// delivered (remembered for the day), is scheduled for tomorrow. Replaces stale requests.
+    /// The content is counts only.
     func scheduleBriefNotifications(appOpenedAt: Date? = nil) async {
         let now = clock.now()
         let scheduler = services.briefNotifications
@@ -606,9 +777,16 @@ final class PlannerModel {
                 guard let date = calendar.date(byAdding: .day, value: offset, to: now) else { continue }
                 let interval = day(containing: date)
                 let slotTime = slot.time(on: interval.start, calendar: calendar)
+                if offset == 0 {
+                    if let appOpenedAt, appOpenedAt >= slotTime, appOpenedAt <= now { markDeliveredInApp(slot.kind, on: interval.start) }
+                    if slotsDeliveredInApp(on: interval.start).contains(slot.kind.rawValue) { continue }
+                }
                 let events = offset == 0 ? todayEvents : await classifiedEvents(in: interval)
                 let breakpoints = AvailabilityEngine.breakpoints(for: events, in: interval, calendar: calendar).map(\.date)
-                let time = BriefDelivery.deliveryTime(slotTime: slotTime, breakpoints: breakpoints, appOpenedAt: offset == 0 ? appOpenedAt : nil)
+                let free = AvailabilityEngine.freeSlots(for: events, in: interval, calendar: calendar).map(\.interval)
+                let time = BriefDelivery.deliveryTime(
+                    slotTime: slotTime, breakpoints: breakpoints, appOpenedAt: offset == 0 ? appOpenedAt : nil, freeIntervals: free
+                )
                 guard time > now else { continue }
                 let brief = BriefComposer.compose(
                     slot: slot, now: time, events: events.filter(isIncludedInBrief),
@@ -631,7 +809,7 @@ final class PlannerModel {
 
 /// User-facing planner failures. Messages live in the String Catalog.
 enum PlannerFailure: Identifiable, Equatable {
-    case calendarAccess, calendarRead, tagSave, deadlineRead, deadlineSave, reminderMirror, mirrorNotAllowed
+    case calendarAccess, calendarRead, tagSave, deadlineRead, deadlineSave, reminderMirror, reminderRemove, mirrorNotAllowed
 
     var id: Self { self }
 
@@ -643,7 +821,34 @@ enum PlannerFailure: Identifiable, Equatable {
         case .deadlineRead: "Eagar could not read your deadlines."
         case .deadlineSave: "Eagar could not save the deadline."
         case .reminderMirror: "Eagar could not add the reminder."
+        case .reminderRemove: "Eagar could not remove a mirrored reminder. It will try again the next time it refreshes."
         case .mirrorNotAllowed: "A college deadline can only be mirrored to a college or local reminder list."
+        }
+    }
+}
+
+/// A store failure as logs may show it: the store's own error, a missing record, or anything
+/// else, never the error's text.
+enum StoreFailureKind: Error, LogSafe {
+    case store(StoreError)
+    case missingRecord
+    case other
+
+    init(_ error: any Error) {
+        if let error = error as? StoreError {
+            self = .store(error)
+        } else if let error = error as? StoreFailureKind {
+            self = error
+        } else {
+            self = .other
+        }
+    }
+
+    var logDescription: String {
+        switch self {
+        case let .store(error): error.logDescription
+        case .missingRecord: "missingRecord"
+        case .other: "other"
         }
     }
 }

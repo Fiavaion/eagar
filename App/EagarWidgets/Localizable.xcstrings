@@ -91,6 +91,26 @@
         }
       }
     },
+    "Opens Eagar on today's brief.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñs Éágár óñ tódáý's bríéf. ············]"
+          }
+        }
+      }
+    },
+    "Start brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stárt bríéf ····]"
+          }
+        }
+      }
+    },
     "Stop Eagar AI": {
       "localizations": {
         "ga": {

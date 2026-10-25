@@ -7,5 +7,6 @@ struct EagarWidgetsBundle: WidgetBundle {
         BriefWidget()
         NextDeadlineWidget()
         KillSwitchControl()
+        StartBriefControl()
     }
 }

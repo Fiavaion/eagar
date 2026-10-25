@@ -46,13 +46,19 @@ struct BriefSettings: Codable, Equatable {
         preferences.order = [.overdue] + visible + BriefSectionKind.allCases.filter { $0 != .overdue && !visible.contains($0) }
     }
 
-    /// Unreadable settings fall back to the defaults, and the failure is logged.
+    /// Where unreadable settings are kept, so the next save does not destroy them.
+    static let backupKey = "brief.settings.unreadable"
+
+    /// Unreadable settings are moved to ``backupKey`` and the defaults are used; the failure is
+    /// logged.
     static func load(from defaults: UserDefaults) -> BriefSettings {
         guard let data = defaults.data(forKey: defaultsKey) else { return BriefSettings() }
         do {
             return try JSONDecoder().decode(BriefSettings.self, from: data)
         } catch {
-            EagarLog(.app).error("brief settings unreadable; using defaults")
+            EagarLog(.app).error("brief settings unreadable; kept a backup and using defaults")
+            defaults.set(data, forKey: backupKey)
+            defaults.removeObject(forKey: defaultsKey)
             return BriefSettings()
         }
     }

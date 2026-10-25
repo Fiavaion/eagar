@@ -42,7 +42,7 @@ struct SettingsView: View {
             } header: {
                 Text("Notifications")
             } footer: {
-                Text("Notifications show counts only. College deadlines say \"College deadline\" without a title.")
+                Text("Brief notifications show counts only. Personal deadline reminders show their title; college ones say \"College deadline\" without a title.")
             }
         }
         .navigationTitle(Text("Settings"))
@@ -90,7 +90,9 @@ private struct BriefSettingsSections: View {
 
         Section {
             Picker("Phrasing", selection: settings.phrasingMode) {
-                ForEach(BriefPhrasingMode.allCases, id: \.self) { mode in
+                // "Claude for personal items" is hidden until consent screens exist (Parked,
+                // FR-PRIV-07): without consent every attempt would only be blocked.
+                ForEach(BriefPhrasingMode.allCases.filter { $0 != .claudeForPersonal }, id: \.self) { mode in
                     Text(BriefLabels.phrasing(mode)).tag(mode)
                 }
             }

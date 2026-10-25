@@ -95,6 +95,13 @@
         "identifier": "EagarBriefTests",
         "name": "EagarBriefTests"
       }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarSync",
+        "identifier": "EagarSyncTests",
+        "name": "EagarSyncTests"
+      }
     }
   ],
   "version": 1

@@ -48,6 +48,12 @@ struct RootView: View {
                 await planner.refresh()
             }
         }
+        .task {
+            // The Control Centre "Start brief" control and brief notifications (FR-OS-02, FR-OS-05).
+            for await _ in NotificationCenter.default.notifications(named: .eagarShowBrief) {
+                tab = .today
+            }
+        }
         .onChange(of: scenePhase) { _, phase in
             // Scene activation is the app-open breakpoint (FR-BRIEF-02).
             if phase == .active { Task { await planner.appBecameActive() } }

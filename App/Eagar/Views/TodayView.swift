@@ -9,6 +9,7 @@ struct TodayView: View {
     @State private var editing: DeadlineDraft?
     @State private var rescheduling: BriefItem?
     @State private var viewingEvent: ClassifiedEvent?
+    @State private var addingEvent = false
 
     var body: some View {
         List {
@@ -38,16 +39,32 @@ struct TodayView: View {
         .navigationTitle(Text("Today"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    editing = planner.newDeadlineDraft()
+                Menu {
+                    Button {
+                        editing = planner.newDeadlineDraft()
+                    } label: {
+                        Label("New deadline", systemImage: "flag")
+                    }
+                    .accessibilityIdentifier("today.addDeadline")
+                    Button {
+                        addingEvent = true
+                    } label: {
+                        Label("New event", systemImage: "calendar.badge.plus")
+                    }
+                    .accessibilityIdentifier("today.addEvent")
                 } label: {
-                    Label("Add deadline", systemImage: "plus")
+                    Label("Add", systemImage: "plus")
                 }
-                .accessibilityIdentifier("today.addDeadline")
+                .accessibilityIdentifier("today.add")
             }
         }
         .refreshable { await planner.refresh() }
-        .task { await planner.briefOpened() }
+        // Re-run whenever the shown brief changes, so the open is logged once the brief exists
+        // (FR-BRIEF-08, SM2), not only on first appearance.
+        .task(id: planner.brief?.id) { await planner.briefOpened() }
+        .sheet(isPresented: $addingEvent) {
+            EventEditor(planner: planner, start: planner.newEventStart)
+        }
         .sheet(item: $editing) { draft in
             DeadlineEditor(planner: planner, draft: draft)
         }

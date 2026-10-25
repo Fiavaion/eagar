@@ -171,6 +171,16 @@
         }
       }
     },
+    "Add": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd ··]"
+          }
+        }
+      }
+    },
     "Add a deadline": {
       "localizations": {
         "ga": {
@@ -391,6 +401,16 @@
         }
       }
     },
+    "Brief notifications show counts only. Personal deadline reminders show their title; college ones say \"College deadline\" without a title.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bríéf ñótífíçátíóñs shów çóúñts óñlý. Pérsóñál déádlíñé rémíñdérs shów théír títlé; çóllégé óñés sáý \"Çóllégé déádlíñé\" wíthóút á títlé. ······················································]"
+          }
+        }
+      }
+    },
     "Brief times": {
       "localizations": {
         "ga": {
@@ -541,6 +561,16 @@
         }
       }
     },
+    "Cloud AI with your consent": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çlóúd ÁÍ wíth ýóúr çóñséñt ··········]"
+          }
+        }
+      }
+    },
     "Cloud calls carrying college content: %lld": {
       "localizations": {
         "ga": {
@@ -567,6 +597,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóllégé ···]"
+          }
+        }
+      }
+    },
+    "College content can only be added to a calendar tagged college.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé çóñtéñt çáñ óñlý bé áddéd tó á çáléñdár tággéd çóllégé. ·························]"
           }
         }
       }
@@ -647,6 +687,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóllégé, stáýs óñ ýóúr dévíçés ············]"
+          }
+        }
+      }
+    },
+    "College. Stays on your devices, local AI only.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé. Stáýs óñ ýóúr dévíçés, lóçál ÁÍ óñlý. ··················]"
           }
         }
       }
@@ -961,6 +1011,16 @@
         }
       }
     },
+    "Eagar could not remove a mirrored reminder. It will try again the next time it refreshes.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót rémóvé á mírróréd rémíñdér. Ít wíll trý ágáíñ thé ñéxt tímé ít réfréshés. ····································]"
+          }
+        }
+      }
+    },
     "Eagar could not save the calendar tag.": {
       "localizations": {
         "ga": {
@@ -977,6 +1037,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár çóúld ñót sávé thé déádlíñé. ··············]"
+          }
+        }
+      }
+    },
+    "Eagar could not save the event.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thé évéñt. ············]"
           }
         }
       }
@@ -1007,6 +1077,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár díd ñót fíñd á çáléñdár fróm áñ ñçád.íé áççóúñt. Tó ádd ít: ··························]"
+          }
+        }
+      }
+    },
+    "Eagar does not have calendar access. Allow it in the Settings app.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár dóés ñót hávé çáléñdár áççéss. Állów ít íñ thé Séttíñgs ápp. ··························]"
           }
         }
       }
@@ -1077,6 +1157,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éñd-óf-dáý bríéf ······]"
+          }
+        }
+      }
+    },
+    "Ends": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éñds ··]"
           }
         }
       }
@@ -1661,12 +1751,32 @@
         }
       }
     },
+    "New event": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéw évéñt ····]"
+          }
+        }
+      }
+    },
     "Next deadline": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñéxt déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "No calendar can take new events. Allow calendar access, or add a calendar in the Calendar app.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó çáléñdár çáñ táké ñéw évéñts. Állów çáléñdár áççéss, ór ádd á çáléñdár íñ thé Çáléñdár ápp. ······································]"
           }
         }
       }
@@ -1891,6 +2001,16 @@
         }
       }
     },
+    "Opens Eagar on today's brief.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñs Éágár óñ tódáý's bríéf. ············]"
+          }
+        }
+      }
+    },
     "Opens Eagar's brief.": {
       "localizations": {
         "ga": {
@@ -1987,6 +2107,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Pérsóñál ítéms máý bé súmmáríséd bý Çláúdé, úsíñg ýóúr Çláúdé kéý, óñçé ýóú hávé gívéñ çóñséñt fór ít. Çóllégé ítéms áré álwáýs súmmáríséd óñ ýóúr dévíçés óñlý. Évérý çáll áppéárs íñ thé príváçý lédgér. ·················································································]"
+          }
+        }
+      }
+    },
+    "Personal. Cloud AI with your consent.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñál. Çlóúd ÁÍ wíth ýóúr çóñséñt. ···············]"
           }
         }
       }
@@ -2401,12 +2531,42 @@
         }
       }
     },
+    "Start brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stárt bríéf ····]"
+          }
+        }
+      }
+    },
     "Start using Eagar": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Stárt úsíñg Éágár ·······]"
+          }
+        }
+      }
+    },
+    "Starts": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stárts ··]"
+          }
+        }
+      }
+    },
+    "Stays on your devices · Local AI only": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stáýs óñ ýóúr dévíçés · Lóçál ÁÍ óñlý ···············]"
           }
         }
       }
@@ -2551,6 +2711,16 @@
         }
       }
     },
+    "That calendar is no longer available. Choose another calendar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thát çáléñdár ís ñó lóñgér áváíláblé. Çhóósé áñóthér çáléñdár. ·························]"
+          }
+        }
+      }
+    },
     "The brief shows plain lists, with no AI.": {
       "localizations": {
         "ga": {
@@ -2617,6 +2787,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Thé tést séñds óñé shórt fíxéd mésságé tó Çláúdé Háíkú 5.5 áñd réçórds thé çáll íñ thé príváçý lédgér, wíth íts éxáçt páýlóád áñd çóst. ······················································]"
+          }
+        }
+      }
+    },
+    "This calendar cannot be changed. Choose another calendar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís çáléñdár çáññót bé çháñgéd. Çhóósé áñóthér çáléñdár. ·······················]"
           }
         }
       }

@@ -4,6 +4,7 @@ import EagarLedger
 import EagarSecurity
 import Foundation
 import Observation
+import WidgetKit
 
 /// UI state: the BYOK key, the key test, the privacy ledger and the spend meter (M0), and the
 /// calendars, deadlines and Brief through ``planner`` (M1).
@@ -51,6 +52,7 @@ final class AppModel {
     /// Turns the kill switch on or off from inside the app (Settings).
     func setKillSwitch(_ engaged: Bool) async {
         killSwitch.set(engaged: engaged)
+        ControlCenter.shared.reloadControls(ofKind: "app.eagar.killSwitch")
         await applyKillSwitch(engaged)
     }
 

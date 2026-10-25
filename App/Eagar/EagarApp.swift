@@ -5,6 +5,8 @@ import SwiftUI
 @main
 struct EagarApp: App {
     @State private var startup: Result<AppModel, StartupFailure>
+    /// The notification centre holds its delegate weakly, so the app keeps it.
+    @State private var notifications: NotificationResponder?
 
     init() {
         let inMemory = UserDefaults.standard.bool(forKey: "EagarInMemoryStores")
@@ -14,8 +16,15 @@ struct EagarApp: App {
             let services = try AppServices.make(inMemory: inMemory, eventStore: eventStore)
             // App Intents (Shortcuts, Siri) reach the same services (FR-OS-03).
             AppDependencyManager.shared.add(dependency: services)
-            _startup = State(initialValue: .success(AppModel(services: services)))
+            let model = AppModel(services: services)
+            // Set before launch finishes, so a notification action that launched the app is
+            // delivered (FR-OS-05).
+            let responder = NotificationResponder(planner: model.planner)
+            responder.install()
+            _notifications = State(initialValue: responder)
+            _startup = State(initialValue: .success(model))
         } catch {
+            _notifications = State(initialValue: nil)
             _startup = State(initialValue: .failure(StartupFailure()))
         }
     }

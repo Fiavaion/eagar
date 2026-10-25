@@ -156,6 +156,9 @@ struct DeadlineEditor: View {
             Form {
                 Section {
                     TextField("Title", text: $draft.title)
+                        // Apple Intelligence Writing Tools could send a college title to Private
+                        // Cloud Compute (BD-04): off for college deadlines.
+                        .writingToolsBehavior(draft.dataClass == .college ? .disabled : .automatic)
                         .accessibilityIdentifier("deadline.title")
                     Toggle("All day", isOn: $draft.isAllDay)
                     DatePicker("Due", selection: $draft.dueAt, displayedComponents: draft.isAllDay ? [.date] : [.date, .hourAndMinute])
