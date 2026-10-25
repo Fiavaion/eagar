@@ -13,19 +13,19 @@ permissions:
 
 jobs:
   build-test:
-    # UNVERIFIED: availability of the `macos-26` runner image and of an Xcode 27.x install on it
-    # is an assumption. Mark must confirm (REVIEW_NOTES unresolved #3). PRD: the OS 27 SDK is
-    # needed while deploying to OS 26.
-    runs-on: macos-26
+    # GitHub's `xcode-27` image (preview; macOS 27, Xcode 27.0–27.2, default 27.1). Checked on
+    # 2026-10-25 against actions/runner-images. `macos-26` ships only Xcode 26.x. The OS 27 SDK
+    # is needed while deploying to OS 26 (PRD M0).
+    runs-on: xcode-27
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select newest Xcode 27
+      - name: Select Xcode 27.1 (matches the locally verified build, D-009)
         run: |
-          XCODE="$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1 || true)"
-          if [ -z "$XCODE" ]; then
-            echo "::error::No Xcode 27.x found under /Applications on this runner image. Confirm the runner image (see comment above)."
+          XCODE=/Applications/Xcode_27.1.app
+          if [ ! -d "$XCODE" ]; then
+            echo "::error::Xcode 27.1 not found on this runner image."
             ls -d /Applications/Xcode*.app || true
             exit 1
           fi

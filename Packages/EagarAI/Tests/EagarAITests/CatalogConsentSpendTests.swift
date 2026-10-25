@@ -27,7 +27,7 @@ struct ModelCatalogTests {
         // The tier is chosen on total prompt size, including cache reads.
         #expect(catalog.costMicroUSD(model: haiku, usage: LLMUsage(inputTokens: 1, cacheReadTokens: 100_000)) == Int64(5_001)) // 0.5 + 5,000 µ$, rounded half up
         let sonnet = ModelID("claude-sonnet-5-5")
-        #expect(catalog.costMicroUSD(model: sonnet, usage: LLMUsage(inputTokens: 1_000, outputTokens: 100, cacheReadTokens: 10_000, cacheWriteTokens: 1_000)) == Int64(2_000 + 1_000 + 2_000 + 2_500))
+        #expect(catalog.costMicroUSD(model: sonnet, usage: LLMUsage(inputTokens: 1_000, outputTokens: 100, cacheReadTokens: 10_000, cacheWriteTokens: 1_000)) == Int64(2_000 + 1_000 + 1_000 + 2_500))
         #expect(catalog.costMicroUSD(model: ModelID("unknown"), usage: LLMUsage(inputTokens: 1)) == nil)
     }
 }

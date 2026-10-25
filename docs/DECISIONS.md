@@ -129,6 +129,16 @@ Alternatives: None practical without Mark's signing team.
 Consequences: An unsigned macOS build cannot store the Claude key; Mark sets `DEVELOPMENT_TEAM` in `App/Config/Local.xcconfig`.
 Refs: PRD §10 M0, invariant 6
 
+## D-010  Corrections after checking live docs  (2026-10-25, M0)
+Context: The live pricing page, authentication page and GitHub runner-image list were checked on 2026-10-25.
+Decision:
+- Corrects D-005: Sonnet 5.5 cache reads are **$0.10/MTok (0.05×)**, as RESEARCH.md said; `models.json` had $0.20. Haiku 5.5 cache prices ($0.01 read, $0.125 5-minute write; $0.05 and $0.625 above 100K-token prompts) are confirmed, so the "to verify" note is removed. Source: https://platform.claude.com/docs/en/about-claude/pricing
+- The Claude client now sends `Authorization: Bearer <key>`; the authentication docs call `x-api-key` legacy (still supported). Source: https://platform.claude.com/docs/en/manage-claude/authentication
+- CI runs on GitHub's `xcode-27` image (preview; Xcode 27.1 default, iPhone 17 on the iOS 27.0 runtime) pinned to Xcode 27.1. `macos-26` ships only Xcode 26.x. Resolves REVIEW_NOTES unresolved #3. Source: https://github.com/actions/runner-images
+Alternatives: Keep `macos-26` and drop to Xcode 26.6; rejected, because the PRD needs the OS 27 SDK.
+Consequences: CI's iOS tests run on the iOS 27.0 simulator runtime (deployment target stays 26.0); local runs use 26.5.
+Refs: D-005, D-009, BD-07
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

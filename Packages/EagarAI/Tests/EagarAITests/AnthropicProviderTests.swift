@@ -134,7 +134,8 @@ struct AnthropicProviderTests {
 
         let sent = try #require(StubURLProtocol.captured.withLock { $0.first })
         #expect(sent.url == AnthropicProvider.endpoint)
-        #expect(sent.headers["x-api-key"] == canaryKey)
+        #expect((sent.headers["Authorization"] ?? sent.headers["authorization"]) == "Bearer \(canaryKey)")
+        #expect(sent.headers["x-api-key"] == nil)
         #expect(sent.headers["anthropic-version"] == "2026-10-21")
         #expect(sent.headers["Content-Type"] ?? sent.headers["content-type"] == "application/json")
     }

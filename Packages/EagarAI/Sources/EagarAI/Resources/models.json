@@ -17,15 +17,14 @@
       "pricing": [
         { "maxPromptTokens": 100000, "inputPerMTok": 0.10, "outputPerMTok": 0.50, "cacheReadPerMTok": 0.01, "cacheWrite5mPerMTok": 0.125 },
         { "maxPromptTokens": null, "inputPerMTok": 0.50, "outputPerMTok": 2.50, "cacheReadPerMTok": 0.05, "cacheWrite5mPerMTok": 0.625 }
-      ],
-      "note": "Cache prices assume the standard 0.1x read and 1.25x 5-minute write multipliers; to verify on the pricing page."
+      ]
     },
     {
       "id": "claude-sonnet-5-5",
       "displayName": "Claude Sonnet 5.5",
       "offered": true,
       "pricing": [
-        { "maxPromptTokens": null, "inputPerMTok": 2.00, "outputPerMTok": 10.00, "cacheReadPerMTok": 0.20, "cacheWrite5mPerMTok": 2.50 }
+        { "maxPromptTokens": null, "inputPerMTok": 2.00, "outputPerMTok": 10.00, "cacheReadPerMTok": 0.10, "cacheWrite5mPerMTok": 2.50 }
       ]
     },
     {

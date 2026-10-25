@@ -111,7 +111,7 @@ public struct AnthropicProvider: LLMProvider {
         urlRequest.httpBody = body
         urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
         urlRequest.setValue(Self.apiVersion, forHTTPHeaderField: "anthropic-version")
-        urlRequest.setValue(key.reveal(), forHTTPHeaderField: "x-api-key")
+        urlRequest.setValue("Bearer \(key.reveal())", forHTTPHeaderField: "authorization")
 
         var attempt = 0
         while true {
