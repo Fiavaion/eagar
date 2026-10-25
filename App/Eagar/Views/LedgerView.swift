@@ -31,6 +31,9 @@ struct LedgerView: View {
             Section {
                 if let summary = model.summary {
                     LedgerSummaryView(summary: summary)
+                } else {
+                    ProgressView("Loading the ledger…")
+                        .accessibilityIdentifier("ledger.summary")
                 }
             }
             Section {

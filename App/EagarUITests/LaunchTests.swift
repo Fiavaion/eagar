@@ -12,8 +12,14 @@ final class LaunchTests: XCTestCase {
         // iPadOS may show it twice, so look it up by label regardless of type.
         app.descendants(matching: .any)["Privacy ledger"].firstMatch.tap()
         let summary = app.descendants(matching: .any)["ledger.summary"]
-        XCTAssertTrue(summary.waitForExistence(timeout: 15))
-        XCTAssertTrue(summary.label.contains("Blocked attempts: 0"), summary.label)
+        guard summary.waitForExistence(timeout: 15) else {
+            // Dump the tree so a failure on a runner we can't inspect is diagnosable.
+            XCTFail("ledger summary not found; element tree:\n\(app.debugDescription)")
+            return
+        }
+        let loaded = NSPredicate(format: "label CONTAINS 'Blocked attempts: 0'")
+        expectation(for: loaded, evaluatedWith: summary)
+        waitForExpectations(timeout: 15)
     }
 }
 

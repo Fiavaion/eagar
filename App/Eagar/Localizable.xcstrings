@@ -601,6 +601,16 @@
         }
       }
     },
+    "Loading the ledger…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóádíñg thé lédgér… ········]"
+          }
+        }
+      }
+    },
     "MCP call": {
       "localizations": {
         "ga": {
