@@ -40,10 +40,13 @@ public typealias BriefWidgetSnapshot = WidgetSnapshot
 
 extension WidgetSnapshot {
     /// Builds the snapshot. College items never contribute a title, only to `collegeCount`.
-    public static func make(for brief: Brief, maxLines: Int = 4) -> WidgetSnapshot {
+    /// - Parameter nextDeadline: the earliest open deadline still in the future, from all
+    ///   deadlines. When `nil`, the earliest future deadline in the brief is used (never an
+    ///   overdue one, which a "time until" display can't show).
+    public static func make(for brief: Brief, maxLines: Int = 4, nextDeadline: Date? = nil) -> WidgetSnapshot {
         let items = brief.allItems
         let personal = items.filter { $0.dataClass != .college }
-        let nextDeadline = items.filter { $0.kind == .deadline }.compactMap(\.start).min()
+        let nextDeadline = nextDeadline ?? items.filter { $0.kind == .deadline }.compactMap(\.start).filter { $0 > brief.generatedAt }.min()
         return WidgetSnapshot(
             generatedAt: brief.generatedAt,
             lines: personal.prefix(maxLines).map { Line(title: $0.title, start: $0.start) },

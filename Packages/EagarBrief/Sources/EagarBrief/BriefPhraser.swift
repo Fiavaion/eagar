@@ -104,8 +104,12 @@ public enum BriefPhraser {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = english
         let names = calendar.weekdaySymbols + calendar.shortWeekdaySymbols + calendar.monthSymbols + calendar.shortMonthSymbols
-        // "May" is also a common verb; a "21st May" is still caught by its number.
-        return Set(names.map { $0.lowercased() }).subtracting(["may"]).union(["noon", "midnight"])
+        // "May" is also a common verb; a "21st May" is still caught by its number. Relative days
+        // and parts of the day are checked too, because a model invents those as readily.
+        return Set(names.map { $0.lowercased() }).subtracting(["may"]).union([
+            "noon", "midnight", "today", "tomorrow", "yesterday", "tonight", "morning", "afternoon",
+            "evening", "weekend", "week", "fortnight", "month",
+        ])
     }()
 
     /// One input line: time and title. Times use the brief's calendar time zone; all-day items

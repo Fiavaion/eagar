@@ -59,10 +59,13 @@ public final class CalendarTagStore: Sendable {
         self.collegeDomains = collegeDomains
     }
 
-    /// Eagar's proposal for an untagged calendar: college if its account is on a college domain
-    /// (FR-CAL-02), otherwise personal.
+    /// Eagar's proposal for an untagged calendar: college if its account or its title names a
+    /// college domain (FR-CAL-02), otherwise personal. A proposal is only shown to Mark; until he
+    /// confirms it, the calendar is treated as college (see ``CalendarClassifier``).
     public func proposedClass(for calendar: CalendarInfo) -> DataClass {
-        CollegeDomains.matches(calendar.accountTitle, domains: collegeDomains) ? .college : .personal
+        let named = CollegeDomains.matches(calendar.accountTitle, domains: collegeDomains)
+            || collegeDomains.contains { calendar.title.localizedCaseInsensitiveContains($0) }
+        return named ? .college : .personal
     }
 
     /// Tags for `calendars`: Mark's confirmed tags where they exist, proposals otherwise.
@@ -110,13 +113,20 @@ public final class CalendarTagStore: Sendable {
     }
 }
 
-/// Applies tags to events (BD-03). An event from an untagged calendar gets Eagar's proposal.
+/// Applies tags to events (BD-03, D-017).
+///
+/// Fails closed: an event counts as personal only when Mark has **confirmed** its calendar as
+/// personal. Unconfirmed calendars (whatever Eagar proposed) and unknown calendars are treated as
+/// college, so a Canvas or NCAD feed subscribed under some other account can never be shown or
+/// sent as personal before Mark has looked at it.
 public enum CalendarClassifier {
+    public static func effectiveClass(_ tag: CalendarTag?) -> DataClass {
+        guard let tag, tag.confirmed else { return .college }
+        return tag.dataClass
+    }
+
     public static func classify(_ events: [CalendarEvent], tags: [String: CalendarTag]) -> [ClassifiedEvent] {
-        events.map { event in
-            // A calendar Eagar has never seen is treated as college until tagged (fail closed).
-            ClassifiedEvent(event: event, dataClass: tags[event.calendarID]?.dataClass ?? .college)
-        }
+        events.map { ClassifiedEvent(event: $0, dataClass: effectiveClass(tags[$0.calendarID])) }
     }
 }
 

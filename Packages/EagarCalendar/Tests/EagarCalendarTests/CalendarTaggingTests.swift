@@ -50,15 +50,26 @@ struct CalendarTaggingTests {
         #expect(try await stores.personal.fetch(FetchDescriptor<CalendarRef>()) { $0.calendarIdentifier } == ["home-cal"])
     }
 
-    @Test func classifierFailsClosedForUnknownCalendars() {
+    /// Review finding (D-017): only a confirmed personal tag makes an event personal; unknown
+    /// calendars and unconfirmed proposals are college.
+    @Test func Boundary_classifierFailsClosedUntilConfirmed() {
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         let events = [
             CalendarEvent(id: "1", calendarID: "home-cal", title: "Dentist", start: start, end: start + 1800),
             CalendarEvent(id: "2", calendarID: "never-seen", title: "?", start: start, end: start + 1800),
+            CalendarEvent(id: "3", calendarID: "subscribed-canvas", title: "Assignment due", start: start, end: start + 1800),
         ]
-        let tags = ["home-cal": CalendarTag(calendarID: "home-cal", dataClass: .personal, includeInBrief: true, confirmed: true)]
+        let tags = [
+            "home-cal": CalendarTag(calendarID: "home-cal", dataClass: .personal, includeInBrief: true, confirmed: true),
+            "subscribed-canvas": CalendarTag(calendarID: "subscribed-canvas", dataClass: .personal, includeInBrief: true, confirmed: false),
+        ]
         let classified = CalendarClassifier.classify(events, tags: tags)
-        #expect(classified.map(\.dataClass) == [.personal, .college])
+        #expect(classified.map(\.dataClass) == [.personal, .college, .college])
+    }
+
+    @Test func calendarTitlesNamingTheCollegeAreProposedCollege() async throws {
+        let feed = CalendarInfo(id: "feed", title: "NCAD.ie timetable", accountTitle: "Subscribed Calendars", sourceKind: .subscribed, entity: .event, allowsModification: false)
+        #expect(try makeStore().proposedClass(for: feed) == .college)
     }
 
     /// FR-CAL-04: college-derived content is never written into a personal calendar.

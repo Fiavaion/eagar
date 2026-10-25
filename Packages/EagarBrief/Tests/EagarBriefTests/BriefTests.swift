@@ -94,6 +94,14 @@ struct BriefDeliveryTests {
         #expect(BriefDelivery.deliveryTime(slotTime: slot, breakpoints: [at(8)]) == at(8))
     }
 
+    /// Review finding: free at the slot time means the brief comes at the slot time.
+    @Test func freeAtSlotDeliversAtSlot() {
+        let free = [DateInterval(start: at(7), end: at(9, 30))]
+        #expect(BriefDelivery.deliveryTime(slotTime: at(8), breakpoints: [at(9, 30)], freeIntervals: free) == at(8))
+        let tooShort = [DateInterval(start: at(7), end: at(8, 10))]
+        #expect(BriefDelivery.deliveryTime(slotTime: at(8), breakpoints: [at(8, 40)], freeIntervals: tooShort) == at(8, 40))
+    }
+
     @Test func appOpenCountsAsBreakpoint() {
         #expect(BriefDelivery.deliveryTime(slotTime: at(8), breakpoints: [at(8, 40)], appOpenedAt: at(8, 5)) == at(8, 5))
         #expect(BriefDelivery.deliveryTime(slotTime: at(8), breakpoints: [], appOpenedAt: at(7, 50)) == at(8, 45))
@@ -130,6 +138,8 @@ struct BriefEgressTests {
 
         let widget = BriefWidgetSnapshot.make(for: brief)
         #expect(widget.collegeCount == 2)
+        #expect(widget.nextDeadline == at(17, day: 16)) // the future one, not the overdue one
+        #expect(BriefWidgetSnapshot.make(for: brief, nextDeadline: at(9, day: 30)).nextDeadline == at(9, day: 30))
         let encoded = String(decoding: try! JSONEncoder().encode(widget), as: UTF8.self)
         for title in collegeTitles { #expect(!encoded.contains(title)) }
         #expect(widget.lines.compactMap(\.title) == ["Bank holiday", "Dentist", "Renew car tax"])
@@ -211,7 +221,9 @@ struct BriefPhrasingTests {
         ("09:30 Studio crit\n13:00 Lunch with Sam", "Studio crit at 9:30, then lunch with Sam at 13:00.", true),
         ("13:00 Lunch with Sam", "Lunch with Sam at 14:00.", false),
         ("13:00 Lunch with Sam", "Lunch with Sam on Friday.", false),
-        ("13:00 Lunch with Sam", "You may want to leave early for lunch with Sam at 13:00 today.", true),
+        ("13:00 Lunch with Sam", "You may want to leave early for lunch with Sam at 13:00.", true),
+        ("13:00 Lunch with Sam", "Lunch with Sam at 13:00 tomorrow.", false),
+        ("All day: Bin collection", "Bin collection this afternoon.", false),
     ])
     func faithfulnessGuard(source: String, output: String, faithful: Bool) {
         #expect(BriefPhraser.isFaithful(output, to: source) == faithful)
