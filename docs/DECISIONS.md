@@ -164,6 +164,13 @@ Alternatives: Defer to M3; Mark chose to settle them now.
 Consequences: The Windows app's validator must implement the same two semantic rules to stay in step. Five new invalid fixtures cover the changes.
 Refs: D-003, D-007, BD-05, BD-12, BD-22, Appendix F
 
+## D-014  CI green on GitHub; lint proven on a test branch  (2026-10-25, M0)
+Context: The last M0 criteria: CI green on push, and CI lint rejecting a deliberately added `print(` and a hard-coded `sk-ant-` string in a test branch.
+Decision: Public repo https://github.com/Fiavaion/eagar (Mark chose public; author identity is his GitHub no-reply address). CI run 40225611094 on `m0/foundations` passed every step on the `xcode-27` runner (lint, lint self-test, all package tests, the macOS and iOS test plans, the catalog check). Branch `ci/lint-check` with a `print(` and a fake `sk-ant-` string failed at the Lint step (run 40227051417, `[no-print]` and `[secrets]`); the branch was then deleted. Getting to green fixed: a duplicate `EagarAI` copy in the app test bundle, the macOS 27 `Tab` element type, the Passwords autofill pop-up taking the first click, and inactive-window clicks on the CI VM (the ledger UI test now opens its tab with `-EagarInitialTab`; tap navigation stays tested on iOS).
+Alternatives: None.
+Consequences: Every M0 acceptance criterion in PRD §10 is met; awaiting Mark's sign-off before tagging `m0`.
+Refs: PRD §10 M0, D-010, D-012
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
