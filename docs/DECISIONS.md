@@ -185,6 +185,17 @@ Alternatives: Use the other team, if it is Mark's; he chose the new ID.
 Consequences: Supersedes the bundle ID in D-011. Extensions will be `com.fiavaion.eagarapp.<name>`. CloudKit stays in the development environment until M6.
 Refs: D-011, BD-02, PRD §10 M1
 
+## D-017  M1 calendar, deadline and brief rules  (2026-10-25, M1)
+Context: Edge cases the PRD leaves open for M1.
+Decision:
+- **Calendars:** a calendar on an `ncad.ie` account (subdomains included) is proposed as college; a calendar Eagar has never seen is treated as college until tagged (fail closed). Retagging moves the `CalendarRef` between stores. College-derived content is never written into a non-college calendar; personal content may go into a college calendar.
+- **Availability:** all-day events block time only when busy or unavailable; the window is half-open; every event end is a breakpoint, and the 15-minute rule creates a gap breakpoint only where no event end already marks it (BD-21 counts both). Busy blocks, event-end breakpoints and conflicts carry the taint of their events.
+- **Deadlines:** offsets of 2 hours or less are `timeSensitive`, others `active`; whole-day offsets use calendar arithmetic so local time survives DST; all-day deadlines notify at 09:00 local. Snoozing schedules a reminder when the snooze ends. Notification sync re-adds every planned request, so edits replace stale ones. College notifications say "College deadline" and never include the title. College deadlines mirror only to local or college reminder lists, never iCloud, unless overridden per item.
+- **Brief:** sections are overdue (always first), today, deadlines, then the later-milestone sections; all-day events lead "today". The brief notification and its body are counts only for every class; widgets show personal titles and a college count. AI phrasing sends a section's college items and its other items as separate requests, so personal lines can use Claude (`claudeForPersonal` mode, with consent) while college lines are phrased only locally. Phrasing failures leave the deterministic text. Brief-level event-log entries take the brief's most restrictive class.
+Alternatives: Phrase whole sections, which would force any mixed section to local only; rejected.
+Consequences: B-6 and the counts-only egress test cover these paths.
+Refs: FR-CAL-02..04, FR-DL-02/03, FR-BRIEF-01..08, BD-04, BD-21
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

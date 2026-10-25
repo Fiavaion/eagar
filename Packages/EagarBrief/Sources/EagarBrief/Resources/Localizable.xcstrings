@@ -1,0 +1,66 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "Items to look at: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ítéms tó lóók át: %lld ·········]"
+          }
+        }
+      }
+    },
+    "Items to look at: %lld, including college items: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ítéms tó lóók át: %lld, íñçlúdíñg çóllégé ítéms: %lld ·····················]"
+          }
+        }
+      }
+    },
+    "Nothing needs you right now.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóthíñg ñééds ýóú ríght ñów. ···········]"
+          }
+        }
+      }
+    },
+    "Your end-of-day brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr éñd-óf-dáý bríéf ········]"
+          }
+        }
+      }
+    },
+    "Your midday brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr míddáý bríéf ·······]"
+          }
+        }
+      }
+    },
+    "Your morning brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr mórñíñg bríéf ·······]"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
