@@ -146,6 +146,13 @@ Alternatives: The legacy file-based macOS keychain needs no entitlement, but it 
 Consequences: Each new Mac or device used for development must be registered to the team. Release builds keep hardened runtime for notarisation.
 Refs: D-009, invariant 6, BD-07
 
+## D-012  M0 live smoke test passed  (2026-10-25, M0)
+Context: M0 acceptance requires a manual "test key" run with Mark's key.
+Decision: Mark ran it on his team-signed Mac build with a key in a dedicated workspace. Result: "Key works with claude-haiku-5-5", cost US$0.000004. The ledger entry (kind `keyTest`, tier `anthropicCloud`, destination `anthropic`, region `global`, outcome `succeeded`, 18 input / 4 output tokens, 4 µ$, 1.19 s, class `publicContent`) holds the exact payload, including the fixed prompt, and no key or `Authorization` header. This confirms `anthropic-version: 2026-10-21`, Bearer auth and `effort: low` on Haiku 5.5 against the live API (D-005, D-010).
+Alternatives: None.
+Consequences: All M0 acceptance criteria are met except CI green on GitHub, which needs a push.
+Refs: PRD §10 M0, FR-AI-07, FR-PRIV-01, FR-PRIV-04
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
