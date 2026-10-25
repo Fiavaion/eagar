@@ -8,6 +8,11 @@ public struct LedgerEntryID: Hashable, Codable, Sendable, LogSafe {
     public let rawValue: UUID
     public let store: StoreKind
 
+    public init(rawValue: UUID, store: StoreKind) {
+        self.rawValue = rawValue
+        self.store = store
+    }
+
     public var logDescription: String { rawValue.uuidString }
 }
 
