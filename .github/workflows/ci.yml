@@ -63,7 +63,9 @@ jobs:
         run: |
           if [ -f App/project.yml ]; then
             xcodebuild -project App/Eagar.xcodeproj -scheme Eagar -testPlan Eagar \
-              -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO test
+              -destination 'platform=macOS' -derivedDataPath build/DerivedData CODE_SIGN_IDENTITY=- test
+            # Every UI string is in the catalog with a ga scaffold (D-008)
+            python3 Tools/sync-strings.py build/DerivedData --check
           else
             echo "::notice::Skipped: App/project.yml not present yet."
           fi
@@ -72,7 +74,7 @@ jobs:
         run: |
           if [ -f App/project.yml ]; then
             xcodebuild -project App/Eagar.xcodeproj -scheme Eagar -testPlan Eagar \
-              -destination 'platform=iOS Simulator,name=iPhone 17' CODE_SIGNING_ALLOWED=NO test
+              -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData CODE_SIGN_IDENTITY=- test
           else
             echo "::notice::Skipped: App/project.yml not present yet."
           fi

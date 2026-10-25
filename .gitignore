@@ -24,3 +24,4 @@ PushServer/.wrangler/
 
 # Source bundle of the specs (duplicates the files in the repo)
 eagar-docs.zip
+build/

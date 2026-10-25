@@ -103,7 +103,7 @@ Refs: BD-07, FR-AI-07..11
 
 ## D-006  Store hardening  (2026-10-25, M0)
 Context: Parallel tests crashed (SIGSEGV, ~50% of runs) inside Core Data while loading several `ModelContainer`s for the same model types at once.
-Decision: `EagarStores` creates containers one at a time, process-wide. A record whose stored class is unrecognised reads as `college`. Every save re-checks the class of inserted and changed models, and a throwing `perform` rolls back. `SyncRegistry` is the only gate a sync engine may use and refuses CollegeStore; the M1 `EagarSync` engine must register through it (until then B-4's sync half asserts the gate, not an engine).
+Decision: `EagarStores` creates containers one at a time, process-wide. The CollegeStore directory is excluded from backup, and every file in it is flagged explicitly after opening, because iOS does not report the directory's flag on its children (found by B-4 on the iOS simulator). A record whose stored class is unrecognised reads as `college`. Every save re-checks the class of inserted and changed models, and a throwing `perform` rolls back. `SyncRegistry` is the only gate a sync engine may use and refuses CollegeStore; the M1 `EagarSync` engine must register through it (until then B-4's sync half asserts the gate, not an engine).
 Alternatives: Disable parallel tests; rejected, because the app may open stores from more than one task.
 Consequences: Container creation is serialised; this is a one-off cost at launch.
 Refs: BD-02, FR-CORE-02, B-3, B-4
