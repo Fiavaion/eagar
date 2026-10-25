@@ -7,6 +7,8 @@ public enum DerivationID: String, Sendable, CaseIterable, LogSafe {
     case aiRequestPayload
     /// The class of a privacy-ledger entry describing an AI call (BD-19).
     case ledgerEntry
+    /// Busy blocks, free slots and breakpoints computed from classified events (FR-CAL-03).
+    case calendarAvailability
 
     public var logDescription: String { rawValue }
 }
