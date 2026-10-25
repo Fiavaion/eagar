@@ -73,8 +73,13 @@ jobs:
       - name: App tests (iOS Simulator)
         run: |
           if [ -f App/project.yml ]; then
+            # Boot the simulator first: a cold simulator can crash the UI-test runner while it
+            # bootstraps ("Early unexpected exit"). Retry failed tests once.
+            xcrun simctl boot 'iPhone 17' || true
+            xcrun simctl bootstatus 'iPhone 17' -b
             xcodebuild -project App/Eagar.xcodeproj -scheme Eagar -testPlan Eagar \
-              -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData CODE_SIGN_IDENTITY=- test
+              -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData CODE_SIGN_IDENTITY=- \
+              -retry-tests-on-failure -test-iterations 2 test
           else
             echo "::notice::Skipped: App/project.yml not present yet."
           fi

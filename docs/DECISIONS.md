@@ -232,6 +232,26 @@ Alternatives: A Darwin notification from the extension instead of polling; polli
 Consequences: The two-device sync test and the Control Centre toggle need Mark's signed builds.
 Refs: FR-CORE-07, FR-OS-01..03, FR-BRIEF-06, BD-02, B-7, D-016, D-018
 
+## D-021  M1 review fixes and the behaviour they settle  (2026-10-25, M1)
+Context: A fresh-context review of all M1 code found no blocker but 5 high and 12 medium issues (each high one confirmed by a probe). All are fixed with tests.
+Decision:
+- **Calendars fail closed:** an event counts as personal only once Mark has **confirmed** its calendar as personal. Unconfirmed proposals and unknown calendars are college, so a Canvas or NCAD feed under any other account never shows or travels as personal. Calendar titles naming ncad.ie are also proposed as college. (Tightens D-017.)
+- **Intent donations:** the planner never asks to donate a college deadline; the B-7 spy now records every call, so the test fails if it does. Moving a deadline to college withdraws "Add a deadline" donations (they can't be withdrawn one by one).
+- **Writing Tools** are off on college deadline titles and on event fields for college calendars (BD-04).
+- **Class change** copies every field into the new store first, then deletes the old record; a failure rolls back and is shown.
+- **Brief delivery:** if Mark is free at the slot time with 15+ minutes to spare, the brief comes at the slot time. A slot delivered by opening the app is remembered for the day and not notified again. Granting notification permission schedules the brief.
+- **Reminders mirroring:** rescheduling updates the mirrored reminder; marking done removes it; snoozing leaves it. A failed removal is shown and retried on every refresh.
+- **Notification actions (FR-OS-05):** Done marks the deadline done; Snooze snoozes for 1 hour (it does not move the due date). Categories are registered once at launch for all notification kinds.
+- **Controls (FR-OS-02):** "Start brief" opens Today; the kill-switch control is reloaded after an in-app or Shortcut change.
+- **FR-CAL-04:** a "New event" sheet writes through `CalendarWriter` to a chosen modifiable calendar; manually typed events derive from nothing.
+- **FR-CORE-06:** each calendar shows class, processing mode and a boundary icon (house: "Stays on your devices · Local AI only"; cloud: "Cloud AI with your consent").
+- **"Claude for personal items" phrasing** is hidden until consent screens exist (Parked).
+- **The widget's next deadline** is the earliest open, unsnoozed future deadline across all deadlines.
+- **CI:** the iOS job boots the simulator first and retries failed tests once (the UI-test runner crashed while bootstrapping on a cold simulator).
+Alternatives: Marking a mirrored reminder complete on done; the event-store adapter has no completion call yet.
+Consequences: First-run tag confirmation matters: until Mark confirms "personal", those calendars' events appear as college counts.
+Refs: D-017, D-019, D-020, FR-CAL-04, FR-CORE-06, FR-OS-02, FR-OS-05, FR-BRIEF-02/08, FR-DL-03, BD-04, B-7
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
