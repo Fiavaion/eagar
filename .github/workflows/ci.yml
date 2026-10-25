@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    # UNVERIFIED: availability of the `macos-26` runner image and of an Xcode 27.x install on it
+    # is an assumption. Mark must confirm (REVIEW_NOTES unresolved #3). PRD: the OS 27 SDK is
+    # needed while deploying to OS 26.
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode 27
+        run: |
+          XCODE="$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1 || true)"
+          if [ -z "$XCODE" ]; then
+            echo "::error::No Xcode 27.x found under /Applications on this runner image. Confirm the runner image (see comment above)."
+            ls -d /Applications/Xcode*.app || true
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Lint
+        run: Tools/lint.sh
+
+      - name: Lint self-test
+        run: Tools/lint-selftest.sh
+
+      - name: Swift package tests
+        run: |
+          for p in Packages/*/; do
+            if [ -f "${p}Package.swift" ]; then
+              echo "::group::swift test $p"
+              swift test --package-path "$p"
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Generate Xcode project
+        run: |
+          if [ -f App/project.yml ]; then
+            xcodegen generate --spec App/project.yml
+          else
+            echo "::notice::App/project.yml not present yet; skipping Xcode project generation and app tests."
+          fi
+
+      - name: App tests (macOS)
+        run: |
+          if [ -f App/project.yml ]; then
+            xcodebuild -project App/Eagar.xcodeproj -scheme Eagar -testPlan Eagar \
+              -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO test
+          else
+            echo "::notice::Skipped: App/project.yml not present yet."
+          fi
+
+      - name: App tests (iOS Simulator)
+        run: |
+          if [ -f App/project.yml ]; then
+            xcodebuild -project App/Eagar.xcodeproj -scheme Eagar -testPlan Eagar \
+              -destination 'platform=iOS Simulator,name=iPhone 17' CODE_SIGNING_ALLOWED=NO test
+          else
+            echo "::notice::Skipped: App/project.yml not present yet."
+          fi
+
+  # M5: Cloudflare push server. Enable when PushServer/ exists.
+  # push-server:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 15
+  #   defaults:
+  #     run:
+  #       working-directory: PushServer
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22
+  #         cache: npm
+  #         cache-dependency-path: PushServer/package-lock.json
+  #     - run: npm ci
+  #     - run: npm test
