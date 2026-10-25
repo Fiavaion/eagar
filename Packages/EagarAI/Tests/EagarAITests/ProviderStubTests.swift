@@ -1,20 +1,46 @@
 import EagarAITestSupport
 import EagarCore
 import Foundation
+import FoundationModels
 import Testing
 @testable import EagarAI
 
 struct ProviderStubTests {
-    @Test func appleOnDeviceStubIsLocalAndHasNoWireFormat() async throws {
+    @Test func appleOnDeviceIsLocalAndHasNoWireFormat() async throws {
         let provider = AppleOnDeviceProvider()
         let capabilities = await provider.capabilities()
         #expect(capabilities.locality == .onDevice)
         #expect(!capabilities.locality.tier.leavesOwnerDevices)
-        _ = await provider.reachability() // depends on the host; must not crash
+        #expect(capabilities.maxContextTokens >= 4_096) // read at runtime on 26.4+
         let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("x", dataClass: .college)])
         #expect(try provider.encodeRequest(request, model: capabilities.defaultModel) == nil)
-        let call = RoutedCall(request: request, effectiveClass: .college, ledgerEntryID: nil, model: capabilities.defaultModel, tier: .onDevice, wirePayload: nil)
-        await #expect(throws: AIError.provider(.unavailable)) { try await provider.complete(call) }
+        let wrongTier = RoutedCall(request: request, effectiveClass: .college, ledgerEntryID: nil, model: capabilities.defaultModel, tier: .macLocal, wirePayload: nil)
+        await #expect(throws: AIError.provider(.misconfigured)) { try await provider.complete(wrongTier) }
+        var schemaRequest = request
+        schemaRequest.outputSchema = JSONSchema(name: "S", json: Data("{}".utf8), dataClass: .publicContent)
+        let withSchema = RoutedCall(request: schemaRequest, effectiveClass: .college, ledgerEntryID: nil, model: capabilities.defaultModel, tier: .onDevice, wirePayload: nil)
+        await #expect(throws: AIError.provider(.misconfigured)) { try await provider.complete(withSchema) }
+    }
+
+    /// FR-AI-06: sizing is arithmetic against the runtime context, never a fixed 4,096 or 8,192.
+    @Test func appleOnDeviceSizing() {
+        let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("one", dataClass: .personal), ClassifiedPayload("two", dataClass: .personal)])
+        #expect(AppleOnDeviceProvider.prompt(for: request) == "one\n\ntwo")
+        #expect(AppleOnDeviceProvider.fits(needed: 3_000, output: 1_000, context: 4_096))
+        #expect(!AppleOnDeviceProvider.fits(needed: 3_200, output: 1_000, context: 4_096))
+        #expect(AppleOnDeviceProvider.fits(needed: 7_000, output: 1_000, context: 8_192))
+        #expect(AppleOnDeviceProvider.estimatedTokens("") == 0)
+        #expect(AppleOnDeviceProvider.estimatedTokens("abcd") == 2)
+    }
+
+    /// A real on-device call, run only where Apple Intelligence is available (e.g. Mark's Mac).
+    @Test(.enabled(if: { if case .available = SystemLanguageModel.default.availability { true } else { false } }(), "Apple Intelligence not available"))
+    func appleOnDeviceLiveCall() async throws {
+        let provider = AppleOnDeviceProvider()
+        let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("Reply with the single word OK.", dataClass: .publicContent)], maxOutputTokens: 16)
+        let call = RoutedCall(request: request, effectiveClass: .publicContent, ledgerEntryID: nil, model: ModelID("apple.systemLanguageModel"), tier: .onDevice, wirePayload: nil)
+        let response = try await provider.complete(call)
+        #expect(response.stopReason == .refusal || !response.text.isEmpty)
     }
 
     @Test func defaultStreamYieldsOneCompletedEvent() async throws {
@@ -43,6 +69,7 @@ struct ProviderStubTests {
             .boundaryViolation(requested: .anthropicCloud, reason: .collegeBoundary), .noPermittedProvider,
             .ledgerWriteFailed, .modelNotOffered, .provider(.http(status: 503)), .provider(.missingAPIKey),
             .provider(.network), .provider(.timedOut), .provider(.decoding), .provider(.unavailable), .provider(.misconfigured),
+            .provider(.contextTooLarge), .provider(.keychain(status: -1)),
         ]
         #expect(Set(errors.map(\.logDescription)).count == errors.count)
         #expect(ModelID("claude-haiku-5-5").logDescription == "claude-haiku-5-5")

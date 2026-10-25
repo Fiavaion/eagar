@@ -293,6 +293,8 @@ public enum ProviderFailure: Sendable, Equatable, LogSafe {
     case decoding
     case unavailable
     case misconfigured
+    /// The prompt does not fit the model's context; split the work into smaller requests.
+    case contextTooLarge
 
     public var logDescription: String {
         switch self {
@@ -304,6 +306,7 @@ public enum ProviderFailure: Sendable, Equatable, LogSafe {
         case .decoding: "decoding"
         case .unavailable: "unavailable"
         case .misconfigured: "misconfigured"
+        case .contextTooLarge: "contextTooLarge"
         }
     }
 }

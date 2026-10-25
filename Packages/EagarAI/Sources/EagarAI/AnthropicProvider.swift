@@ -151,7 +151,7 @@ public struct AnthropicProvider: LLMProvider {
         switch failure {
         case let .http(status): status == 429 || status >= 500
         case .network, .timedOut: true
-        case .missingAPIKey, .keychain, .decoding, .unavailable, .misconfigured: false
+        case .missingAPIKey, .keychain, .decoding, .unavailable, .misconfigured, .contextTooLarge: false
         }
     }
 
