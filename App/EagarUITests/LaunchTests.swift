@@ -8,11 +8,9 @@ final class LaunchTests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
 
-        // The tab's element type differs by platform and OS (button, radio button, tab), and
-        // iPadOS may show it twice, so look it up by label regardless of type.
-        app.descendants(matching: .any)["Privacy ledger"].firstMatch.tap()
         let summary = app.descendants(matching: .any)["ledger.summary"]
-        guard summary.waitForExistence(timeout: 15) else {
+        open(tab: "Privacy ledger", in: app, until: summary)
+        guard summary.exists else {
             // Dump the tree so a failure on a runner we can't inspect is diagnosable.
             XCTFail("ledger summary not found; element tree:\n\(app.debugDescription)")
             return
@@ -20,6 +18,21 @@ final class LaunchTests: XCTestCase {
         let loaded = NSPredicate(format: "label CONTAINS 'Blocked attempts: 0'")
         expectation(for: loaded, evaluatedWith: summary)
         waitForExpectations(timeout: 15)
+    }
+}
+
+/// Switches tabs. The tab is a `Tab` on macOS 27, a radio button on macOS 26 and a button on
+/// iOS. On macOS the focused key field can open the Passwords autofill pop-up, which swallows
+/// the first click, so Escape dismisses it and the switch is retried.
+@MainActor
+private func open(tab label: String, in app: XCUIApplication, until target: XCUIElement) {
+    for _ in 0..<3 {
+        #if os(macOS)
+        app.typeKey(XCUIKeyboardKey.escape, modifierFlags: [])
+        #endif
+        let candidates = [app.tabs[label], app.buttons[label], app.radioButtons[label]].map(\.firstMatch)
+        candidates.first(where: \.exists)?.tap()
+        if target.waitForExistence(timeout: 5) { return }
     }
 }
 
