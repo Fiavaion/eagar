@@ -1,6 +1,6 @@
 # Decisions
 
-Current milestone: M0
+Current milestone: M1
 
 ADR-style log of decisions made during the build. Append only; never rewrite history. Format:
 
@@ -170,6 +170,13 @@ Decision: Public repo https://github.com/Fiavaion/eagar (Mark chose public; auth
 Alternatives: None.
 Consequences: Every M0 acceptance criterion in PRD §10 is met; awaiting Mark's sign-off before tagging `m0`.
 Refs: PRD §10 M0, D-010, D-012
+
+## D-015  M0 signed off  (2026-10-25, M0)
+Context: Every M0 acceptance criterion passed (D-012, D-014).
+Decision: Mark signed off M0. `m0/foundations` was fast-forwarded into `main` and tagged `m0`. Current milestone: M1.
+Alternatives: None.
+Consequences: M1 work starts on `m1/<topic>` branches, after an M1 plan is agreed.
+Refs: PRD §10 M0, CLAUDE.md "How to work"
 
 ## Parked
 
