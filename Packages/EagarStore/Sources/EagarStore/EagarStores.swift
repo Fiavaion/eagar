@@ -80,12 +80,28 @@ public final class EagarStores: Sendable {
                     cloudKitDatabase: .none
                 )
             }
-            return try containerCreation.withLock { _ in
+            let container = try containerCreation.withLock { _ in
                 try ModelContainer(for: schema, configurations: configuration)
             }
+            if kind == .college, case let .directory(root) = location {
+                try excludeContentsFromBackup(of: root.appending(path: "College", directoryHint: .isDirectory))
+            }
+            return container
         } catch {
             EagarLog(.store).fault("could not open \(kind) store")
             throw .setupFailed(kind)
+        }
+    }
+
+    /// Flags every file already in the college directory (the SQLite store and its -wal/-shm
+    /// files). Excluding the directory covers files created later; iOS does not report the
+    /// directory's flag on its children, so the files are flagged explicitly as well (B-4).
+    private static func excludeContentsFromBackup(of directory: URL) throws {
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        for file in try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) {
+            var url = file
+            try url.setResourceValues(values)
         }
     }
 
