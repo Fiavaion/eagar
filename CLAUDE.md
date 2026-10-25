@@ -45,7 +45,7 @@ Package dependencies follow the layer list in PRD §7.2 (downward only: `EagarCo
 
 ## Build and test
 
-The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Simulator names are placeholders; update this section when M0 creates the project and whenever Xcode changes them.
+The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Verified with Xcode 27.1 and the iOS 26.5 simulator runtime (D-009); update the simulator names whenever Xcode changes them. The project is generated (D-001): run `xcodegen generate --spec App/project.yml` first and after any change to `project.yml`. Unsigned local builds can pass `CODE_SIGN_IDENTITY=-`; macOS Keychain access needs `DEVELOPMENT_TEAM` in `App/Config/Local.xcconfig`.
 
 ```sh
 # Unit tests for one package (fast; run constantly)
@@ -53,6 +53,9 @@ swift test --package-path Packages/EagarAI
 
 # All packages
 for p in Packages/*/; do swift test --package-path "$p" || exit 1; done
+
+# Generate the Xcode project (D-001)
+xcodegen generate --spec App/project.yml
 
 # App build, iOS simulator
 xcodebuild -project App/Eagar.xcodeproj -scheme Eagar \
@@ -71,12 +74,17 @@ xcodebuild -project App/Eagar.xcodeproj -scheme Eagar \
   -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M5)' build
 
 # Boundary and invariant suite only (must always pass)
+swift test --package-path Packages/EagarCore --filter Boundary
 swift test --package-path Packages/EagarAI --filter Boundary
 swift test --package-path Packages/EagarStore --filter Boundary
 swift test --package-path Packages/EagarCompose --filter SendInvariant   # from M3, when EagarCompose exists
 
-# Lints (no print, no secrets, import/host boundary, pinned deps, string catalogs)
+# Lints (no print, no secrets, import/host boundary, pinned deps, string catalogs) and their self-test
 Tools/lint.sh
+Tools/lint-selftest.sh
+
+# After adding UI strings: merge extracted strings into the catalog with a ga scaffold (D-008)
+Tools/sync-strings.py ~/Library/Developer/Xcode/DerivedData/Eagar-*/
 
 # Push server (from M5)
 cd PushServer && npm ci && npm test
