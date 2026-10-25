@@ -220,6 +220,18 @@ Alternatives: Keep local phrasing on by default with the check; rejected while t
 Consequences: The deterministic brief is what Mark sees by default.
 Refs: FR-BRIEF-04, FR-DL-03, FR-CAL-05
 
+## D-020  M1 wiring: kill switch, sync, widgets, Shortcuts  (2026-10-25, M1)
+Context: Connecting the M1 packages to the app.
+Decision:
+- **Kill switch:** shared state in the App Group (`KillSwitchState`). The Control Centre control and the "Stop Eagar AI" Shortcut set it (one `SetKillSwitchIntent`, compiled into the app and the widget extension); Settings has a toggle. While the app runs it checks the state every 0.5 s and halts or resumes the router, so a change made in Control Centre stops AI within 1 s.
+- **Sync:** compiled in only when `EAGAR_CLOUDKIT` is set (Mark's `Local.xcconfig`), because creating a CloudKit container without the iCloud entitlement crashes and CI builds are unsigned. Only `Deadline` syncs in M1. It syncs on app activation and after deadline changes. After an iCloud account change, Settings offers "Sync with this iCloud account" (D-018).
+- **Widgets:** `EagarWidgets` extension (Brief, Next deadline, kill-switch control), App ID `com.fiavaion.eagarapp.widgets` with the App Group. The app publishes a `WidgetSnapshot` (personal titles, college count) after each brief composition and reloads timelines. The widget never sees college titles. Unsigned builds have no App Group, so widgets show placeholders.
+- **Shortcuts (FR-OS-03):** "Add a deadline" (always personal) and "Show my brief", plus "Stop Eagar AI". The app donates "Add a deadline" only for personal deadlines; college items are never donated (B-7).
+- **Signing:** `Local.xcconfig` sets `DEVELOPMENT_TEAM`, `EAGAR_ENTITLEMENTS`, `EAGAR_WIDGET_ENTITLEMENTS` and `EAGAR_CLOUDKIT`; CI uses the unsigned defaults in `Base.xcconfig`.
+Alternatives: A Darwin notification from the extension instead of polling; polling is simpler and only runs while the app is open.
+Consequences: The two-device sync test and the Control Centre toggle need Mark's signed builds.
+Refs: FR-CORE-07, FR-OS-01..03, FR-BRIEF-06, BD-02, B-7, D-016, D-018
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

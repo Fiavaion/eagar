@@ -4,6 +4,7 @@ import EagarCore
 import EagarLedger
 import EagarSecurity
 import EagarStore
+import EagarSync
 import EagarSuggest
 import Foundation
 import SwiftData
@@ -24,6 +25,10 @@ struct AppServices: Sendable {
     let eventLog: EventLog
     let deadlineNotifications: any NotificationScheduling
     let briefNotifications: any BriefNotificationScheduling
+    /// PersonalStore sync (BD-02). `nil` unless the build has the iCloud entitlement (D-020).
+    let sync: PersonalSyncEngine?
+    let donations: any IntentDonating
+    let widgets: any WidgetPublishing
 
     /// Every SwiftData model in the app. Both stores share one schema; placement is per record.
     static var models: [any PersistentModel.Type] {
@@ -35,7 +40,9 @@ struct AppServices: Sendable {
         secrets: any SecretStore = Keychain(),
         eventStore: any EventStoreAdapting = EventKitAdapter(),
         deadlineNotifications: any NotificationScheduling = UserNotificationScheduler(),
-        briefNotifications: any BriefNotificationScheduling = UserBriefNotificationScheduler()
+        briefNotifications: any BriefNotificationScheduling = UserBriefNotificationScheduler(),
+        donations: any IntentDonating = SystemIntentDonor(),
+        widgets: any WidgetPublishing = SystemWidgetPublisher()
     ) throws -> AppServices {
         let location: StoreLocation = inMemory
             ? .inMemory
@@ -55,8 +62,29 @@ struct AppServices: Sendable {
             stores: stores, ledger: ledger, consents: consents, router: router,
             secrets: secrets, catalog: catalog, policy: policy,
             eventStore: eventStore, calendarTags: CalendarTagStore(stores: stores), eventLog: EventLog(stores: stores),
-            deadlineNotifications: deadlineNotifications, briefNotifications: briefNotifications
+            deadlineNotifications: deadlineNotifications, briefNotifications: briefNotifications,
+            sync: inMemory ? nil : makeSync(stores: stores), donations: donations, widgets: widgets
         )
+    }
+
+    static let iCloudContainer = "iCloud.com.fiavaion.eagarapp"
+
+    /// Sync is compiled in only for team-signed builds (`EAGAR_CLOUDKIT`, set in Local.xcconfig):
+    /// creating a CloudKit container without the iCloud entitlement crashes, and CI builds are
+    /// unsigned. Only PersonalStore is synced; the coordinator refuses CollegeStore.
+    static func makeSync(stores: EagarStores) -> PersonalSyncEngine? {
+        #if EAGAR_CLOUDKIT
+        let stateURL = URL.applicationSupportDirectory.appending(path: "Eagar/Sync/personal-sync.json")
+        do {
+            let coordinator = try SyncCoordinator(store: stores.personal, adapters: [AnySyncAdapter(DeadlineSyncAdapter())], stateURL: stateURL)
+            return PersonalSyncEngine(containerIdentifier: iCloudContainer, coordinator: coordinator)
+        } catch {
+            EagarLog(.app).error("personal sync not started")
+            return nil
+        }
+        #else
+        return nil
+        #endif
     }
 }
 

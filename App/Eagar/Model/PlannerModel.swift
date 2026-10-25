@@ -127,6 +127,7 @@ final class PlannerModel {
 
     /// Launch and scene activation: the app-open breakpoint (FR-BRIEF-02).
     func appBecameActive() async {
+        await services.sync?.syncNow()
         await refresh()
         await scheduleBriefNotifications(appOpenedAt: clock.now())
     }
@@ -345,6 +346,7 @@ final class PlannerModel {
         if let saved = row(for: id), mirrorNeedsUpdate(old: existing, new: saved, wantedList: draft.mirrorListID) {
             await updateMirror(saved, listID: draft.mirrorListID, previousReminderID: existing?.mirroredReminderID)
         }
+        if let saved = row(for: id), existing == nil { services.donations.donateAddedDeadline(saved.snapshot) }
         await deadlinesChanged(requestAuthorisation: true)
         return true
     }
@@ -460,6 +462,7 @@ final class PlannerModel {
         )
         composeBrief()
         await scheduleBriefNotifications()
+        await services.sync?.syncLocalChanges()
     }
 
     func requestNotificationAuthorisation() async {
@@ -501,6 +504,7 @@ final class PlannerModel {
             ratings = [:]
         }
         brief = composed
+        services.widgets.publish(WidgetSnapshot.make(for: composed))
         startPhrasing(composed)
     }
 

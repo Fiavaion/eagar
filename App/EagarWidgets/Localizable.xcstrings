@@ -1,0 +1,146 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "AI on": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ óñ ··]"
+          }
+        }
+      }
+    },
+    "AI stopped": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ stóppéd ····]"
+          }
+        }
+      }
+    },
+    "Brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bríéf ··]"
+          }
+        }
+      }
+    },
+    "College items: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé ítéms: %lld ········]"
+          }
+        }
+      }
+    },
+    "College items: %lld. They stay on your devices.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé ítéms: %lld. Théý stáý óñ ýóúr dévíçés. ···················]"
+          }
+        }
+      }
+    },
+    "How long until your next deadline.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Hów lóñg úñtíl ýóúr ñéxt déádlíñé. ··············]"
+          }
+        }
+      }
+    },
+    "Next deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéxt déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "No deadlines": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó déádlíñés ·····]"
+          }
+        }
+      }
+    },
+    "Nothing needs you right now.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóthíñg ñééds ýóú ríght ñów. ···········]"
+          }
+        }
+      }
+    },
+    "Stop Eagar AI": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóp Éágár ÁÍ ·····]"
+          }
+        }
+      }
+    },
+    "Stopped": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóppéd ···]"
+          }
+        }
+      }
+    },
+    "Stops all drafting and AI at once.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóps áll dráftíñg áñd ÁÍ át óñçé. ··············]"
+          }
+        }
+      }
+    },
+    "Stops all drafting and AI in Eagar at once, or allows it again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóps áll dráftíñg áñd ÁÍ íñ Éágár át óñçé, ór állóws ít ágáíñ. ·························]"
+          }
+        }
+      }
+    },
+    "Your next items, with college items shown as a count.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr ñéxt ítéms, wíth çóllégé ítéms shówñ ás á çóúñt. ·····················]"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

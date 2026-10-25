@@ -41,6 +41,53 @@ final class AppModel {
 
     var catalog: ModelCatalog { services.catalog }
 
+    // MARK: Kill switch (FR-CORE-07)
+
+    /// Mirrors the shared kill-switch state; the router is halted while it is on.
+    private(set) var killSwitchEngaged = false
+    private let killSwitch: KillSwitchState = EagarAppGroup.killSwitch
+    static let killSwitchPollInterval: Duration = .milliseconds(500)
+
+    /// Turns the kill switch on or off from inside the app (Settings).
+    func setKillSwitch(_ engaged: Bool) async {
+        killSwitch.set(engaged: engaged)
+        await applyKillSwitch(engaged)
+    }
+
+    /// Follows changes made by the Control Centre control or a Shortcut while the app runs.
+    /// Polls twice a second, well inside the 1-second budget, and only while the app is open.
+    func watchKillSwitch() async {
+        while !Task.isCancelled {
+            let engaged = killSwitch.isEngaged
+            if engaged != killSwitchEngaged { await applyKillSwitch(engaged) }
+            try? await Task.sleep(for: Self.killSwitchPollInterval)
+        }
+    }
+
+    private func applyKillSwitch(_ engaged: Bool) async {
+        killSwitchEngaged = engaged
+        if engaged { await services.router.halt() } else { await services.router.resume() }
+    }
+
+    // MARK: Sync (BD-02)
+
+    /// Starts personal sync on team-signed builds (no-op otherwise).
+    func startSync() async {
+        guard let sync = services.sync else { return }
+        await sync.start()
+        await sync.syncLocalChanges()
+        syncPausedForAccountChange = await sync.coordinator.isPausedForAccountChange
+    }
+
+    /// True after an iCloud sign-out or account switch, until Mark confirms (D-018).
+    private(set) var syncPausedForAccountChange = false
+    var syncAvailable: Bool { services.sync != nil }
+
+    func confirmICloudAccount() async {
+        await services.sync?.confirmAccountAndStart()
+        syncPausedForAccountChange = false
+    }
+
     // MARK: Claude key (FR-AI-07)
 
     var hasKey: Bool { maskedKey != nil }

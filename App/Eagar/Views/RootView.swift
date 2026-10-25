@@ -24,7 +24,7 @@ struct RootView: View {
                 NavigationStack { DeadlinesView(planner: planner) }
             }
             Tab("Settings", systemImage: "gearshape", value: RootTab.settings) {
-                NavigationStack { SettingsView(planner: planner) }
+                NavigationStack { SettingsView(model: model) }
             }
             Tab("Privacy ledger", systemImage: "list.bullet.rectangle", value: RootTab.ledger) {
                 NavigationStack { LedgerView(model: model) }
@@ -38,8 +38,10 @@ struct RootView: View {
         }
         .task {
             await model.refreshLedger()
+            await model.startSync()
             await planner.appBecameActive()
         }
+        .task { await model.watchKillSwitch() }
         .task {
             // Calendar edits made elsewhere while Eagar is open (FR-CAL-05). No Combine (CLAUDE.md).
             for await _ in NotificationCenter.default.notifications(named: .EKEventStoreChanged) {

@@ -1,3 +1,4 @@
+import AppIntents
 import EagarCalendar
 import SwiftUI
 
@@ -11,6 +12,8 @@ struct EagarApp: App {
         let eventStore: any EventStoreAdapting = UserDefaults.standard.bool(forKey: "EagarFakeCalendar") ? DemoEventStore() : EventKitAdapter()
         do {
             let services = try AppServices.make(inMemory: inMemory, eventStore: eventStore)
+            // App Intents (Shortcuts, Siri) reach the same services (FR-OS-03).
+            AppDependencyManager.shared.add(dependency: services)
             _startup = State(initialValue: .success(AppModel(services: services)))
         } catch {
             _startup = State(initialValue: .failure(StartupFailure()))

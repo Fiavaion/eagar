@@ -4,5 +4,6 @@ EAGAR_BUNDLE_PREFIX = com.fiavaion
 DEVELOPMENT_TEAM =
 // Unsigned builds (CI) use plain entitlements; Local.xcconfig switches to EagarSigned.entitlements.
 EAGAR_ENTITLEMENTS = Eagar/Eagar.entitlements
+EAGAR_WIDGET_ENTITLEMENTS = EagarWidgets/EagarWidgets.entitlements
 
 #include? "Local.xcconfig"

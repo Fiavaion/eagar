@@ -3,10 +3,35 @@ import SwiftUI
 
 /// Settings for M1: calendars and the brief (FR-CAL-02, FR-BRIEF-01, 04, 07).
 struct SettingsView: View {
-    let planner: PlannerModel
+    let model: AppModel
+    private var planner: PlannerModel { model.planner }
 
     var body: some View {
         Form {
+            Section {
+                Toggle(isOn: Binding(get: { model.killSwitchEngaged }, set: { on in Task { await model.setKillSwitch(on) } })) {
+                    Label("Stop all AI", systemImage: "stop.circle")
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("settings.killSwitch")
+            } header: {
+                Text("Kill switch")
+            } footer: {
+                Text("Stops all drafting and AI at once. Also in Control Centre and Shortcuts.")
+            }
+            if model.syncAvailable {
+                Section {
+                    if model.syncPausedForAccountChange {
+                        Text("Your iCloud account changed, so syncing is paused. Your data is still on this device.")
+                        Button("Sync with this iCloud account") { Task { await model.confirmICloudAccount() } }
+                            .frame(minHeight: 44)
+                    } else {
+                        Label("Personal deadlines sync through your iCloud account. College data never does.", systemImage: "icloud")
+                    }
+                } header: {
+                    Text("iCloud")
+                }
+            }
             CalendarSettingsSections(planner: planner)
             BriefSettingsSections(planner: planner)
             Section {

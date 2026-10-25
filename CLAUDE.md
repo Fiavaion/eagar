@@ -45,7 +45,7 @@ Package dependencies follow the layer list in PRD §7.2 (downward only: `EagarCo
 
 ## Build and test
 
-The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Verified with Xcode 27.1 and the iOS 26.5 simulator runtime (D-009); update the simulator names whenever Xcode changes them. The project is generated (D-001): run `xcodegen generate --spec App/project.yml` first and after any change to `project.yml`. Unsigned local builds can pass `CODE_SIGN_IDENTITY=-`. macOS Keychain access needs a team-signed build: `App/Config/Local.xcconfig` (git-ignored) sets `DEVELOPMENT_TEAM` and `EAGAR_ENTITLEMENTS = Eagar/EagarSigned.entitlements`, and the first signed build needs `-allowProvisioningUpdates` (D-011).
+The scheme `Eagar` and test plan `Eagar` are fixed by PRD M0. Verified with Xcode 27.1 and the iOS 26.5 simulator runtime (D-009); update the simulator names whenever Xcode changes them. The project is generated (D-001): run `xcodegen generate --spec App/project.yml` first and after any change to `project.yml`. Unsigned local builds can pass `CODE_SIGN_IDENTITY=-`. Team-signed builds (Keychain on macOS, iCloud sync, App Group widgets): `App/Config/Local.xcconfig` (git-ignored) sets `DEVELOPMENT_TEAM`, `EAGAR_ENTITLEMENTS`, `EAGAR_WIDGET_ENTITLEMENTS` and `SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) EAGAR_CLOUDKIT`; the first signed build needs `-allowProvisioningUpdates` (D-011, D-020). To reproduce CI locally, override them on the command line: `DEVELOPMENT_TEAM= EAGAR_ENTITLEMENTS=Eagar/Eagar.entitlements EAGAR_WIDGET_ENTITLEMENTS=EagarWidgets/EagarWidgets.entitlements SWIFT_ACTIVE_COMPILATION_CONDITIONS=DEBUG CODE_SIGN_IDENTITY=-`.
 
 ```sh
 # Unit tests for one package (fast; run constantly)

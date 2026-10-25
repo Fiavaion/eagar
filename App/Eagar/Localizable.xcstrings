@@ -131,6 +131,16 @@
         }
       }
     },
+    "AI on": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ óñ ··]"
+          }
+        }
+      }
+    },
     "AI phrasing": {
       "localizations": {
         "ga": {
@@ -141,12 +151,32 @@
         }
       }
     },
+    "AI stopped": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁÍ stóppéd ····]"
+          }
+        }
+      }
+    },
     "AI summary": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[ÁÍ súmmárý ····]"
+          }
+        }
+      }
+    },
+    "Add a deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd á déádlíñé ······]"
           }
         }
       }
@@ -167,6 +197,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ádd déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "Added.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áddéd. ··]"
+          }
+        }
+      }
+    },
+    "Adds a personal deadline to Eagar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádds á pérsóñál déádlíñé tó Éágár. ··············]"
           }
         }
       }
@@ -327,6 +377,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Blóçkéd áttémpts: %lld ·········]"
+          }
+        }
+      }
+    },
+    "Brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bríéf ··]"
           }
         }
       }
@@ -557,6 +617,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóllégé éñtríés réçórd métádátá óñlý, ñévér çóñtéñt. ·····················]"
+          }
+        }
+      }
+    },
+    "College items: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé ítéms: %lld ········]"
+          }
+        }
+      }
+    },
+    "College items: %lld. They stay on your devices.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé ítéms: %lld. Théý stáý óñ ýóúr dévíçés. ···················]"
           }
         }
       }
@@ -1181,6 +1261,16 @@
         }
       }
     },
+    "How long until your next deadline.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Hów lóñg úñtíl ýóúr ñéxt déádlíñé. ··············]"
+          }
+        }
+      }
+    },
     "How to create an API key": {
       "localizations": {
         "ga": {
@@ -1571,6 +1661,16 @@
         }
       }
     },
+    "Next deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéxt déádlíñé ·····]"
+          }
+        }
+      }
+    },
     "No calendars found.": {
       "localizations": {
         "ga": {
@@ -1791,6 +1891,16 @@
         }
       }
     },
+    "Opens Eagar's brief.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñs Éágár's bríéf. ········]"
+          }
+        }
+      }
+    },
     "Outcome": {
       "localizations": {
         "ga": {
@@ -1857,6 +1967,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Pérsóñál ···]"
+          }
+        }
+      }
+    },
+    "Personal deadlines sync through your iCloud account. College data never does.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñál déádlíñés sýñç thróúgh ýóúr íÇlóúd áççóúñt. Çóllégé dátá ñévér dóés. ·······························]"
           }
         }
       }
@@ -2161,6 +2281,16 @@
         }
       }
     },
+    "Show my brief": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Shów mý bríéf ·····]"
+          }
+        }
+      }
+    },
     "Show up to %lld items": {
       "localizations": {
         "ga": {
@@ -2281,6 +2411,76 @@
         }
       }
     },
+    "Stop AI": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóp ÁÍ ···]"
+          }
+        }
+      }
+    },
+    "Stop Eagar AI": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóp Éágár ÁÍ ·····]"
+          }
+        }
+      }
+    },
+    "Stop all AI": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóp áll ÁÍ ····]"
+          }
+        }
+      }
+    },
+    "Stopped": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóppéd ···]"
+          }
+        }
+      }
+    },
+    "Stops all drafting and AI at once.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóps áll dráftíñg áñd ÁÍ át óñçé. ··············]"
+          }
+        }
+      }
+    },
+    "Stops all drafting and AI at once. Also in Control Centre and Shortcuts.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóps áll dráftíñg áñd ÁÍ át óñçé. Álsó íñ Çóñtról Çéñtré áñd Shórtçúts. ·····························]"
+          }
+        }
+      }
+    },
+    "Stops all drafting and AI in Eagar at once, or allows it again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóps áll dráftíñg áñd ÁÍ íñ Éágár át óñçé, ór állóws ít ágáíñ. ·························]"
+          }
+        }
+      }
+    },
     "Stored key": {
       "localizations": {
         "ga": {
@@ -2307,6 +2507,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Súççéédéd ····]"
+          }
+        }
+      }
+    },
+    "Sync with this iCloud account": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sýñç wíth thís íÇlóúd áççóúñt ············]"
           }
         }
       }
@@ -2347,6 +2557,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Thé bríéf shóws pláíñ lísts, wíth ñó ÁÍ. ················]"
+          }
+        }
+      }
+    },
+    "The deadline needs a title.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé déádlíñé ñééds á títlé. ···········]"
           }
         }
       }
@@ -2601,6 +2821,16 @@
         }
       }
     },
+    "Your iCloud account changed, so syncing is paused. Your data is still on this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr íÇlóúd áççóúñt çháñgéd, só sýñçíñg ís páúséd. Ýóúr dátá ís stíll óñ thís dévíçé. ··································]"
+          }
+        }
+      }
+    },
     "Your key": {
       "localizations": {
         "ga": {
@@ -2617,6 +2847,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ýóúr mórñíñg bríéf árrívés áftér 08:00, át thé fírst ñátúrál bréák. Ýóú çáñ çháñgé thé tímés íñ Séttíñgs. ··········································]"
+          }
+        }
+      }
+    },
+    "Your next items, with college items shown as a count.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr ñéxt ítéms, wíth çóllégé ítéms shówñ ás á çóúñt. ·····················]"
+          }
+        }
+      }
+    },
+    "iCloud": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[íÇlóúd ··]"
           }
         }
       }
