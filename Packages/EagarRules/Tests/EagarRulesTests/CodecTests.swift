@@ -49,7 +49,7 @@ struct CodecTests {
             rules: [Rule(id: "r", description: "d", enabled: false, priority: 3, laneIds: ["home"],
                          when: .any([.leaf(field: .ccCount, op: .gt, value: .number(5)),
                                      .not(.leaf(field: .isReply, op: .equals, value: .bool(true)))]),
-                         then: [Action(type: .adjustScore, amount: -5), Action(type: .notify, level: .timeSensitive)])],
+                         then: [.adjustScore(amount: -5), .notify(.timeSensitive)])],
             guards: Guards(
                 internalDomains: ["example.com"],
                 largeReplyAll: LargeReplyAllGuard(enabled: true, action: .confirm, threshold: 8),
@@ -139,6 +139,53 @@ struct CodecTests {
         for error in errors { #expect(!error.description.isEmpty) }
         #expect(RulesError.schemaViolations([ValidationError(instancePath: "/a", keyword: "type", message: "m")])
             .description.contains("/a: m"))
+    }
+
+    static let oneActionOfEachKind: [Action] = [
+        .adjustScore(amount: 2.5), .setLane(laneId: "home"), .setThreadState(.waiting), .addLabel("L"),
+        .markRead, .suggestPlaybook(playbookId: "p"), .notify(.none), .muteUntil("2026-11-01T08:00:00Z"),
+    ]
+
+    @Test("Every action kind encodes to schema-valid JSON with only its own field, and round-trips",
+          arguments: CodecTests.oneActionOfEachKind)
+    func actionRoundTrip(action: Action) throws {
+        let document = RulesDocument(
+            documentId: "0b6f3b9e-1d0c-4f0a-9a3e-7f2c1b9b2a11", revision: 0, updatedAt: "2026-10-25T09:00:00Z",
+            dataClass: .personal,
+            rules: [Rule(id: "r", when: .leaf(field: .subject, op: .contains, value: .string("x")), then: [action])]
+        )
+        let data = try EagarRulesCodec.encode(document)
+        let decoded = try EagarRulesCodec.decode(data)
+        #expect(decoded.rules?.first?.then == [action])
+        guard case .array(let rules)? = try JSONValue.parse(data)["rules"],
+              case .array(let actions)? = rules.first?["then"],
+              case .object(let fields)? = actions.first else {
+            Issue.record("action missing from encoded JSON")
+            return
+        }
+        #expect(fields["type"] == .string(action.kind.rawValue))
+        #expect(fields.count == (action == .markRead ? 1 : 2))
+    }
+
+    @Test("Every action kind is covered by the round-trip test")
+    func actionKindsCovered() {
+        #expect(Set(Self.oneActionOfEachKind.map(\.kind)) == Set(Action.Kind.allCases))
+    }
+
+    @Test("An unknown action type is reported against the type enum")
+    func unknownActionType() throws {
+        var json = try JSONValue.parse(Repo.fixture("valid", "rules-full.json"))
+        guard case .object(var root) = json, case .array(var rules)? = root["rules"],
+              case .object(var rule) = rules[0] else {
+            Issue.record("fixture shape changed")
+            return
+        }
+        rule["then"] = .array([.object(["type": .string("archive")])])
+        rules[0] = .object(rule)
+        root["rules"] = .array(rules)
+        json = .object(root)
+        let violations = try EagarRulesCodec.rulesValidator.get().validate(json)
+        #expect(violations.contains { $0.instancePath == "/rules/0/then/0/type" && $0.keyword == "enum" }, "\(violations)")
     }
 
     @Test("Autonomy levels are ordered")

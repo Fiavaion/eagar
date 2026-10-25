@@ -153,9 +153,20 @@ Alternatives: None.
 Consequences: All M0 acceptance criteria are met except CI green on GitHub, which needs a push.
 Refs: PRD §10 M0, FR-AI-07, FR-PRIV-01, FR-PRIV-04
 
+## D-013  Owner answers: typed text and three eagar-rules rules  (2026-10-25, M0)
+Context: D-003 left the routing of source-less (user-typed) text for Mark to confirm; D-007 listed three open rules-format questions.
+Decision: Mark confirmed (2026-10-25):
+- User-typed text with no source is bounded by its data class only, as built in D-003 (personal text still needs consent before Claude; college-class text never leaves his devices).
+- An L3 autonomy grant whose `laneId` is not defined in the same document is refused (semantic error, on decode and encode), because its boundary is unknown (BD-12).
+- `action` is a `oneOf` split by `type`; each branch is closed and requires its own field (`adjustScore`→`amount`, `setLane`→`laneId`, `setThreadState`→`state`, `addLabel`→`label`, `suggestPlaybook`→`playbookId`, `notify`→`level`, `muteUntil`→`until`; `markRead` none). The Swift `Action` is now an enum, so Swift cannot build an action the schema rejects. The validator's closest-branch ranking prefers the branch whose `type` const matches, so errors stay specific.
+- A lane with `boundary: localOnly` and `processingMode: cloudAllowed` is a semantic error.
+Alternatives: Defer to M3; Mark chose to settle them now.
+Consequences: The Windows app's validator must implement the same two semantic rules to stay in step. Five new invalid fixtures cover the changes.
+Refs: D-003, D-007, BD-05, BD-12, BD-22, Appendix F
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
 - **Ledger delete hardening:** stop `ClassifiedStore.perform` from deleting ledger or consent rows outside `EagarLedger` (verify finding, low). M1.
-- **eagar-rules questions for Mark:** (1) refuse an L3 grant whose lane is not defined in the same document (its boundary is unknown)? (2) per-action required fields (e.g. `adjustScore` needs `amount`) via a `oneOf` split — changes the shared schema the Windows app uses; (3) flag lanes with `boundary: localOnly` but `processingMode: cloudAllowed`?
+- **`setLane` lane IDs:** nothing checks that a `setLane` action names a lane defined in the same document (found while applying D-013). Decide with the rules engine in M3.
 - **Consent screens (FR-PRIV-07 UI):** the consent model, registry and revocation are built; per-source consent screens arrive with the first personal source (M2/M3), since M0 has no sources.

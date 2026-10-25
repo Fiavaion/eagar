@@ -126,6 +126,18 @@ struct JSONSchemaValidatorTests {
         #expect(found.map(\.keyword) == ["additionalProperties"])
     }
 
+    @Test("oneOf prefers the branch whose discriminator const matches, even with more local errors")
+    func oneOfPrefersMatchingDiscriminator() throws {
+        let schema = #"""
+        {"oneOf":[
+          {"type":"object","additionalProperties":false,"required":["kind"],"properties":{"kind":{"const":"plain"}}},
+          {"type":"object","additionalProperties":false,"required":["kind","amount"],"properties":{"kind":{"const":"score"},"amount":{"type":"number"}}}
+        ]}
+        """#
+        let found = try errors(schema, #"{"kind":"score"}"#)
+        #expect(found == [ValidationError(instancePath: "", keyword: "required", message: "missing required property \"amount\"")])
+    }
+
     @Test("oneOf rejects a value matching several branches")
     func oneOfAmbiguous() throws {
         let found = try errors(#"{"oneOf":[{"type":"number"},{"type":"integer"}]}"#, "2")

@@ -28,6 +28,11 @@ private let invalidExpectations: [String: Expected] = [
     "rules-guard-bad-action.json": .schema(path: "/guards/largeReplyAll/action", keyword: "enum"),
     "rules-guard-unknown-property.json": .schema(path: "/guards/tone", keyword: "additionalProperties"),
     "rules-l3-on-local-only-lane.json": .semantic(.autonomyL3OnLocalOnlyLane),
+    "rules-adjust-score-missing-amount.json": .schema(path: "/rules/0/then/0", keyword: "required"),
+    "rules-set-lane-extra-field.json": .schema(path: "/rules/0/then/0", keyword: "additionalProperties"),
+    "rules-notify-missing-level.json": .schema(path: "/rules/1/then/0", keyword: "required"),
+    "rules-l3-grant-unknown-lane.json": .semantic(.autonomyL3OnUnknownLane),
+    "rules-local-only-lane-cloud-mode.json": .semantic(.localOnlyLaneAllowsCloudProcessing),
     "ledger-with-subject.json": .schema(path: "/events/0", keyword: "additionalProperties"),
     "ledger-bad-event.json": .schema(path: "/events/0/event", keyword: "enum"),
     "ledger-address-in-lane.json": .schema(path: "/events/1/lane", keyword: "pattern"),
@@ -94,6 +99,20 @@ struct FixtureTests {
         default:
             Issue.record("unexpected error for \(name): \(String(describing: error))")
         }
+    }
+
+    @Test("A bad action is reported against the branch for its own type", arguments: [
+        ("rules-adjust-score-missing-amount.json", "/rules/0/then/0: missing required property \"amount\""),
+        ("rules-set-lane-extra-field.json", "/rules/0/then/0: property \"label\" is not allowed"),
+        ("rules-notify-missing-level.json", "/rules/1/then/0: missing required property \"level\""),
+    ])
+    func actionMessageNamesClosestBranch(name: String, message: String) throws {
+        let error = #expect(throws: RulesError.self) { try EagarRulesCodec.decode(Repo.fixture("invalid", name)) }
+        guard case .schemaViolations(let violations)? = error else {
+            Issue.record("expected schema violation, got \(String(describing: error))")
+            return
+        }
+        #expect(violations.map(\.description) == [message])
     }
 
     @Test("Extension keys survive decode and encode")

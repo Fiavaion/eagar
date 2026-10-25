@@ -6,6 +6,11 @@ public struct SemanticIssue: Sendable, Equatable, CustomStringConvertible {
     public enum Code: String, Sendable, Equatable {
         /// Rule 1: an L3 grant on a `localOnly` lane. Refused.
         case autonomyL3OnLocalOnlyLane
+        /// Rule 1: an L3 grant whose `laneId` names no lane in the document. Its boundary is
+        /// unknown, so it fails closed. Refused.
+        case autonomyL3OnUnknownLane
+        /// Boundary consistency (BD-05): a `localOnly` lane with `processingMode` `cloudAllowed`. Refused.
+        case localOnlyLaneAllowsCloudProcessing
         /// Rule 1: a grant above `policy.maxAutonomy`. Consumers ignore the grant.
         case autonomyAbovePolicyMaximum
         /// Rule 3: `crossAccountLeak` present but not enabled and blocking.
@@ -32,9 +37,10 @@ public struct SemanticIssue: Sendable, Equatable, CustomStringConvertible {
 
 /// Checks the normative rules of Appendix F that the schema cannot express.
 ///
-/// Implemented here: rule 1 (autonomy limits) and rule 3 (`crossAccountLeak` cannot be
-/// disabled, also enforced by the schema). Rules 2, 4, 5 and 6 govern the rules engine at
-/// run time and belong to M3.
+/// Implemented here: lane boundary consistency (a `localOnly` lane cannot allow cloud
+/// processing, BD-05), rule 1 (autonomy limits, with L3 on an undefined lane refused because
+/// its boundary is unknown) and rule 3 (`crossAccountLeak` cannot be disabled, also enforced by
+/// the schema). Rules 2, 4, 5 and 6 govern the rules engine at run time and belong to M3.
 public enum RulesSemanticValidator {
     /// Every issue in `document`, errors and warnings alike.
     public static func issues(in document: RulesDocument) -> [SemanticIssue] {
@@ -42,12 +48,26 @@ public enum RulesSemanticValidator {
         let boundaries = Dictionary((document.lanes ?? []).map { ($0.id, $0.boundary) }, uniquingKeysWith: { first, _ in first })
         let maximum = document.policy?.maxAutonomy
 
+        for (index, lane) in (document.lanes ?? []).enumerated()
+        where lane.boundary == .localOnly && lane.processingMode == .cloudAllowed {
+            issues.append(SemanticIssue(
+                code: .localOnlyLaneAllowsCloudProcessing, severity: .error, instancePath: "/lanes/\(index)",
+                message: "lane \"\(lane.id)\" has boundary localOnly, so its processingMode cannot be cloudAllowed"
+            ))
+        }
+
         for (index, grant) in (document.autonomy ?? []).enumerated() {
             let path = "/autonomy/\(index)"
             if grant.level == .l3, boundaries[grant.laneId] == .localOnly {
                 issues.append(SemanticIssue(
                     code: .autonomyL3OnLocalOnlyLane, severity: .error, instancePath: path,
                     message: "autonomy level L3 cannot be granted on lane \"\(grant.laneId)\" because its boundary is localOnly"
+                ))
+            }
+            if grant.level == .l3, boundaries[grant.laneId] == nil {
+                issues.append(SemanticIssue(
+                    code: .autonomyL3OnUnknownLane, severity: .error, instancePath: path,
+                    message: "autonomy level L3 cannot be granted on lane \"\(grant.laneId)\" because no lane with that id is defined, so its boundary is unknown"
                 ))
             }
             if let maximum, grant.level > maximum {

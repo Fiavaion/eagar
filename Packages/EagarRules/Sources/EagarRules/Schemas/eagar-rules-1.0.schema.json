@@ -92,19 +92,62 @@
       ]
     },
     "action": {
+      "description": "One branch per action type; each requires its own field and allows nothing else. The outer enum lists every type so an unknown one is reported directly.",
       "type": "object",
-      "additionalProperties": false,
       "required": ["type"],
       "properties": {
-        "type": { "enum": ["adjustScore", "setLane", "setThreadState", "addLabel", "markRead", "suggestPlaybook", "notify", "muteUntil"] },
-        "amount": { "type": "number" },
-        "laneId": { "type": "string" },
-        "state": { "enum": ["needsReply", "waiting", "delegated", "done"] },
-        "label": { "type": "string" },
-        "playbookId": { "type": "string" },
-        "level": { "enum": ["none", "passive", "active", "timeSensitive"] },
-        "until": { "type": "string" }
-      }
+        "type": { "enum": ["adjustScore", "setLane", "setThreadState", "addLabel", "markRead", "suggestPlaybook", "notify", "muteUntil"] }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "amount"],
+          "properties": { "type": { "const": "adjustScore" }, "amount": { "type": "number" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "laneId"],
+          "properties": { "type": { "const": "setLane" }, "laneId": { "type": "string" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "state"],
+          "properties": { "type": { "const": "setThreadState" }, "state": { "enum": ["needsReply", "waiting", "delegated", "done"] } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "label"],
+          "properties": { "type": { "const": "addLabel" }, "label": { "type": "string" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": { "type": { "const": "markRead" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "playbookId"],
+          "properties": { "type": { "const": "suggestPlaybook" }, "playbookId": { "type": "string" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "level"],
+          "properties": { "type": { "const": "notify" }, "level": { "enum": ["none", "passive", "active", "timeSensitive"] } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "until"],
+          "properties": { "type": { "const": "muteUntil" }, "until": { "type": "string" } }
+        }
+      ]
     },
     "guards": {
       "type": "object",

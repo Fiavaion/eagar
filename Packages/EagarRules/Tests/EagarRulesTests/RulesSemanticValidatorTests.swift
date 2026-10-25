@@ -60,6 +60,50 @@ struct RulesSemanticValidatorTests {
         }
     }
 
+    @Test("Rule 1: L3 on a lane the document does not define is refused, by decode and encode")
+    func l3OnUnknownLane() {
+        let doc = document(grants: [grant("home", .l3), grant("missing", .l3)])
+        let issues = RulesSemanticValidator.issues(in: doc)
+        #expect(issues.map(\.code) == [.autonomyL3OnUnknownLane])
+        #expect(issues.first?.instancePath == "/autonomy/1")
+        #expect(issues.first?.severity == .error)
+        let error = #expect(throws: RulesError.self) { try EagarRulesCodec.encode(doc) }
+        if case .semanticViolations(let refused)? = error {
+            #expect(refused.map(\.code) == [.autonomyL3OnUnknownLane])
+        } else {
+            Issue.record("expected semantic violation, got \(String(describing: error))")
+        }
+    }
+
+    @Test("Rule 1: below L3, a grant on an undefined lane is not refused", arguments: [AutonomyLevel.l0, .l1, .l2])
+    func belowL3OnUnknownLane(level: AutonomyLevel) {
+        #expect(RulesSemanticValidator.issues(in: document(grants: [grant("missing", level)])).isEmpty)
+    }
+
+    @Test("BD-05: a localOnly lane cannot allow cloud processing, by decode and encode")
+    func localOnlyLaneCloudMode() {
+        var doc = document(grants: [])
+        doc.lanes?[0].processingMode = .cloudAllowed
+        let issues = RulesSemanticValidator.issues(in: doc)
+        #expect(issues.map(\.code) == [.localOnlyLaneAllowsCloudProcessing])
+        #expect(issues.first?.instancePath == "/lanes/0")
+        #expect(issues.first?.severity == .error)
+        #expect(issues.first?.description.hasPrefix("/lanes/0: lane \"work\" has boundary localOnly") == true)
+        let error = #expect(throws: RulesError.self) { try EagarRulesCodec.encode(doc) }
+        if case .semanticViolations(let refused)? = error {
+            #expect(refused.map(\.code) == [.localOnlyLaneAllowsCloudProcessing])
+        } else {
+            Issue.record("expected semantic violation, got \(String(describing: error))")
+        }
+    }
+
+    @Test("BD-05: a localOnly lane may be rules-only or local AI", arguments: [ProcessingMode.rulesOnly, .localAI])
+    func localOnlyLaneLocalModes(mode: ProcessingMode) {
+        var doc = document(grants: [])
+        doc.lanes?[0].processingMode = mode
+        #expect(RulesSemanticValidator.issues(in: doc).isEmpty)
+    }
+
     @Test("Rule 3: crossAccountLeak cannot be disabled or softened", arguments: [
         GuardSetting(enabled: false, action: .block),
         GuardSetting(enabled: true, action: .warn),

@@ -416,12 +416,19 @@ public struct JSONSchemaValidator: Sendable {
 
     /// Chooses the failed branch that came nearest to matching, so its errors can be reported.
     ///
-    /// A branch that disagrees on the value's own type is furthest away; then one with more
-    /// errors on the value itself (missing or extra properties); then one with more errors overall.
+    /// A branch that disagrees on the value's own type is furthest away; then one whose `const`
+    /// fails on a direct property (a discriminator such as an action's `type`, so a branch meant
+    /// for another kind of value is never preferred); then one with more errors on the value
+    /// itself (missing or extra properties); then one with more errors overall.
     private func closest(_ results: [[ValidationError]], at path: String) -> [ValidationError] {
-        func score(_ errors: [ValidationError]) -> (Int, Int, Int) {
+        let childPrefix = path + "/"
+        func isDirectChild(_ errorPath: String) -> Bool {
+            errorPath.hasPrefix(childPrefix) && !errorPath.dropFirst(childPrefix.count).contains("/")
+        }
+        func score(_ errors: [ValidationError]) -> (Int, Int, Int, Int) {
             let local = errors.filter { $0.instancePath == path }
-            return (local.filter { $0.keyword == "type" }.count, local.count, errors.count)
+            let discriminators = errors.filter { $0.keyword == "const" && isDirectChild($0.instancePath) }
+            return (local.filter { $0.keyword == "type" }.count, discriminators.count, local.count, errors.count)
         }
         return results.min { score($0) < score($1) } ?? []
     }
