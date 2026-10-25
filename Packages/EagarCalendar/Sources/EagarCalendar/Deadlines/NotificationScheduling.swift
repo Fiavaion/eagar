@@ -32,9 +32,10 @@ public struct UserNotificationScheduler: NotificationScheduling {
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
+    /// Asks for permission. Categories are registered once at launch by the app, for every
+    /// notification kind together; setting them here would replace the others.
     public func requestAuthorization() async throws -> Bool {
-        center.setNotificationCategories([Self.category()])
-        return try await center.requestAuthorization(options: [.alert, .sound, .badge])
+        try await center.requestAuthorization(options: [.alert, .sound, .badge])
     }
 
     /// The `deadline` category with Done and Snooze actions.
