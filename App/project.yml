@@ -1,0 +1,109 @@
+# XcodeGen spec (D-001). Generate with: xcodegen generate --spec App/project.yml
+name: Eagar
+options:
+  bundleIdPrefix: app.eagar
+  deploymentTarget:
+    iOS: "26.0"
+    macOS: "26.0"
+  developmentLanguage: en-GB
+  createIntermediateGroups: true
+configFiles:
+  Debug: Config/Base.xcconfig
+  Release: Config/Base.xcconfig
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+packages:
+  EagarCore: { path: ../Packages/EagarCore }
+  EagarStore: { path: ../Packages/EagarStore }
+  EagarSecurity: { path: ../Packages/EagarSecurity }
+  EagarLedger: { path: ../Packages/EagarLedger }
+  EagarAI: { path: ../Packages/EagarAI }
+  EagarRules: { path: ../Packages/EagarRules }
+  EagarTestSupport: { path: ../Packages/EagarTestSupport }
+targets:
+  Eagar:
+    type: application
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: Eagar
+    dependencies:
+      - package: EagarCore
+      - package: EagarStore
+      - package: EagarSecurity
+      - package: EagarLedger
+      - package: EagarAI
+        product: EagarAI
+      - package: EagarRules
+    entitlements:
+      path: Eagar/Eagar.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.files.user-selected.read-write: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar
+        PRODUCT_NAME: Eagar
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Eagar
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "Eagar asks for Face ID before erasing ledger entries and, later, before sending each email."
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+  EagarTests:
+    type: bundle.unit-test
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: EagarTests
+    dependencies:
+      - target: Eagar
+      - package: EagarTestSupport
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar.tests
+        GENERATE_INFOPLIST_FILE: YES
+        # One path for both platforms: Contents/MacOS on macOS, the bundle root on iOS.
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Eagar.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Eagar"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  EagarUITests:
+    type: bundle.ui-testing
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: EagarUITests
+    dependencies:
+      - target: Eagar
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagar.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Eagar
+schemes:
+  Eagar:
+    build:
+      targets:
+        Eagar: all
+        EagarTests: [test]
+        EagarUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      testPlans:
+        - path: Eagar.xctestplan
+          defaultPlan: true
+    archive:
+      config: Release

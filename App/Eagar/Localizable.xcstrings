@@ -1,0 +1,1146 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "All": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áll ··]"
+          }
+        }
+      }
+    },
+    "Apple PCC": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ápplé PÇÇ ····]"
+          }
+        }
+      }
+    },
+    "Approved profile": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áppróvéd prófílé ······]"
+          }
+        }
+      }
+    },
+    "Authentication was cancelled or failed, so nothing was erased.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áúthéñtíçátíóñ wás çáñçélléd ór fáíléd, só ñóthíñg wás éráséd. ·························]"
+          }
+        }
+      }
+    },
+    "Before you start": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Béfóré ýóú stárt ······]"
+          }
+        }
+      }
+    },
+    "Blocked": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Blóçkéd ···]"
+          }
+        }
+      }
+    },
+    "Blocked attempt": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Blóçkéd áttémpt ······]"
+          }
+        }
+      }
+    },
+    "Blocked attempts: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Blóçkéd áttémpts: %lld ·········]"
+          }
+        }
+      }
+    },
+    "Calculated from the token counts Claude reports and the price table below.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çálçúlátéd fróm thé tókéñ çóúñts Çláúdé répórts áñd thé príçé táblé bélów. ······························]"
+          }
+        }
+      }
+    },
+    "Calls that left your devices: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çálls thát léft ýóúr dévíçés: %lld ··············]"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél ··]"
+          }
+        }
+      }
+    },
+    "Claude": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çláúdé ··]"
+          }
+        }
+      }
+    },
+    "Claude key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çláúdé kéý ····]"
+          }
+        }
+      }
+    },
+    "Claude rejected this key. Check it has not expired or been revoked.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çláúdé réjéçtéd thís kéý. Çhéçk ít hás ñót éxpíréd ór bééñ révókéd. ···························]"
+          }
+        }
+      }
+    },
+    "Claude spending": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çláúdé spéñdíñg ······]"
+          }
+        }
+      }
+    },
+    "Cloud calls carrying college content: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çlóúd çálls çárrýíñg çóllégé çóñtéñt: %lld ·················]"
+          }
+        }
+      }
+    },
+    "Cloud calls carrying college content: %lld. Blocked attempts: %lld. Calls that left your devices: %lld. Recorded cost: %@.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çlóúd çálls çárrýíñg çóllégé çóñtéñt: %lld. Blóçkéd áttémpts: %lld. Çálls thát léft ýóúr dévíçés: %lld. Réçórdéd çóst: %@. ·················································]"
+          }
+        }
+      }
+    },
+    "College": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé ···]"
+          }
+        }
+      }
+    },
+    "College entries record metadata only, never content.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé éñtríés réçórd métádátá óñlý, ñévér çóñtéñt. ·····················]"
+          }
+        }
+      }
+    },
+    "Confirm that you want to erase privacy ledger entries.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóñfírm thát ýóú wáñt tó érásé príváçý lédgér éñtríés. ······················]"
+          }
+        }
+      }
+    },
+    "Cost": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóst ··]"
+          }
+        }
+      }
+    },
+    "Create a dedicated workspace for Eagar with a monthly spend limit, then create a key in it that expires. Use a separate key on each device, so you can revoke one without affecting the others.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çréáté á dédíçátéd wórkspáçé fór Éágár wíth á móñthlý spéñd límít, théñ çréáté á kéý íñ ít thát éxpírés. Úsé á sépáráté kéý óñ éáçh dévíçé, só ýóú çáñ révóké óñé wíthóút áfféçtíñg thé óthérs. ············································································]"
+          }
+        }
+      }
+    },
+    "Data class": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dátá çláss ····]"
+          }
+        }
+      }
+    },
+    "Destination": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Déstíñátíóñ ····]"
+          }
+        }
+      }
+    },
+    "Detail": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Détáíl ··]"
+          }
+        }
+      }
+    },
+    "Duration": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dúrátíóñ ···]"
+          }
+        }
+      }
+    },
+    "Eagar could not export the privacy ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót éxpórt thé príváçý lédgér. ·················]"
+          }
+        }
+      }
+    },
+    "Eagar could not open its data": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót ópéñ íts dátá ············]"
+          }
+        }
+      }
+    },
+    "Eagar could not read the privacy ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád thé príváçý lédgér. ················]"
+          }
+        }
+      }
+    },
+    "Eagar could not update the privacy ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót úpdáté thé príváçý lédgér. ·················]"
+          }
+        }
+      }
+    },
+    "Eagar could not use the Keychain on this device. On a Mac, the app must be signed for Keychain access.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót úsé thé Kéýçháíñ óñ thís dévíçé. Óñ á Máç, thé ápp múst bé sígñéd fór Kéýçháíñ áççéss. ·········································]"
+          }
+        }
+      }
+    },
+    "Eagar uses your own Claude API key for personal data you choose to send to Claude. College data never leaves your devices.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár úsés ýóúr ówñ Çláúdé ÁPÍ kéý fór pérsóñál dátá ýóú çhóósé tó séñd tó Çláúdé. Çóllégé dátá ñévér léávés ýóúr dévíçés. ·················································]"
+          }
+        }
+      }
+    },
+    "Entries": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éñtríés ···]"
+          }
+        }
+      }
+    },
+    "Erase": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé ··]"
+          }
+        }
+      }
+    },
+    "Erase entries": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé éñtríés ·····]"
+          }
+        }
+      }
+    },
+    "Erase entries before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé éñtríés béfóré ········]"
+          }
+        }
+      }
+    },
+    "Erase ledger entries?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé lédgér éñtríés? ········]"
+          }
+        }
+      }
+    },
+    "Erase older entries": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé óldér éñtríés ········]"
+          }
+        }
+      }
+    },
+    "Erase older entries…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Érásé óldér éñtríés… ········]"
+          }
+        }
+      }
+    },
+    "Event": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évéñt ··]"
+          }
+        }
+      }
+    },
+    "Exact payload sent": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éxáçt páýlóád séñt ·······]"
+          }
+        }
+      }
+    },
+    "Export as CSV, with payloads": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éxpórt ás ÇSV, wíth páýlóáds ···········]"
+          }
+        }
+      }
+    },
+    "Export as CSV, without payloads": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éxpórt ás ÇSV, wíthóút páýlóáds ············]"
+          }
+        }
+      }
+    },
+    "Export as JSON, with payloads": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éxpórt ás JSÓÑ, wíth páýlóáds ············]"
+          }
+        }
+      }
+    },
+    "Export as JSON, without payloads": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éxpórt ás JSÓÑ, wíthóút páýlóáds ·············]"
+          }
+        }
+      }
+    },
+    "Failed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fáíléd ··]"
+          }
+        }
+      }
+    },
+    "Filter": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fíltér ··]"
+          }
+        }
+      }
+    },
+    "From": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fróm ··]"
+          }
+        }
+      }
+    },
+    "How to create an API key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Hów tó çréáté áñ ÁPÍ kéý ··········]"
+          }
+        }
+      }
+    },
+    "How to set up a workspace and spend limit": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Hów tó sét úp á wórkspáçé áñd spéñd límít ················]"
+          }
+        }
+      }
+    },
+    "Input %@ and output %@ per million tokens": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñpút %@ áñd óútpút %@ pér míllíóñ tókéñs ················]"
+          }
+        }
+      }
+    },
+    "Input tokens": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñpút tókéñs ·····]"
+          }
+        }
+      }
+    },
+    "Inputs": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñpúts ··]"
+          }
+        }
+      }
+    },
+    "Key test": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Kéý tést ···]"
+          }
+        }
+      }
+    },
+    "Key works with %@. Cost: %@.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Kéý wórks wíth %@. Çóst: %@. ···········]"
+          }
+        }
+      }
+    },
+    "Kill switch": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Kíll swítçh ····]"
+          }
+        }
+      }
+    },
+    "Leave empty for no limit. Set a hard limit on the workspace in Claude Console as well.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Léávé émptý fór ñó límít. Sét á hárd límít óñ thé wórkspáçé íñ Çláúdé Çóñsólé ás wéll. ··································]"
+          }
+        }
+      }
+    },
+    "Ledger actions": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lédgér áçtíóñs ······]"
+          }
+        }
+      }
+    },
+    "Ledger erased": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lédgér éráséd ·····]"
+          }
+        }
+      }
+    },
+    "Limit to dates": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Límít tó dátés ······]"
+          }
+        }
+      }
+    },
+    "MCP call": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[MÇP çáll ···]"
+          }
+        }
+      }
+    },
+    "Meitheal (NCAD)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Méíthéál (ÑÇÁD) ······]"
+          }
+        }
+      }
+    },
+    "Model": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Módél ··]"
+          }
+        }
+      }
+    },
+    "Model call": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Módél çáll ····]"
+          }
+        }
+      }
+    },
+    "Models": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Módéls ··]"
+          }
+        }
+      }
+    },
+    "Monthly limit in US dollars": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móñthlý límít íñ ÚS dóllárs ···········]"
+          }
+        }
+      }
+    },
+    "No entries yet. Every call to a model, and every blocked attempt, appears here.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó éñtríés ýét. Évérý çáll tó á módél, áñd évérý blóçkéd áttémpt, áppéárs héré. ································]"
+          }
+        }
+      }
+    },
+    "No key is stored on this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó kéý ís stóréd óñ thís dévíçé. ·············]"
+          }
+        }
+      }
+    },
+    "No payload was sent off this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó páýlóád wás séñt óff thís dévíçé. ··············]"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÓK ··]"
+          }
+        }
+      }
+    },
+    "On Mac": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óñ Máç ··]"
+          }
+        }
+      }
+    },
+    "On this device": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óñ thís dévíçé ······]"
+          }
+        }
+      }
+    },
+    "Outcome": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óútçómé ···]"
+          }
+        }
+      }
+    },
+    "Output tokens": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óútpút tókéñs ·····]"
+          }
+        }
+      }
+    },
+    "Paste your API key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pásté ýóúr ÁPÍ kéý ·······]"
+          }
+        }
+      }
+    },
+    "Pending": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Péñdíñg ···]"
+          }
+        }
+      }
+    },
+    "Personal": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñál ···]"
+          }
+        }
+      }
+    },
+    "Prices checked on %@.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Príçés çhéçkéd óñ %@. ········]"
+          }
+        }
+      }
+    },
+    "Privacy ledger": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Príváçý lédgér ······]"
+          }
+        }
+      }
+    },
+    "Processed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Próçésséd ····]"
+          }
+        }
+      }
+    },
+    "Processed: %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Próçésséd: %@ ·····]"
+          }
+        }
+      }
+    },
+    "Public": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Públíç ··]"
+          }
+        }
+      }
+    },
+    "Purge": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Púrgé ··]"
+          }
+        }
+      }
+    },
+    "Purpose": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Púrpósé ···]"
+          }
+        }
+      }
+    },
+    "Push registration": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Púsh régístrátíóñ ·······]"
+          }
+        }
+      }
+    },
+    "Recorded": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réçórdéd ···]"
+          }
+        }
+      }
+    },
+    "Recorded cost: %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réçórdéd çóst: %@ ·······]"
+          }
+        }
+      }
+    },
+    "Region": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Régíóñ ··]"
+          }
+        }
+      }
+    },
+    "Remove key from this device": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé kéý fróm thís dévíçé ···········]"
+          }
+        }
+      }
+    },
+    "Requests are processed by Anthropic using your key, in the US or globally. Anthropic stores workspace data in the US.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réqúésts áré próçésséd bý Áñthrópíç úsíñg ýóúr kéý, íñ thé ÚS ór glóbállý. Áñthrópíç stórés wórkspáçé dátá íñ thé ÚS. ···············································]"
+          }
+        }
+      }
+    },
+    "Save key to this device": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sávé kéý tó thís dévíçé ·········]"
+          }
+        }
+      }
+    },
+    "Save limit": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sávé límít ····]"
+          }
+        }
+      }
+    },
+    "Soft monthly limit": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sóft móñthlý límít ·······]"
+          }
+        }
+      }
+    },
+    "Something went wrong": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sóméthíñg wéñt wróñg ········]"
+          }
+        }
+      }
+    },
+    "Spending": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Spéñdíñg ···]"
+          }
+        }
+      }
+    },
+    "Stored key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóréd kéý ····]"
+          }
+        }
+      }
+    },
+    "Stored key, ending %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóréd kéý, éñdíñg %@ ········]"
+          }
+        }
+      }
+    },
+    "Succeeded": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Súççéédéd ····]"
+          }
+        }
+      }
+    },
+    "Test key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tést kéý ···]"
+          }
+        }
+      }
+    },
+    "Testing key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Téstíñg kéý ····]"
+          }
+        }
+      }
+    },
+    "The key is kept in this device's Keychain only. It is never synced, logged or exported, and is sent only to Anthropic.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé kéý ís képt íñ thís dévíçé's Kéýçháíñ óñlý. Ít ís ñévér sýñçéd, lóggéd ór éxpórtéd, áñd ís séñt óñlý tó Áñthrópíç. ···············································]"
+          }
+        }
+      }
+    },
+    "The limit is reached. Claude features are paused until next month or until you raise the limit.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé límít ís réáçhéd. Çláúdé féátúrés áré páúséd úñtíl ñéxt móñth ór úñtíl ýóú ráísé thé límít. ······································]"
+          }
+        }
+      }
+    },
+    "The local stores could not be created. Restart Eagar; if this keeps happening, check free storage.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé lóçál stórés çóúld ñót bé çréátéd. Réstárt Éágár; íf thís kééps háppéñíñg, çhéçk fréé stórágé. ·······································]"
+          }
+        }
+      }
+    },
+    "The test could not reach Claude. Check your connection and try again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé tést çóúld ñót réáçh Çláúdé. Çhéçk ýóúr çóññéçtíóñ áñd trý ágáíñ. ····························]"
+          }
+        }
+      }
+    },
+    "The test sends one short fixed message to Claude Haiku 5.5 and records the call in the privacy ledger, with its exact payload and cost.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé tést séñds óñé shórt fíxéd mésságé tó Çláúdé Háíkú 5.5 áñd réçórds thé çáll íñ thé príváçý lédgér, wíth íts éxáçt páýlóád áñd çóst. ······················································]"
+          }
+        }
+      }
+    },
+    "This cannot be undone.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís çáññót bé úñdóñé. ·········]"
+          }
+        }
+      }
+    },
+    "This month": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís móñth ····]"
+          }
+        }
+      }
+    },
+    "Time": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tímé ··]"
+          }
+        }
+      }
+    },
+    "To": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tó ··]"
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tódáý ··]"
+          }
+        }
+      }
+    },
+    "Usage": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úságé ··]"
+          }
+        }
+      }
+    },
+    "Where your data goes": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Whéré ýóúr dátá góés ········]"
+          }
+        }
+      }
+    },
+    "You will be asked to authenticate. The erasure itself is recorded in the ledger.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóú wíll bé áskéd tó áúthéñtíçáté. Thé érásúré ítsélf ís réçórdéd íñ thé lédgér. ································]"
+          }
+        }
+      }
+    },
+    "Your key": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr kéý ···]"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

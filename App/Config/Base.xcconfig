@@ -1,0 +1,6 @@
+// Bundle prefix and team for Eagar (PRD M0). Placeholders until Mark supplies his company's values.
+// Put real values in Config/Local.xcconfig (git-ignored); it overrides these.
+EAGAR_BUNDLE_PREFIX = app.eagar.placeholder
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

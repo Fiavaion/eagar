@@ -1,0 +1,80 @@
+{
+  "configurations": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "Default",
+      "options": {}
+    }
+  ],
+  "defaultOptions": {
+    "codeCoverage": true,
+    "language": "en",
+    "region": "IE"
+  },
+  "testTargets": [
+    {
+      "target": {
+        "containerPath": "container:Eagar.xcodeproj",
+        "identifier": "EagarTests",
+        "name": "EagarTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:Eagar.xcodeproj",
+        "identifier": "EagarUITests",
+        "name": "EagarUITests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarCore",
+        "identifier": "EagarCoreTests",
+        "name": "EagarCoreTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarStore",
+        "identifier": "EagarStoreTests",
+        "name": "EagarStoreTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarSecurity",
+        "identifier": "EagarSecurityTests",
+        "name": "EagarSecurityTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarLedger",
+        "identifier": "EagarLedgerTests",
+        "name": "EagarLedgerTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarAI",
+        "identifier": "EagarAITests",
+        "name": "EagarAITests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarRules",
+        "identifier": "EagarRulesTests",
+        "name": "EagarRulesTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarTestSupport",
+        "identifier": "EagarTestSupportTests",
+        "name": "EagarTestSupportTests"
+      }
+    }
+  ],
+  "version": 1
+}
