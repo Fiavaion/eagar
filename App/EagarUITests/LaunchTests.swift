@@ -1,39 +1,48 @@
 import XCTest
 
-final class LaunchTests: XCTestCase {
-    @MainActor
-    func testLaunchShowsKeySetupAndLedger() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-EagarInMemoryStores", "YES", "-AppleLanguages", "(en-GB)"]
-        app.launch()
-        XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
-
-        let summary = app.descendants(matching: .any)["ledger.summary"]
-        open(tab: "Privacy ledger", in: app, until: summary)
-        guard summary.exists else {
-            // Dump the tree so a failure on a runner we can't inspect is diagnosable.
-            XCTFail("ledger summary not found; element tree:\n\(app.debugDescription)")
-            return
-        }
-        let loaded = NSPredicate(format: "label CONTAINS 'Blocked attempts: 0'")
-        expectation(for: loaded, evaluatedWith: summary)
-        waitForExpectations(timeout: 15)
-    }
+private func launch(_ arguments: [String] = []) -> XCUIApplication {
+    let app = XCUIApplication()
+    app.launchArguments += ["-EagarInMemoryStores", "YES", "-AppleLanguages", "(en-GB)"] + arguments
+    app.launch()
+    return app
 }
 
-/// Switches tabs. The tab is a `Tab` on macOS 27, a radio button on macOS 26 and a button on
-/// iOS. On macOS the focused key field can open the Passwords autofill pop-up, which swallows
-/// the first click, so Escape dismisses it and the switch is retried.
 @MainActor
-private func open(tab label: String, in app: XCUIApplication, until target: XCUIElement) {
-    for _ in 0..<3 {
-        #if os(macOS)
-        app.typeKey(XCUIKeyboardKey.escape, modifierFlags: [])
-        #endif
-        let candidates = [app.tabs[label], app.buttons[label], app.radioButtons[label]].map(\.firstMatch)
-        candidates.first(where: \.exists)?.tap()
-        if target.waitForExistence(timeout: 5) { return }
+private func expectSummary(in app: XCUIApplication) {
+    let summary = app.descendants(matching: .any)["ledger.summary"]
+    guard summary.waitForExistence(timeout: 15) else {
+        // Dump the tree so a failure on a runner we can't inspect is diagnosable.
+        XCTFail("ledger summary not found; element tree:\n\(app.debugDescription)")
+        return
     }
+    let loaded = NSPredicate(format: "label CONTAINS 'Blocked attempts: 0'")
+    XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: loaded, object: summary)], timeout: 15)
+    XCTAssertTrue(summary.label.contains("Blocked attempts: 0"), summary.label)
+}
+
+final class LaunchTests: XCTestCase {
+    @MainActor
+    func testLaunchShowsKeySetup() throws {
+        let app = launch()
+        XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
+    }
+
+    @MainActor
+    func testLedgerShowsSummary() throws {
+        expectSummary(in: launch(["-EagarInitialTab", "ledger"]))
+    }
+
+    #if os(iOS)
+    /// Tab switching by tap. iOS only: on the macOS 27 CI runner the window is not treated as
+    /// active, so clicks on toolbar tabs do not switch them (it works on a real Mac).
+    @MainActor
+    func testTappingLedgerTabShowsSummary() throws {
+        let app = launch()
+        XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
+        app.buttons["Privacy ledger"].firstMatch.tap()
+        expectSummary(in: app)
+    }
+    #endif
 }
 
 final class IrishPseudoLocaleTests: XCTestCase {
