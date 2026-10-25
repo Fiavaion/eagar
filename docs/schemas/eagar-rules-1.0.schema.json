@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "eagar-rules-1.0.schema.json",
+  "description": "eagar-rules v1: lanes, sender rules, guards, playbooks, autonomy grants and institution policy (PRD Appendix F, BD-22).",
+  "type": "object",
+  "required": ["format", "formatVersion", "documentId", "revision", "updatedAt", "dataClass"],
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "eagar-rules" },
+    "formatVersion": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "documentId": { "type": "string", "format": "uuid" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "author": { "$ref": "#/$defs/author" },
+    "dataClass": { "enum": ["publicContent", "approvedProfile", "personal", "college"] },
+    "lanes": { "type": "array", "items": { "$ref": "#/$defs/lane" } },
+    "rules": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+    "guards": { "$ref": "#/$defs/guards" },
+    "playbooks": { "type": "array", "items": { "$ref": "#/$defs/playbook" } },
+    "autonomy": { "type": "array", "items": { "$ref": "#/$defs/autonomyGrant" } },
+    "policy": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/policy" } ] }
+  },
+  "$defs": {
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "match", "weight", "boundary", "processingMode"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "match": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "accountAddress": { "type": "string" },
+            "accountDomain": { "type": "string" }
+          }
+        },
+        "weight": { "type": "number" },
+        "boundary": { "enum": ["localOnly", "cloudAllowed"] },
+        "processingMode": { "enum": ["rulesOnly", "localAI", "cloudAllowed"] },
+        "schedule": { "type": "array", "items": { "$ref": "#/$defs/timeWindow" } },
+        "dryRun": { "type": "boolean", "default": true }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "when", "then"],
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "enabled": { "type": "boolean", "default": true },
+        "priority": { "type": "integer" },
+        "laneIds": { "type": "array", "items": { "type": "string" } },
+        "when": { "$ref": "#/$defs/condition" },
+        "then": { "type": "array", "items": { "$ref": "#/$defs/action" } }
+      }
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all"],
+          "properties": { "all": { "type": "array", "items": { "$ref": "#/$defs/condition" } } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any"],
+          "properties": { "any": { "type": "array", "items": { "$ref": "#/$defs/condition" } } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["not"],
+          "properties": { "not": { "$ref": "#/$defs/condition" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["field", "op", "value"],
+          "properties": {
+            "field": { "enum": ["from.address", "from.domain", "to.address", "to.domain", "cc.count", "subject", "listId", "providerLabel", "providerCategory", "hasAttachment", "isReply", "sentByMe", "receivedAt.hour", "receivedAt.weekday", "body"] },
+            "op": { "enum": ["equals", "notEquals", "contains", "startsWith", "endsWith", "matchesRegex", "in", "gt", "lt", "exists"] },
+            "value": {}
+          }
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["adjustScore", "setLane", "setThreadState", "addLabel", "markRead", "suggestPlaybook", "notify", "muteUntil"] },
+        "amount": { "type": "number" },
+        "laneId": { "type": "string" },
+        "state": { "enum": ["needsReply", "waiting", "delegated", "done"] },
+        "label": { "type": "string" },
+        "playbookId": { "type": "string" },
+        "level": { "enum": ["none", "passive", "active", "timeSensitive"] },
+        "until": { "type": "string" }
+      }
+    },
+    "guards": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "internalDomains": { "type": "array", "items": { "type": "string" } },
+        "wrongRecipient": { "$ref": "#/$defs/guardSetting" },
+        "missingAttachment": { "$ref": "#/$defs/guardSetting" },
+        "externalDomain": { "$ref": "#/$defs/guardSetting" },
+        "largeReplyAll": {
+          "type": "object",
+          "additionalProperties": false,
+          "allOf": [ { "$ref": "#/$defs/guardSettingFields" } ],
+          "properties": {
+            "enabled": {},
+            "action": {},
+            "threshold": { "type": "integer" }
+          }
+        },
+        "lateNight": {
+          "type": "object",
+          "additionalProperties": false,
+          "allOf": [ { "$ref": "#/$defs/guardSettingFields" } ],
+          "properties": {
+            "enabled": {},
+            "action": {},
+            "quietHours": { "$ref": "#/$defs/timeWindow" },
+            "holdUntil": { "type": "string" }
+          }
+        },
+        "personalData": {
+          "type": "object",
+          "additionalProperties": false,
+          "allOf": [ { "$ref": "#/$defs/guardSettingFields" } ],
+          "properties": {
+            "enabled": {},
+            "action": {},
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "regex"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "regex": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "tone": { "$ref": "#/$defs/guardSetting" },
+        "crossAccountLeak": { "const": { "enabled": true, "action": "block" } }
+      }
+    },
+    "guardSettingFields": {
+      "description": "Shared fields of every guard; composed with allOf by guards that add their own fields.",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "action": { "enum": ["warn", "confirm", "block"] }
+      }
+    },
+    "guardSetting": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [ { "$ref": "#/$defs/guardSettingFields" } ],
+      "properties": {
+        "enabled": {},
+        "action": {}
+      }
+    },
+    "playbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "name", "category", "trigger", "template", "approvedAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "laneIds": { "type": "array", "items": { "type": "string" } },
+        "trigger": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "description": { "type": "string" },
+            "rule": { "$ref": "#/$defs/condition" }
+          }
+        },
+        "requiredFacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "source"],
+            "properties": {
+              "name": { "type": "string" },
+              "source": { "enum": ["thread", "calendar", "cdbooking.availability", "cdbooking.booking", "canvas", "user"] }
+            }
+          }
+        },
+        "decisionInputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "options"],
+            "properties": {
+              "name": { "type": "string" },
+              "prompt": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "template": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["body"],
+          "properties": {
+            "subject": { "type": "string" },
+            "body": { "type": "string" },
+            "branches": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        },
+        "aiFill": { "enum": ["none", "local", "cloudAllowed"] },
+        "guards": { "type": "array", "items": { "type": "string" } },
+        "approvedAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "autonomyGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "laneId", "level", "grantedAt"],
+      "properties": {
+        "category": { "type": "string" },
+        "laneId": { "type": "string" },
+        "level": { "enum": ["L0", "L1", "L2", "L3"] },
+        "delayMinutes": { "type": "integer", "minimum": 1 },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "approvals": { "type": "integer" },
+            "medianEditRatio": { "type": "number" },
+            "guardTriggers": { "type": "integer" },
+            "windowDays": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Institution policy profile (FR-GOV-04)",
+      "properties": {
+        "issuer": { "type": "string" },
+        "appliesToDomains": { "type": "array", "items": { "type": "string" } },
+        "maxProcessingMode": { "enum": ["rulesOnly", "localAI", "cloudAllowed"] },
+        "forceDryRun": { "type": "boolean" },
+        "maxAutonomy": { "enum": ["L0", "L1", "L2", "L3"] },
+        "learningAllowed": { "type": "boolean" },
+        "profileToCloudAllowed": { "type": "boolean" }
+      }
+    },
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "days": { "type": "array", "items": { "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] } },
+        "from": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
+        "to": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" }
+      }
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "app": { "type": "string" },
+        "appVersion": { "type": "string" },
+        "platform": { "type": "string" }
+      }
+    }
+  }
+}

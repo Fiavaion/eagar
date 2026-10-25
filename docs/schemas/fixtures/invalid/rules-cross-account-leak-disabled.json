@@ -1,0 +1,234 @@
+{
+  "$schema": "https://example.com/eagar/schemas/eagar-rules-1.0.schema.json",
+  "format": "eagar-rules",
+  "formatVersion": "1.0",
+  "documentId": "5d1c2e7a-8b3f-4c6d-9e0a-1f2b3c4d5e6f",
+  "revision": 12,
+  "updatedAt": "2026-10-25T10:30:15.250+01:00",
+  "author": {
+    "app": "Eagar",
+    "appVersion": "0.4.0",
+    "platform": "macOS"
+  },
+  "dataClass": "college",
+  "lanes": [
+    {
+      "id": "ncad",
+      "name": "Work",
+      "match": {
+        "accountDomain": "example.ie"
+      },
+      "weight": 1.5,
+      "boundary": "localOnly",
+      "processingMode": "localAI",
+      "schedule": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri"
+          ],
+          "from": "08:30",
+          "to": "17:30"
+        }
+      ],
+      "dryRun": true
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "match": {
+        "accountAddress": "someone@example.com"
+      },
+      "weight": 1,
+      "boundary": "cloudAllowed",
+      "processingMode": "cloudAllowed",
+      "dryRun": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "vip-hod",
+      "description": "HoD mail to top of work lane",
+      "laneIds": [
+        "ncad"
+      ],
+      "when": {
+        "field": "from.address",
+        "op": "in",
+        "value": [
+          "hod@example.ie"
+        ]
+      },
+      "then": [
+        {
+          "type": "adjustScore",
+          "amount": 40
+        },
+        {
+          "type": "setThreadState",
+          "state": "needsReply"
+        }
+      ]
+    },
+    {
+      "id": "newsletters-quiet",
+      "enabled": true,
+      "priority": -10,
+      "laneIds": [
+        "personal"
+      ],
+      "when": {
+        "field": "listId",
+        "op": "exists",
+        "value": true
+      },
+      "then": [
+        {
+          "type": "notify",
+          "level": "passive"
+        },
+        {
+          "type": "addLabel",
+          "label": "Newsletters"
+        },
+        {
+          "type": "muteUntil",
+          "until": "2026-11-01T08:00:00Z"
+        }
+      ]
+    }
+  ],
+  "guards": {
+    "internalDomains": [
+      "example.ie"
+    ],
+    "wrongRecipient": {
+      "enabled": true,
+      "action": "confirm"
+    },
+    "missingAttachment": {
+      "enabled": true,
+      "action": "warn"
+    },
+    "externalDomain": {
+      "enabled": true,
+      "action": "confirm"
+    },
+    "largeReplyAll": {
+      "enabled": true,
+      "action": "confirm",
+      "threshold": 10
+    },
+    "lateNight": {
+      "enabled": true,
+      "action": "confirm",
+      "quietHours": {
+        "days": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+        ],
+        "from": "22:00",
+        "to": "07:00"
+      },
+      "holdUntil": "08:30"
+    },
+    "personalData": {
+      "enabled": true,
+      "action": "block",
+      "patterns": [
+        {
+          "name": "ppsNumber",
+          "regex": "\\b[0-9]{7}[A-W][A-IW]?\\b"
+        }
+      ]
+    },
+    "tone": {
+      "enabled": true,
+      "action": "warn"
+    },
+    "crossAccountLeak": {
+      "enabled": false,
+      "action": "block"
+    }
+  },
+  "playbooks": [
+    {
+      "id": "equipment-availability",
+      "version": 3,
+      "name": "Equipment availability reply",
+      "category": "equipment-booking-answer",
+      "laneIds": [
+        "ncad"
+      ],
+      "trigger": {
+        "description": "Student or staff asks whether a kit item is free on a date",
+        "rule": {
+          "field": "subject",
+          "op": "matchesRegex",
+          "value": "(?i)(book|borrow|available).*(camera|kit|tripod)"
+        }
+      },
+      "requiredFacts": [
+        {
+          "name": "itemModel",
+          "source": "thread"
+        },
+        {
+          "name": "slots",
+          "source": "cdbooking.availability"
+        }
+      ],
+      "decisionInputs": [],
+      "template": {
+        "body": "Hi {{greetingName}},\n\n{{slotsSentence}} You can book it at cdbooking.com.\n\nThanks, M"
+      },
+      "aiFill": "local",
+      "guards": [
+        "externalDomain",
+        "missingAttachment"
+      ],
+      "approvedAt": "2026-10-20T14:02:00Z"
+    }
+  ],
+  "autonomy": [
+    {
+      "category": "equipment-booking-answer",
+      "laneId": "ncad",
+      "level": "L2",
+      "delayMinutes": 10,
+      "grantedAt": "2026-10-22T12:00:00Z",
+      "evidence": {
+        "approvals": 25,
+        "medianEditRatio": 0.03,
+        "guardTriggers": 0,
+        "windowDays": 30
+      }
+    },
+    {
+      "category": "newsletter-unsubscribe",
+      "laneId": "personal",
+      "level": "L3",
+      "delayMinutes": 5,
+      "grantedAt": "2026-10-23T12:00:00Z"
+    }
+  ],
+  "policy": {
+    "issuer": "Example College IT",
+    "appliesToDomains": [
+      "example.ie"
+    ],
+    "maxProcessingMode": "localAI",
+    "forceDryRun": false,
+    "maxAutonomy": "L3",
+    "learningAllowed": true,
+    "profileToCloudAllowed": true
+  }
+}

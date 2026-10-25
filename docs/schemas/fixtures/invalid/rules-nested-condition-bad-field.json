@@ -1,0 +1,85 @@
+{
+  "$schema": "https://example.com/eagar/schemas/eagar-rules-1.0.schema.json",
+  "format": "eagar-rules",
+  "formatVersion": "1.0",
+  "documentId": "a3b2c1d0-1111-4222-8333-944455556666",
+  "revision": 7,
+  "updatedAt": "2026-10-25T09:00:00Z",
+  "author": {
+    "app": "Eagar",
+    "appVersion": "0.4.0",
+    "platform": "macOS"
+  },
+  "dataClass": "personal",
+  "lanes": [],
+  "rules": [
+    {
+      "id": "nested",
+      "when": {
+        "all": [
+          {
+            "any": [
+              {
+                "field": "from.domain",
+                "op": "endsWith",
+                "value": "example.com"
+              },
+              {
+                "field": "to.domain",
+                "op": "equals",
+                "value": "example.com"
+              }
+            ]
+          },
+          {
+            "not": {
+              "field": "receivedAt.minute",
+              "op": "gt",
+              "value": 20
+            }
+          },
+          {
+            "not": {
+              "not": {
+                "field": "hasAttachment",
+                "op": "equals",
+                "value": false
+              }
+            }
+          },
+          {
+            "field": "providerCategory",
+            "op": "in",
+            "value": [
+              {
+                "kind": "promotions"
+              },
+              null,
+              3.5
+            ]
+          },
+          {
+            "all": []
+          }
+        ]
+      },
+      "then": [
+        {
+          "type": "suggestPlaybook",
+          "playbookId": "p1"
+        },
+        {
+          "type": "setLane",
+          "laneId": "personal"
+        },
+        {
+          "type": "markRead"
+        }
+      ]
+    }
+  ],
+  "guards": {},
+  "playbooks": [],
+  "autonomy": [],
+  "policy": null
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://example.com/eagar/schemas/eagar-rules-1.0.schema.json",
+  "format": "eagar-rules",
+  "formatVersion": "1.0",
+  "documentId": "0b6f3b9e-1d0c-4f0a-9a3e-7f2c1b9b2a11",
+  "revision": 7,
+  "updatedAt": "2026-02-30T09:00:00Z",
+  "author": {
+    "app": "Eagar",
+    "appVersion": "0.4.0",
+    "platform": "macOS"
+  },
+  "dataClass": "college",
+  "lanes": [],
+  "rules": [],
+  "guards": {},
+  "playbooks": [],
+  "autonomy": [],
+  "policy": null
+}

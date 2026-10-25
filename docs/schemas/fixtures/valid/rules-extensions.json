@@ -1,0 +1,33 @@
+{
+  "$schema": "https://example.com/eagar/schemas/eagar-rules-1.0.schema.json",
+  "format": "eagar-rules",
+  "formatVersion": "1.0",
+  "documentId": "c0ffee00-0000-4000-8000-000000000001",
+  "revision": 7,
+  "updatedAt": "2026-10-25T09:00:00Z",
+  "author": {
+    "app": "Eagar",
+    "appVersion": "0.4.0",
+    "platform": "macOS"
+  },
+  "dataClass": "personal",
+  "lanes": [],
+  "rules": [],
+  "guards": {},
+  "playbooks": [],
+  "autonomy": [],
+  "policy": null,
+  "x-windows": {
+    "colour": "#2a7",
+    "pinned": [
+      1,
+      2,
+      3
+    ],
+    "nested": {
+      "ok": true,
+      "nothing": null
+    }
+  },
+  "x-note": "Extension keys are preserved by every consumer."
+}

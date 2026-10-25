@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "eagar-approval-ledger-1.0.schema.json",
+  "description": "Content-free approval ledger export (PRD Appendix F.6, FR-SEND-19). No subject, body, address or name fields exist; identifier fields are restricted to token characters so free text and addresses cannot be smuggled in.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "formatVersion", "exportedAt", "period", "events", "summary"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "eagar-approval-ledger" },
+    "formatVersion": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/calendarDate" },
+        "to": { "$ref": "#/$defs/calendarDate" }
+      }
+    },
+    "events": { "type": "array", "items": { "$ref": "#/$defs/event" } },
+    "summary": { "$ref": "#/$defs/summary" }
+  },
+  "$defs": {
+    "calendarDate": { "type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" },
+    "token": {
+      "description": "An identifier such as a lane ID, category or edit class. Letters, digits, '.', '_' and '-' only: no spaces, no '@'.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "guardName": { "enum": ["wrongRecipient", "missingAttachment", "externalDomain", "largeReplyAll", "lateNight", "personalData", "tone", "crossAccountLeak"] },
+    "count": { "type": "integer", "minimum": 0 },
+    "ratio": { "type": "number", "minimum": 0 },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "event"],
+      "properties": {
+        "at": { "type": "string", "format": "date-time" },
+        "lane": { "$ref": "#/$defs/token" },
+        "category": { "$ref": "#/$defs/token" },
+        "event": { "enum": ["drafted", "approved", "edited", "rejected", "guardTriggered", "held", "released", "undone", "sent", "dryRunSent", "killSwitch"] },
+        "origin": { "enum": ["manual", "playbook", "ai", "followUp", "delegation"] },
+        "playbookVersion": { "type": "integer", "minimum": 1 },
+        "profileVersion": { "type": "integer", "minimum": 0 },
+        "providerLocality": { "enum": ["onDevice", "macLocal", "applePCC", "selfHostedInstitutional", "anthropicCloud"] },
+        "editRatio": { "$ref": "#/$defs/ratio" },
+        "editClasses": { "type": "array", "items": { "$ref": "#/$defs/token" } },
+        "guardTriggers": { "type": "array", "items": { "$ref": "#/$defs/guardName" } },
+        "autonomyLevel": { "enum": ["L0", "L1", "L2", "L3"] },
+        "dryRun": { "type": "boolean" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["drafts", "approved", "rejected", "medianEditRatio", "guardCatches", "sendsWithoutApproval"],
+      "properties": {
+        "drafts": { "$ref": "#/$defs/count" },
+        "approved": { "$ref": "#/$defs/count" },
+        "rejected": { "$ref": "#/$defs/count" },
+        "medianEditRatio": { "$ref": "#/$defs/ratio" },
+        "guardCatches": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "wrongRecipient": { "$ref": "#/$defs/count" },
+            "missingAttachment": { "$ref": "#/$defs/count" },
+            "externalDomain": { "$ref": "#/$defs/count" },
+            "largeReplyAll": { "$ref": "#/$defs/count" },
+            "lateNight": { "$ref": "#/$defs/count" },
+            "personalData": { "$ref": "#/$defs/count" },
+            "tone": { "$ref": "#/$defs/count" },
+            "crossAccountLeak": { "$ref": "#/$defs/count" }
+          }
+        },
+        "sendsWithoutApproval": { "$ref": "#/$defs/count" }
+      }
+    }
+  }
+}

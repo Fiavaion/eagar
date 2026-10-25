@@ -1,0 +1,50 @@
+{
+  "format": "eagar-approval-ledger",
+  "formatVersion": "1.0",
+  "exportedAt": "2026-12-01T09:00:00Z",
+  "period": {
+    "from": "2026-11-01",
+    "to": "2026-11-30"
+  },
+  "events": [
+    {
+      "at": "2026-11-03T10:12:00Z",
+      "lane": "ncad",
+      "category": "equipment-booking-answer",
+      "event": "approved",
+      "origin": "playbook",
+      "playbookVersion": 3,
+      "profileVersion": 5,
+      "providerLocality": "macLocal",
+      "editRatio": 0.04,
+      "editClasses": [
+        "greetingChanged"
+      ],
+      "guardTriggers": [],
+      "autonomyLevel": "L2",
+      "dryRun": false
+    },
+    {
+      "at": "2026-11-04T23:05:00Z",
+      "lane": "personal",
+      "event": "guardTriggered",
+      "guardTriggers": [
+        "lateNight"
+      ]
+    },
+    {
+      "at": "2026-11-05T08:00:00Z",
+      "event": "killSwitch"
+    }
+  ],
+  "summary": {
+    "drafts": 120,
+    "approved": 104,
+    "rejected": 16,
+    "medianEditRatio": 0.07,
+    "guardCatches": {
+      "missingAttachment": 3,
+      "externalDomain": 9
+    }
+  }
+}
