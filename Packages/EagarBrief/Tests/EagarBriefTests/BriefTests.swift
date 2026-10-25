@@ -200,7 +200,21 @@ struct BriefPhrasingTests {
         #expect(BriefPhraser.line(for: item, calendar: dublin).hasSuffix("Dentist"))
         #expect(BriefPhraser.line(for: item, calendar: dublin) != "Dentist")
         let allDay = BriefItem(id: "j", kind: .event, title: "Holiday", start: at(0), isAllDay: true, dataClass: .personal, actions: [.open])
-        #expect(BriefPhraser.line(for: allDay, calendar: dublin) == "Holiday")
+        #expect(BriefPhraser.line(for: allDay, calendar: dublin) == "All day: Holiday")
+    }
+
+    /// The hallucinations seen in testing are rejected; faithful rewrites pass.
+    @Test(arguments: [
+        ("All day: Bin collection", "The bin collection is on Saturday, 21st May, at 10:00 am.", false),
+        ("All day: Submission week", "The submission week is from 11th to 17th November.", false),
+        ("All day: Bin collection", "It's bin collection day.", true),
+        ("09:30 Studio crit\n13:00 Lunch with Sam", "Studio crit at 9:30, then lunch with Sam at 13:00.", true),
+        ("13:00 Lunch with Sam", "Lunch with Sam at 14:00.", false),
+        ("13:00 Lunch with Sam", "Lunch with Sam on Friday.", false),
+        ("13:00 Lunch with Sam", "You may want to leave early for lunch with Sam at 13:00 today.", true),
+    ])
+    func faithfulnessGuard(source: String, output: String, faithful: Bool) {
+        #expect(BriefPhraser.isFaithful(output, to: source) == faithful)
     }
 }
 

@@ -1,3 +1,4 @@
+import EventKit
 import SwiftUI
 
 enum RootTab: String, Hashable {
@@ -38,6 +39,12 @@ struct RootView: View {
         .task {
             await model.refreshLedger()
             await planner.appBecameActive()
+        }
+        .task {
+            // Calendar edits made elsewhere while Eagar is open (FR-CAL-05). No Combine (CLAUDE.md).
+            for await _ in NotificationCenter.default.notifications(named: .EKEventStoreChanged) {
+                await planner.refresh()
+            }
         }
         .onChange(of: scenePhase) { _, phase in
             // Scene activation is the app-open breakpoint (FR-BRIEF-02).

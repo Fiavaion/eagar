@@ -34,7 +34,9 @@ public struct PhrasedSection: Sendable, Hashable {
 public enum BriefPhraser {
     static let instruction = """
     Rewrite these calendar and deadline lines as one short, calm sentence in British English. \
-    Keep every time and name exactly as given. Do not add anything.
+    Use only what the lines say. Keep every time and name exactly as written. \
+    Never mention a date, day of the week, month or time that is not in the lines. \
+    Do not add places, people or details.
     """
 
     public static func phrase(_ brief: Brief, mode: BriefPhrasingMode, router: AIRouter, calendar: Calendar = .current) async -> [BriefSectionKind: PhrasedSection] {
@@ -58,6 +60,11 @@ public enum BriefPhraser {
                 do {
                     let response = try await router.run(request)
                     guard response.stopReason != .refusal, !response.text.isEmpty else { continue }
+                    let source = request.inputs.map(\.text).joined(separator: "\n")
+                    guard isFaithful(response.text, to: source) else {
+                        EagarLog(.ai).notice("brief phrasing for \(section.kind) discarded: it added dates or numbers")
+                        continue
+                    }
                     parts.append(.init(text: response.text, tier: response.tier, isCollege: group.isCollege))
                 } catch {
                     // Phrasing is optional: the deterministic section stays as it is.
@@ -69,9 +76,42 @@ public enum BriefPhraser {
         return result
     }
 
-    /// One input line: time and title. Times use the brief's calendar time zone.
+    /// Whether `output` stays within `source`: every number, weekday and month name it mentions
+    /// must appear in the source lines. Models invent dates and times (an all-day event became
+    /// "Saturday, 21st May, at 10:00 am" in testing); any such sentence is discarded and the
+    /// deterministic brief is shown instead.
+    static func isFaithful(_ output: String, to source: String) -> Bool {
+        let sourceLower = source.lowercased()
+        let sourceNumbers = Set(numbers(in: source))
+        guard numbers(in: output).allSatisfy(sourceNumbers.contains) else { return false }
+        let words = output.lowercased().split { !$0.isLetter }.map(String.init)
+        return words.allSatisfy { word in
+            !calendarWords.contains(word) || sourceLower.contains(word)
+        }
+    }
+
+    /// Runs of digits, e.g. "09:30" gives ["09", "30"]; "21st" gives ["21"].
+    static func numbers(in text: String) -> [String] {
+        text.split { !$0.isNumber }.map { run in
+            let trimmed = run.drop { $0 == "0" }
+            return trimmed.isEmpty ? "0" : String(trimmed)
+        }
+    }
+
+    /// Weekday and month names (English, as the prompt asks for British English).
+    static let calendarWords: Set<String> = {
+        let english = Locale(identifier: "en_GB")
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = english
+        let names = calendar.weekdaySymbols + calendar.shortWeekdaySymbols + calendar.monthSymbols + calendar.shortMonthSymbols
+        // "May" is also a common verb; a "21st May" is still caught by its number.
+        return Set(names.map { $0.lowercased() }).subtracting(["may"]).union(["noon", "midnight"])
+    }()
+
+    /// One input line: time and title. Times use the brief's calendar time zone; all-day items
+    /// say so, so the model has no reason to invent a time.
     static func line(for item: BriefItem, calendar: Calendar) -> String {
-        guard let start = item.start, !item.isAllDay else { return item.title }
+        guard let start = item.start, !item.isAllDay else { return "All day: \(item.title)" }
         var style = Date.FormatStyle(date: .omitted, time: .shortened)
         style.timeZone = calendar.timeZone
         return "\(start.formatted(style)) \(item.title)"

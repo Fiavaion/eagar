@@ -10,7 +10,7 @@ struct ProviderStubTests {
         let capabilities = await provider.capabilities()
         #expect(capabilities.locality == .onDevice)
         #expect(!capabilities.locality.tier.leavesOwnerDevices)
-        #expect(capabilities.maxContextTokens >= 4_096) // read at runtime on 26.4+
+        #expect(capabilities.maxContextTokens == AppleOnDeviceProvider.contextTokens) // read at runtime, never assumed
         let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("x", dataClass: .college)])
         #expect(try provider.encodeRequest(request, model: capabilities.defaultModel) == nil)
         let wrongTier = RoutedCall(request: request, effectiveClass: .college, ledgerEntryID: nil, model: capabilities.defaultModel, tier: .macLocal, wirePayload: nil)
@@ -33,7 +33,9 @@ struct ProviderStubTests {
     }
 
     /// A real on-device call, run only where Apple Intelligence is available (e.g. Mark's Mac).
-    @Test(.enabled(if: AppleOnDeviceProvider.isAvailable, "Apple Intelligence not available"))
+    /// Simulators can report Apple Intelligence as available without model assets (tiny context),
+    /// so the live call also needs a usable context.
+    @Test(.enabled(if: AppleOnDeviceProvider.isAvailable && AppleOnDeviceProvider.contextTokens >= 1_024, "Apple Intelligence not usable here"))
     func appleOnDeviceLiveCall() async throws {
         let provider = AppleOnDeviceProvider()
         let request = AIRequest(purpose: .triage, inputs: [ClassifiedPayload("Reply with the single word OK.", dataClass: .publicContent)], maxOutputTokens: 16)

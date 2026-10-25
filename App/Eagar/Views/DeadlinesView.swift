@@ -140,6 +140,7 @@ struct DeadlineEditor: View {
     let planner: PlannerModel
     @State private var draft: DeadlineDraft
     @State private var confirmingDelete = false
+    @State private var confirmingICloudOverride = false
     @Environment(\.dismiss) private var dismiss
 
     init(planner: PlannerModel, draft: DeadlineDraft) {
@@ -197,7 +198,23 @@ struct DeadlineEditor: View {
                             }
                         }
                         if draft.dataClass == .college {
-                            Toggle("Allow iCloud Reminders for this deadline", isOn: $draft.mirrorOverride)
+                            Toggle("Allow iCloud Reminders for this deadline", isOn: Binding(
+                                get: { draft.mirrorOverride },
+                                set: { allow in
+                                    // Turning it on copies a college title into iCloud: confirm first (FR-DL-03).
+                                    if allow { confirmingICloudOverride = true } else { draft.mirrorOverride = false }
+                                }
+                            ))
+                            .confirmationDialog(
+                                "Copy this college deadline to iCloud Reminders?",
+                                isPresented: $confirmingICloudOverride,
+                                titleVisibility: .visible
+                            ) {
+                                Button("Allow for this deadline") { draft.mirrorOverride = true }
+                                Button("Cancel", role: .cancel) {}
+                            } message: {
+                                Text("Its title will be stored in iCloud. Other college deadlines are not affected.")
+                            }
                         }
                     } header: {
                         Text("Reminders")

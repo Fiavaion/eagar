@@ -212,6 +212,14 @@ Alternatives: Delete local data on account switch (Apple's sample); rejected pen
 Consequences: `PersonalSyncEngine` itself has no unit tests (CKSyncEngine events can't be constructed); it is verified by the two-device test in M1 acceptance.
 Refs: BD-02, PRD §7.5, FR-CORE-07, D-006
 
+## D-019  AI brief phrasing: faithfulness check, default off  (2026-10-25, M1)
+Context: In app testing the on-device model invented details: an all-day "Bin collection" became "on Saturday, 21st May, at 10:00 am", and "Submission week" became "from 11th to 17th November".
+Decision: Phrasing defaults to off; Mark can turn on "local only" or "Claude for personal" in Settings. Every phrased sentence must pass a faithfulness check: each number, weekday and month name it mentions must appear in the input lines, otherwise it is discarded and the deterministic brief is shown. The prompt forbids adding dates, days, times, places or people, and all-day items are given to the model as "All day: …". The check does not catch every invention (for example an invented place), which is why the default is off.
+Also in M1's app: a college deadline's iCloud Reminders override needs a confirmation; calendar edits made while Eagar is open refresh the view at once; the app integration's UI choices (six tabs; brief and timeline use only calendars included in the brief, while breakpoints use all; snoozed deadlines stay out of the brief until the snooze ends; brief notifications are scheduled only once notifications are allowed; phrasing reruns only when the brief changes) are as reported in the app commit.
+Alternatives: Keep local phrasing on by default with the check; rejected while the check cannot catch every invention.
+Consequences: The deterministic brief is what Mark sees by default.
+Refs: FR-BRIEF-04, FR-DL-03, FR-CAL-05
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

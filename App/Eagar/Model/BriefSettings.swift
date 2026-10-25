@@ -21,7 +21,8 @@ struct BriefSettings: Codable, Equatable {
         SlotSetting(kind: .endOfDay, enabled: false, hour: 17, minute: 30),
     ]
     var preferences: BriefPreferences = .default
-    var phrasingMode: BriefPhrasingMode = .localOnly
+    /// Off by default: models can invent details, so Mark opts in (D-019).
+    var phrasingMode: BriefPhrasingMode = .off
 
     static let defaultsKey = "brief.settings"
 

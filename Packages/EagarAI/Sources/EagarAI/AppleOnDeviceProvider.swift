@@ -23,6 +23,13 @@ public struct AppleOnDeviceProvider: LLMProvider {
         Self.isAvailable ? .reachable : .unreachable
     }
 
+    /// The runtime context size, or the documented floor before OS 26.4. A simulator without
+    /// model assets can report a smaller value.
+    public static var contextTokens: Int {
+        if #available(iOS 26.4, macOS 26.4, *) { return SystemLanguageModel.default.contextSize }
+        return fallbackContextTokens
+    }
+
     /// Whether Apple Intelligence's on-device model can run here now.
     public static var isAvailable: Bool {
         if case .available = SystemLanguageModel.default.availability { true } else { false }

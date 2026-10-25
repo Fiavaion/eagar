@@ -211,6 +211,16 @@
         }
       }
     },
+    "Allow for this deadline": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Állów fór thís déádlíñé ·········]"
+          }
+        }
+      }
+    },
     "Allow iCloud Reminders for this deadline": {
       "localizations": {
         "ga": {
@@ -597,6 +607,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóñtíñúé ···]"
+          }
+        }
+      }
+    },
+    "Copy this college deadline to iCloud Reminders?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çópý thís çóllégé déádlíñé tó íÇlóúd Rémíñdérs? ···················]"
           }
         }
       }
@@ -1227,6 +1247,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Íñpúts ··]"
+          }
+        }
+      }
+    },
+    "Its title will be stored in iCloud. Other college deadlines are not affected.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íts títlé wíll bé stóréd íñ íÇlóúd. Óthér çóllégé déádlíñés áré ñót áfféçtéd. ·······························]"
           }
         }
       }
