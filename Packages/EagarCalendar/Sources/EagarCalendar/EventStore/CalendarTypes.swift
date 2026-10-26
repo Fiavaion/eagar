@@ -57,8 +57,11 @@ public struct CalendarEvent: Sendable, Hashable, Identifiable {
     public let end: Date
     public let isAllDay: Bool
     public let availability: EventAvailability
+    /// Attendee email addresses, lower-cased, held in memory only. Keep-in-touch uses them to
+    /// infer the last interaction with a person (FR-PEOPLE-03); never logged or persisted.
+    public let attendeeEmails: [String]
 
-    public init(id: String, calendarID: String, title: String, location: String? = nil, start: Date, end: Date, isAllDay: Bool = false, availability: EventAvailability = .busy) {
+    public init(id: String, calendarID: String, title: String, location: String? = nil, start: Date, end: Date, isAllDay: Bool = false, availability: EventAvailability = .busy, attendeeEmails: [String] = []) {
         self.id = id
         self.calendarID = calendarID
         self.title = title
@@ -67,6 +70,7 @@ public struct CalendarEvent: Sendable, Hashable, Identifiable {
         self.end = end
         self.isAllDay = isAllDay
         self.availability = availability
+        self.attendeeEmails = attendeeEmails
     }
 }
 

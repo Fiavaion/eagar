@@ -153,7 +153,19 @@ public final class EventKitAdapter: EventStoreAdapting {
             start: start,
             end: event.endDate ?? start,
             isAllDay: event.isAllDay,
-            availability: availability
+            availability: availability,
+            attendeeEmails: (event.attendees ?? []).compactMap { emailAddress(fromParticipantURL: $0.url) }
         )
+    }
+
+    /// The lower-cased address in a `mailto:` participant URL, or nil for any other URL.
+    static func emailAddress(fromParticipantURL url: URL) -> String? {
+        guard url.scheme?.lowercased() == "mailto" else { return nil }
+        let rest = url.absoluteString.dropFirst("mailto:".count)
+        let address = rest.split(separator: "?", maxSplits: 1).first.map(String.init) ?? ""
+        let decoded = (address.removingPercentEncoding ?? address)
+            .trimmingCharacters(in: .whitespaces)
+            .lowercased()
+        return decoded.contains("@") ? decoded : nil
     }
 }
