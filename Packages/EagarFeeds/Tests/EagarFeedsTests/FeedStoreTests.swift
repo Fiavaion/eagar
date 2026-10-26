@@ -39,7 +39,7 @@ struct FeedDeadlineTests {
         func item(_ id: String, due: Date, closed: Bool = false, title: String = "Loan") -> FeedDeadline {
             FeedDeadline(origin: .booking, sourceID: source, externalID: id, title: title, dueAt: due, isAllDay: false, itemClass: .college, reminderOffsetsMinutes: [1440, 120], isClosed: closed)
         }
-        var counts = try await reconciler.upsert([item("1", due: now), item("2", due: now)], now: now)
+        var counts = try await reconciler.upsert([item("1", due: now), item("2", due: now), item("3", due: now, closed: true)], now: now)
         #expect(counts.inserted == 2)
 
         // Mark snoozes and edits offsets on deadline 2; the feed must not undo that.

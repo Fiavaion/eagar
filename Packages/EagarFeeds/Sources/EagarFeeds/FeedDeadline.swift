@@ -88,7 +88,8 @@ public struct FeedDeadlineReconciler: Sendable {
         self.stores = stores
     }
 
-    /// Upserts `deadlines`. With `replacingAllFrom` set, deadlines of that origin and source
+    /// Upserts `deadlines`. A closed item marks its deadline done, and creates none if it had
+    /// none. With `replacingAllFrom` set, deadlines of that origin and source
     /// that are not in `deadlines` are deleted (the feed was read in full).
     public func upsert(
         _ deadlines: [FeedDeadline], replacingAllFrom scope: (origin: DeadlineOrigin, source: SourceID)? = nil, now: Date
@@ -112,13 +113,13 @@ public struct FeedDeadlineReconciler: Sendable {
                             deadline.markDone(at: now)
                             counts.closed += 1
                         }
-                    } else {
+                    } else if !item.isClosed {
+                        // A closed item with no deadline yet (a loan already returned) adds nothing.
                         let deadline = Deadline(
                             deadlineUUID: item.id, title: item.title, dueAt: item.dueAt, isAllDay: item.isAllDay,
                             origin: item.origin, reminderOffsetsMinutes: item.reminderOffsetsMinutes,
                             dataClass: item.dataClass, sourceID: item.sourceID, createdAt: now
                         )
-                        if item.isClosed { deadline.markDone(at: now) }
                         context.insert(deadline)
                         counts.inserted += 1
                     }
