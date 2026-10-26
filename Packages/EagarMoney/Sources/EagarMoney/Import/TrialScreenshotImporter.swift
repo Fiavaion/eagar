@@ -42,7 +42,7 @@ public struct TrialScreenshotImporter: Sendable {
     public let parser: ReceiptParser
     public let extractor: OnDeviceTrialExtractor?
     public let mode: TrialExtractionMode
-    private let log = EagarLog(.app)
+    private let log = EagarLog(.money)
 
     /// - Parameters:
     ///   - router: the app's router; `nil` means parser only.

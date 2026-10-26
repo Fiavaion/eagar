@@ -13,6 +13,8 @@ public enum DerivationID: String, Sendable, CaseIterable, LogSafe {
     case keepInTouchInteraction
     /// A keep-in-touch nudge built from a person, a free slot and an inferred interaction (FR-PEOPLE-04).
     case keepInTouchNudge
+    /// The monthly subscriptions summary built from active trials (FR-TRIAL-06).
+    case subscriptionSummary
 
     public var logDescription: String { rawValue }
 }

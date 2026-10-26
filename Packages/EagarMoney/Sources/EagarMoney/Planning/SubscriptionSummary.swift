@@ -63,9 +63,7 @@ public enum SubscriptionSummary {
             monthlyTotals: monthly.mapValues(roundedToCents),
             upcomingCharges: charges,
             upcomingTotals: upcoming.mapValues(roundedToCents),
-            // A summary is derived from its trials; with no DerivationID for it yet (EagarCore
-            // is outside this package), the taint rule is applied directly.
-            dataClass: DataClass.max(of: active.map(\.dataClass))
+            dataClass: Taint.derive(.subscriptionSummary, from: active.map(\.dataClass))
         )
     }
 

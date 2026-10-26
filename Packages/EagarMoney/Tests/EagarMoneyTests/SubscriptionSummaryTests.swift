@@ -60,7 +60,7 @@ struct SubscriptionSummaryTests {
         #expect(!SubscriptionSummary.isSummaryDay(TestCalendars.date(2026, 11, 2), calendar: cal))
     }
 
-    @Test func summaryClassFollowsTheTaintRule() {
+    @Test func Derivation_subscriptionSummary() {
         let personal = TrialSnapshot(service: "A", price: 1, renewsAt: first)
         #expect(SubscriptionSummary.summary([personal], monthContaining: first, calendar: cal).dataClass == .personal)
         let college = TrialSnapshot(service: "B", price: 1, renewsAt: first, dataClass: .college)

@@ -51,7 +51,7 @@ public struct UserBirthdayNotificationScheduler: BirthdayNotificationScheduling 
 
 /// Reconciles planned birthday reminders with those pending (FR-PEOPLE-06).
 public enum BirthdayNotificationSync {
-    private static let log = EagarLog(.app)
+    private static let log = EagarLog(.people)
 
     /// Removes stale `birthday.` requests and (re-)adds every planned one, so a renamed person
     /// or changed birthday never leaves an old notification behind. Other prefixes are untouched.
