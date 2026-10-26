@@ -1,0 +1,98 @@
+[
+  {
+    "currency" : "EUR",
+    "date" : "2026-12-03",
+    "file" : "receipt-01.png",
+    "price" : "69.99",
+    "service" : "Calm",
+    "text" : "Receipt\nApple Account: someone@example.invalid\nDate: 26 Oct 2026\nOrder ID: MX4TQ0ZZ91\nDocument No.: 100000000001\nApp Store\nCalm Premium (Yearly)\nRenews 3 Dec 2026\n€69.99\nSubtotal €56.90\nVAT charged at 23% €13.09\nTotal €69.99"
+  },
+  {
+    "currency" : "GBP",
+    "date" : "2026-11-12",
+    "file" : "receipt-02.png",
+    "price" : "10.99",
+    "service" : "Netflix",
+    "text" : "NETFLIX\nYour free trial ends on 12/11/2026\nAfter your trial, your plan costs £10.99/month.\nCancel anytime in Account settings."
+  },
+  {
+    "currency" : "EUR",
+    "date" : "2026-11-05",
+    "file" : "receipt-03.png",
+    "price" : "11.99",
+    "service" : "Spotify",
+    "text" : "Spotify\nPremium Individual\nYour trial ends 5 Nov 2026.\nThen €11.99/month. Cancel anytime."
+  },
+  {
+    "currency" : "USD",
+    "date" : "2026-11-20",
+    "file" : "receipt-04.png",
+    "price" : "13.99",
+    "service" : "Disney+",
+    "text" : "Disney+\nWelcome to Disney+ Premium\nFree trial started October 27, 2026\n$13.99/mo starting November 20, 2026\nPlus applicable taxes"
+  },
+  {
+    "currency" : "EUR",
+    "date" : "2026-11-30",
+    "file" : "receipt-05.png",
+    "price" : "12.99",
+    "service" : "Headspace",
+    "text" : "Headspace\nSubscription summary\nTrial ends: 2026-11-30\nPrice: EUR 12.99 per month\nPayment method: card ending 0000"
+  },
+  {
+    "currency" : "GBP",
+    "date" : "2026-12-01",
+    "file" : "receipt-06.png",
+    "price" : "8.99",
+    "service" : "Apple TV+",
+    "text" : "Receipt\nApple Account\nInvoice date: 26.10.2026\nApple TV+\nMonthly\nRenews 01.12.2026\n£8.99\nTotal £8.99"
+  },
+  {
+    "currency" : "EUR",
+    "date" : "2026-12-09",
+    "file" : "receipt-07.png",
+    "price" : "9.99",
+    "service" : "Duolingo",
+    "text" : "duolingo\nSuper Duolingo\nFree trial: 14 days\nBilling starts 9 December 2026\n€9.99 / month after trial"
+  },
+  {
+    "currency" : "USD",
+    "date" : "2026-12-15",
+    "file" : "receipt-08.png",
+    "price" : "59.99",
+    "service" : "Adobe Creative Cloud",
+    "text" : "Adobe\nCreative Cloud All Apps\nOrder number 0000000000\nPlan price US$ 59.99/mo\nNext billing date Dec 15, 2026"
+  },
+  {
+    "currency" : "GBP",
+    "date" : "2026-11-28",
+    "file" : "receipt-09.png",
+    "price" : "8.99",
+    "service" : "Audible",
+    "text" : "audible\nYour free trial is active\n£8.99 a month after your free trial ends on 28 November 2026.\nCancel at least a day before to avoid charges."
+  },
+  {
+    "currency" : "USD",
+    "date" : "2026-11-21",
+    "file" : "receipt-10.png",
+    "price" : "5.00",
+    "service" : "Medium",
+    "text" : "Medium\nMembership confirmed\nPurchased on 10/21/2026\nMedium membership $5.00 / month\nRenews on 11/21/2026"
+  },
+  {
+    "currency" : "EUR",
+    "date" : "2026-11-26",
+    "file" : "receipt-11.png",
+    "price" : "2.99",
+    "service" : "iCloud+",
+    "text" : "Receipt\nApple Account\nDate: 26 Oct 2026\niCloud+\niCloud+ with 200 GB (Monthly)\nRenews 26 Nov 2026\n2,99 €\nVAT 0,56 €\nTotal 2,99 €"
+  },
+  {
+    "currency" : "EUR",
+    "date" : "2027-01-02",
+    "file" : "receipt-12.png",
+    "price" : "96.00",
+    "service" : "Notion",
+    "text" : "Notion\nPlus plan\nBilled annually\n€96.00/year\nYour plan renews on 2 January 2027."
+  }
+]
