@@ -18,7 +18,7 @@ let package = Package(
         ),
         .testTarget(
             name: "EagarSecurityTests",
-            dependencies: ["EagarSecurity"],
+            dependencies: ["EagarSecurity", "EagarCore"],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
     ],

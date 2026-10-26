@@ -1,3 +1,4 @@
+import EagarCore
 import Foundation
 
 /// A secret value (API key, OAuth token, app-specific password, feed token).
@@ -37,4 +38,19 @@ public struct SecretKey: Hashable, Sendable {
 
     /// Mark's Claude API key for this device (BD-07).
     public static let anthropicAPIKey = SecretKey(account: "anthropic.apiKey")
+
+    /// The per-user cdbooking iCal feed URL, which embeds the `feed_token` (FR-BOOK-01, Appendix E.2).
+    public static func cdbookingFeedURL(_ source: SourceID) -> SecretKey {
+        SecretKey(account: "cdbooking.\(source.rawValue.uuidString).feedURL")
+    }
+
+    /// The cdbooking `api_token` bearer token (FR-BOOK-01, Appendix E.2).
+    public static func cdbookingAPIToken(_ source: SourceID) -> SecretKey {
+        SecretKey(account: "cdbooking.\(source.rawValue.uuidString).apiToken")
+    }
+
+    /// The Canvas calendar feed URL, a bearer secret (FR-CANVAS-01).
+    public static func canvasFeedURL(_ source: SourceID) -> SecretKey {
+        SecretKey(account: "canvas.\(source.rawValue.uuidString).feedURL")
+    }
 }

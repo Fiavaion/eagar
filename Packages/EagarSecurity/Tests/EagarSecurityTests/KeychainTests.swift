@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import EagarCore
 import Testing
 @testable import EagarSecurity
 
@@ -104,5 +105,16 @@ struct KeychainTests {
         #expect(!dumped.contains("canary"))
         #expect(secret.masked == "••••••••0002")
         #expect(Secret("short").masked == "•••••")
+    }
+
+    /// Feed secrets get one Keychain item per source and per secret (FR-BOOK-01, FR-CANVAS-01).
+    @Test func feedSecretKeysAreDistinctPerSource() {
+        let a = SourceID(), b = SourceID()
+        let keys = [
+            SecretKey.cdbookingFeedURL(a), .cdbookingAPIToken(a), .canvasFeedURL(a),
+            .cdbookingFeedURL(b), .cdbookingAPIToken(b), .canvasFeedURL(b), .anthropicAPIKey,
+        ]
+        #expect(Set(keys).count == keys.count)
+        #expect(SecretKey.cdbookingAPIToken(a) == .cdbookingAPIToken(a))
     }
 }
