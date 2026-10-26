@@ -11,6 +11,8 @@ public enum DerivationID: String, Sendable, CaseIterable, LogSafe {
     case calendarAvailability
     /// A person's last interaction inferred from calendar, mail and manual signals (FR-PEOPLE-03).
     case keepInTouchInteraction
+    /// A keep-in-touch nudge built from a person, a free slot and an inferred interaction (FR-PEOPLE-04).
+    case keepInTouchNudge
 
     public var logDescription: String { rawValue }
 }
