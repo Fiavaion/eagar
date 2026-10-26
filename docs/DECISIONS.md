@@ -1,6 +1,6 @@
 # Decisions
 
-Current milestone: M1
+Current milestone: M2 (in progress, on `m2/feeds`; M1 device checks still open, see D-022)
 
 ADR-style log of decisions made during the build. Append only; never rewrite history. Format:
 
@@ -251,6 +251,13 @@ Decision:
 Alternatives: Marking a mirrored reminder complete on done; the event-store adapter has no completion call yet.
 Consequences: First-run tag confirmation matters: until Mark confirms "personal", those calendars' events appear as college counts.
 Refs: D-017, D-019, D-020, FR-CAL-04, FR-CORE-06, FR-OS-02, FR-OS-05, FR-BRIEF-02/08, FR-DL-03, BD-04, B-7
+
+## D-022  Start M2 before the M1 device checks  (2026-10-26, M2)
+Context: M1 is built, reviewed twice and green in CI, but the device checks (calendar tag confirmation, the two-device sync test, the Control Centre kill switch, VoiceOver, V1, V3, the TestFlight record and the D-018 default) need Mark at the devices. Mark asked for as much work as possible overnight.
+Decision: Mark chose to go ahead. `checkpoint/pre-m2` tags the M1 head (`eaa94ec`, pushed). M2 is built on `m2/feeds`, branched from `m1/calendar-brief`, and pushed for CI. M1 is not merged or tagged until Mark signs it off; any device-check failure is fixed on the branch, or M2 is reverted to the checkpoint if it can't be fixed.
+Alternatives: Waiting for the device checks (loses a night); merging M1 to `main` first (puts unsigned work on `main`).
+Consequences: The M1 device checks stay open (see the M1 list in the morning report). M2 decisions that touch college data, secrets or AI routing are marked "for Mark to confirm".
+Refs: CLAUDE.md "One milestone at a time", D-018, D-021
 
 ## Parked
 
