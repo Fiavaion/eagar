@@ -2,6 +2,8 @@ import EagarAI
 import EagarCalendar
 import EagarCore
 import EagarLedger
+import EagarMoney
+import EagarPeople
 import EagarSecurity
 import EagarStore
 import EagarSync
@@ -32,7 +34,10 @@ struct AppServices: Sendable {
 
     /// Every SwiftData model in the app. Both stores share one schema; placement is per record.
     static var models: [any PersistentModel.Type] {
-        [LedgerEntry.self, ConsentRecord.self, CalendarRef.self, Deadline.self, EventLogEntry.self]
+        [
+            LedgerEntry.self, ConsentRecord.self, CalendarRef.self, Deadline.self, EventLogEntry.self,
+            Trial.self, Person.self, ContactLog.self,
+        ]
     }
 
     static func make(
@@ -76,7 +81,11 @@ struct AppServices: Sendable {
         #if EAGAR_CLOUDKIT
         let stateURL = URL.applicationSupportDirectory.appending(path: "Eagar/Sync/personal-sync.json")
         do {
-            let coordinator = try SyncCoordinator(store: stores.personal, adapters: [AnySyncAdapter(DeadlineSyncAdapter())], stateURL: stateURL)
+            let adapters = [
+                AnySyncAdapter(DeadlineSyncAdapter()), AnySyncAdapter(TrialSyncAdapter()),
+                AnySyncAdapter(PersonSyncAdapter()), AnySyncAdapter(ContactLogSyncAdapter()),
+            ]
+            let coordinator = try SyncCoordinator(store: stores.personal, adapters: adapters, stateURL: stateURL)
             return PersonalSyncEngine(containerIdentifier: iCloudContainer, coordinator: coordinator)
         } catch {
             EagarLog(.app).error("personal sync not started")

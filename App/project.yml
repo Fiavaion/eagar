@@ -31,6 +31,9 @@ packages:
   EagarCalendar: { path: ../Packages/EagarCalendar }
   EagarBrief: { path: ../Packages/EagarBrief }
   EagarSuggest: { path: ../Packages/EagarSuggest }
+  EagarSync: { path: ../Packages/EagarSync }
+  EagarMoney: { path: ../Packages/EagarMoney }
+  EagarPeople: { path: ../Packages/EagarPeople }
 targets:
   Eagar:
     type: application
@@ -53,6 +56,9 @@ targets:
         product: EagarCalendar
       - package: EagarBrief
       - package: EagarSuggest
+      - package: EagarSync
+      - package: EagarMoney
+      - package: EagarPeople
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp

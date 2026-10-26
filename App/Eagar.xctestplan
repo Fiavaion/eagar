@@ -102,6 +102,20 @@
         "identifier": "EagarSyncTests",
         "name": "EagarSyncTests"
       }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarMoney",
+        "identifier": "EagarMoneyTests",
+        "name": "EagarMoneyTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarPeople",
+        "identifier": "EagarPeopleTests",
+        "name": "EagarPeopleTests"
+      }
     }
   ],
   "version": 1
