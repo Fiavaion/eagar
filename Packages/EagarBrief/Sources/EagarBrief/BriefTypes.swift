@@ -36,12 +36,24 @@ public enum BriefSectionKind: String, Sendable, Codable, CaseIterable, LogSafe {
 }
 
 /// What an item can do (FR-BRIEF-03: every item has at least one action).
+///
+/// Trials add `cancelSubscription` (opens the cancel page, FR-TRIAL-05) and
+/// `confirmCancelled` (Mark confirms he cancelled); keep-in-touch nudges add `plan`,
+/// `logContact` and `changeCadence` next to `snooze` (FR-PEOPLE-05).
 public enum BriefAction: String, Sendable, Codable, CaseIterable {
     case open, done, snooze, reschedule, dismiss
+    case cancelSubscription, confirmCancelled
+    case plan, logContact, changeCadence
+
+    /// Whether the action deals with the item (counts towards "fully actioned", SM2).
+    /// Opening an item or its cancel page is not dealing with it.
+    public var dealsWithItem: Bool { self != .open && self != .cancelSubscription }
 }
 
+/// What a brief item refers to. M2 adds trials, the monthly subscription summary and
+/// keep-in-touch nudges; loans (cdbooking) are the next kind to join.
 public enum BriefItemKind: String, Sendable, Codable {
-    case event, deadline
+    case event, deadline, trial, subscriptionSummary, nudge
 }
 
 /// One brief line. `title` is shown only inside the app; notifications and widgets use
@@ -55,9 +67,15 @@ public struct BriefItem: Sendable, Hashable, Identifiable, Classified {
     public let isAllDay: Bool
     public let dataClass: DataClass
     public let actions: [BriefAction]
+    /// A second line shown under the title inside the app, e.g. "Cancel by Thu 29 Oct to
+    /// avoid being charged €9.99". Same class and rules as `title`.
+    public let detail: String?
     public var sourceID: SourceID? { nil }
 
-    public init(id: String, kind: BriefItemKind, title: String, start: Date?, end: Date? = nil, isAllDay: Bool = false, dataClass: DataClass, actions: [BriefAction]) {
+    public init(
+        id: String, kind: BriefItemKind, title: String, start: Date?, end: Date? = nil, isAllDay: Bool = false,
+        dataClass: DataClass, actions: [BriefAction], detail: String? = nil
+    ) {
         precondition(!actions.isEmpty, "FR-BRIEF-03: every brief item needs an action")
         self.id = id
         self.kind = kind
@@ -67,6 +85,7 @@ public struct BriefItem: Sendable, Hashable, Identifiable, Classified {
         self.isAllDay = isAllDay
         self.dataClass = dataClass
         self.actions = actions
+        self.detail = detail
     }
 }
 
@@ -104,7 +123,7 @@ public struct BriefPreferences: Sendable, Hashable, Codable {
         self.maxItems = maxItems
     }
 
-    public static let `default` = BriefPreferences(maxItems: [.today: 8, .deadlines: 6, .overdue: 6])
+    public static let `default` = BriefPreferences(maxItems: [.today: 8, .deadlines: 6, .overdue: 6, .trials: 5, .keepInTouch: 3])
 
     /// Sections in display order. Overdue always comes first when present (FR-DL-04).
     func orderedKinds() -> [BriefSectionKind] {
@@ -133,4 +152,87 @@ public struct BriefDeadline: Sendable, Hashable {
         self.isAllDay = isAllDay
         self.dataClass = dataClass
     }
+}
+
+/// A trial or subscription as the brief needs it (FR-TRIAL-02, FR-TRIAL-06). The app maps
+/// EagarMoney's `TrialSnapshot` and its next cancel-by to this.
+public struct BriefTrial: Sendable, Hashable {
+    public let id: String
+    public let service: String
+    public let price: Decimal
+    /// ISO 4217 code.
+    public let currencyCode: String
+    /// The day Mark must cancel by to avoid `renewal`.
+    public let cancelBy: Date
+    public let renewal: Date
+    /// The trial shows in the brief from this many days before cancel-by (its largest
+    /// reminder day, 7 by default).
+    public let windowDays: Int
+    public let dataClass: DataClass
+
+    public init(id: String, service: String, price: Decimal, currencyCode: String, cancelBy: Date, renewal: Date, windowDays: Int = 7, dataClass: DataClass) {
+        self.id = id
+        self.service = service
+        self.price = price
+        self.currencyCode = currencyCode
+        self.cancelBy = cancelBy
+        self.renewal = renewal
+        self.windowDays = max(0, windowDays)
+        self.dataClass = dataClass
+    }
+}
+
+/// The monthly subscriptions summary as the brief needs it (FR-TRIAL-06). Shown on the 1st
+/// of the month only.
+public struct BriefSubscriptionSummary: Sendable, Hashable {
+    public let activeCount: Int
+    /// Monthly cost of everything active, per currency.
+    public let monthlyTotals: [String: Decimal]
+    /// Charges falling in this month.
+    public let chargeCount: Int
+    /// Their sum, per currency.
+    public let chargeTotals: [String: Decimal]
+    public let dataClass: DataClass
+
+    public init(activeCount: Int, monthlyTotals: [String: Decimal], chargeCount: Int, chargeTotals: [String: Decimal], dataClass: DataClass) {
+        self.activeCount = activeCount
+        self.monthlyTotals = monthlyTotals
+        self.chargeCount = chargeCount
+        self.chargeTotals = chargeTotals
+        self.dataClass = dataClass
+    }
+}
+
+/// A keep-in-touch nudge as the brief needs it (FR-PEOPLE-05). `title` is the app's
+/// deterministic phrasing ("Thursday evening is free; Aoife: 7 weeks"). A nudge placed in a
+/// slot after a college event is `college`: shown in the app, counted only elsewhere.
+public struct BriefNudge: Sendable, Hashable {
+    public let id: String
+    public let title: String
+    public let slot: DateInterval
+    public let dataClass: DataClass
+
+    public init(id: String, title: String, slot: DateInterval, dataClass: DataClass) {
+        self.id = id
+        self.title = title
+        self.slot = slot
+        self.dataClass = dataClass
+    }
+}
+
+/// Everything beyond the calendar and deadlines that feeds the brief. Each source fills its
+/// own section; a new source (cdbooking loans next, `.loans`) adds a field here and a section
+/// builder in ``BriefComposer``, so callers that don't have it yet keep compiling.
+public struct BriefSources: Sendable, Hashable {
+    public var trials: [BriefTrial]
+    public var subscriptionSummary: BriefSubscriptionSummary?
+    public var nudges: [BriefNudge]
+
+    public init(trials: [BriefTrial] = [], subscriptionSummary: BriefSubscriptionSummary? = nil, nudges: [BriefNudge] = []) {
+        self.trials = trials
+        self.subscriptionSummary = subscriptionSummary
+        self.nudges = nudges
+    }
+
+    public static let none = BriefSources()
 }

@@ -719,26 +719,16 @@ final class PlannerModel {
     }
 
     private func record(_ action: BriefAction, on item: BriefItem) async {
-        if action != .open { itemStates[item.id] = action }
+        if action.dealsWithItem { itemStates[item.id] = action }
         do {
             if sessionItemIDs.contains(item.id), let session {
                 try await session.acted(action, on: item.id)
             } else {
                 // Added after the brief was opened: logged directly, outside the session timing.
-                try await services.eventLog.record(Self.logKind(action), subject: item.id, dataClass: item.dataClass)
+                try await services.eventLog.record(BriefSession.logKind(action), subject: item.id, dataClass: item.dataClass)
             }
         } catch {
             log.error("event log write failed: \(error)")
-        }
-    }
-
-    private static func logKind(_ action: BriefAction) -> EventLogKind {
-        switch action {
-        case .open: .itemOpened
-        case .done: .itemDone
-        case .snooze: .itemSnoozed
-        case .reschedule: .itemRescheduled
-        case .dismiss: .itemDismissed
         }
     }
 

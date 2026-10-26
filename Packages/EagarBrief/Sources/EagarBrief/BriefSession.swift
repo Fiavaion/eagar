@@ -35,20 +35,25 @@ public actor BriefSession {
     @discardableResult
     public func acted(_ action: BriefAction, on itemID: String) async throws(StoreError) -> Bool {
         guard let item = brief.allItems.first(where: { $0.id == itemID }) else { return false }
-        let kind: EventLogKind = switch action {
-        case .open: .itemOpened
-        case .done: .itemDone
-        case .snooze: .itemSnoozed
-        case .reschedule: .itemRescheduled
-        case .dismiss: .itemDismissed
-        }
-        try await log.record(kind, subject: itemID, dataClass: item.dataClass)
-        // Opening an item isn't dealing with it; every other action is.
-        if action != .open { remaining.remove(itemID) }
+        try await log.record(Self.logKind(action), subject: itemID, dataClass: item.dataClass)
+        // Opening an item (or a trial's cancel page) isn't dealing with it; every other action is.
+        if action.dealsWithItem { remaining.remove(itemID) }
         guard remaining.isEmpty, !completed, let openedAt else { return false }
         completed = true
         try await log.record(.briefCompleted, subject: brief.id, value: clock.now().timeIntervalSince(openedAt), dataClass: briefClass)
         return true
+    }
+
+    /// The content-free event-log kind for an action. Confirming a cancellation, planning a
+    /// catch-up and logging contact complete the item; a cancel page counts as opening it.
+    public static func logKind(_ action: BriefAction) -> EventLogKind {
+        switch action {
+        case .open, .cancelSubscription: .itemOpened
+        case .done, .confirmCancelled, .plan, .logContact: .itemDone
+        case .snooze: .itemSnoozed
+        case .reschedule, .changeCadence: .itemRescheduled
+        case .dismiss: .itemDismissed
+        }
     }
 
     public func rated(_ itemID: String, helpful: Bool) async throws(StoreError) {

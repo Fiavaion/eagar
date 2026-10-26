@@ -220,6 +220,8 @@ private struct BriefItemRow: View {
                 }
                 .fixedSize()
                 .accessibilityLabel(Text("Snooze \(item.title)"))
+            case .cancelSubscription, .confirmCancelled, .plan, .logContact, .changeCadence:
+                EmptyView()
             }
         }
         .disabled(state == .done || state == .dismiss)

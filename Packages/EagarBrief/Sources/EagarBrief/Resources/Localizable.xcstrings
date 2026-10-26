@@ -1,6 +1,46 @@
 {
   "sourceLanguage": "en-GB",
   "strings": {
+    "Active: %lld, about %@ a month. Charges this month: %lld, %@ in total.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áçtívé: %lld, ábóút %@ á móñth. Çhárgés thís móñth: %lld, %@ íñ tótál. ····························]"
+          }
+        }
+      }
+    },
+    "Active: %lld, about %@ a month. No charges due this month.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áçtívé: %lld, ábóút %@ á móñth. Ñó çhárgés dúé thís móñth. ·······················]"
+          }
+        }
+      }
+    },
+    "Cancel by %@ to avoid being charged %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél bý %@ tó ávóíd béíñg çhárgéd %@ ···············]"
+          }
+        }
+      }
+    },
+    "Cancel today to avoid being charged %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél tódáý tó ávóíd béíñg çhárgéd %@ ···············]"
+          }
+        }
+      }
+    },
     "Items to look at: %lld": {
       "localizations": {
         "ga": {
@@ -27,6 +67,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñóthíñg ñééds ýóú ríght ñów. ···········]"
+          }
+        }
+      }
+    },
+    "Subscriptions this month": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Súbsçríptíóñs thís móñth ··········]"
           }
         }
       }

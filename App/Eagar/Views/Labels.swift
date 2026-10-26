@@ -101,7 +101,7 @@ enum BriefLabels {
         case .today: "Today"
         case .deadlines: "Coming up"
         case .loans: "Loans due"
-        case .trials: "Trials about to bill"
+        case .trials: "Trials and subscriptions"
         case .mail: "Mail"
         case .approvals: "Waiting for approval"
         case .waiting: "Waiting on others"
@@ -133,6 +133,11 @@ enum BriefLabels {
         case .snooze: "Snoozed"
         case .reschedule: "Rescheduled"
         case .dismiss: "Dismissed"
+        case .cancelSubscription: "Cancel page opened"
+        case .confirmCancelled: "Cancelled"
+        case .plan: "Planned"
+        case .logContact: "Logged"
+        case .changeCadence: "Cadence changed"
         }
     }
 

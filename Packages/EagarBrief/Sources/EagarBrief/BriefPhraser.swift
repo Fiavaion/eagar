@@ -115,9 +115,10 @@ public enum BriefPhraser {
     /// One input line: time and title. Times use the brief's calendar time zone; all-day items
     /// say so, so the model has no reason to invent a time.
     static func line(for item: BriefItem, calendar: Calendar) -> String {
-        guard let start = item.start, !item.isAllDay else { return "All day: \(item.title)" }
+        let text = item.detail.map { "\(item.title): \($0)" } ?? item.title
+        guard let start = item.start, !item.isAllDay else { return item.start == nil ? text : "All day: \(text)" }
         var style = Date.FormatStyle(date: .omitted, time: .shortened)
         style.timeZone = calendar.timeZone
-        return "\(start.formatted(style)) \(item.title)"
+        return "\(start.formatted(style)) \(text)"
     }
 }
