@@ -9,6 +9,8 @@ public enum DerivationID: String, Sendable, CaseIterable, LogSafe {
     case ledgerEntry
     /// Busy blocks, free slots and breakpoints computed from classified events (FR-CAL-03).
     case calendarAvailability
+    /// A deadline derived from a feed record: a cdbooking loan or a Canvas assignment (FR-DL-01).
+    case feedDeadline
 
     public var logDescription: String { rawValue }
 }
