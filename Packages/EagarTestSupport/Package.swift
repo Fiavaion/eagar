@@ -12,6 +12,7 @@ let package = Package(
         .package(path: "../EagarSecurity"),
         .package(path: "../EagarLedger"),
         .package(path: "../EagarAI"),
+        .package(path: "../EagarFeeds"),
     ],
     targets: [
         .target(
@@ -20,12 +21,13 @@ let package = Package(
                 "EagarCore", "EagarSecurity", "EagarLedger",
                 .product(name: "EagarAI", package: "EagarAI"),
                 .product(name: "EagarAITestSupport", package: "EagarAI"),
+                .product(name: "EagarFeeds", package: "EagarFeeds"),
             ],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
         .testTarget(
             name: "EagarTestSupportTests",
-            dependencies: ["EagarTestSupport"],
+            dependencies: ["EagarTestSupport", .product(name: "EagarFeeds", package: "EagarFeeds")],
             swiftSettings: [.treatAllWarnings(as: .error)]
         ),
     ],
