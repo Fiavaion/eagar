@@ -4,7 +4,7 @@ import Foundation
 /// A trial Mark has not confirmed yet: what the "Add trial" intent, the share extension and
 /// screenshot import produce (FR-TRIAL-01, FR-TRIAL-03, FR-OS-03). Every field is optional
 /// because extraction can miss any of them; the confirmation screen fills the gaps.
-public struct TrialDraft: Sendable, Hashable {
+public struct TrialDraft: Sendable, Hashable, Codable {
     public var service: String?
     public var price: Decimal?
     /// ISO 4217 code, e.g. `EUR`.
