@@ -13,6 +13,12 @@
         "ga": { "stringUnit": { "state": "needs_review", "value": "[%@ évéñíñg ···]" } }
       }
     },
+    "%@’s birthday": {
+      "comment": "Birthday notification title; the argument is a name",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%@’s bírthdáý ····]" } }
+      }
+    },
     "%@ is free; %@: %@": {
       "comment": "Keep-in-touch nudge: slot, person, time since last contact",
       "localizations": {
@@ -54,10 +60,22 @@
         "ga": { "stringUnit": { "state": "needs_review", "value": "[%lld wééks ··]" } }
       }
     },
+    "Birthday today": {
+      "comment": "Birthday notification body without age",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[Bírthdáý tódáý ····]" } }
+      }
+    },
     "Catch up with %@": {
       "comment": "Calendar event title for a planned keep-in-touch catch-up",
       "localizations": {
         "ga": { "stringUnit": { "state": "needs_review", "value": "[Çátçh úp wíth %@ ·····]" } }
+      }
+    },
+    "Turns %lld today": {
+      "comment": "Birthday notification body with age",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[Túrñs %lld tódáý ····]" } }
       }
     },
     "no contact yet": {
