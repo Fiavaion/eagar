@@ -1,0 +1,89 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "%@ afternoon": {
+      "comment": "Weekday name, then part of day",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%@ áftérñóóñ ····]" } }
+      }
+    },
+    "%@ evening": {
+      "comment": "Weekday name, then part of day",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%@ évéñíñg ···]" } }
+      }
+    },
+    "%@’s birthday": {
+      "comment": "Birthday notification title; the argument is a name",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%@’s bírthdáý ····]" } }
+      }
+    },
+    "%@ is free; %@: %@": {
+      "comment": "Keep-in-touch nudge: slot, person, time since last contact",
+      "localizations": {
+        "en-GB": { "stringUnit": { "state": "translated", "value": "%1$@ is free; %2$@: %3$@" } },
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%1$@ ís fréé; %2$@: %3$@ ·····]" } }
+      }
+    },
+    "%@ morning": {
+      "comment": "Weekday name, then part of day",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%@ móríñíñg ···]" } }
+      }
+    },
+    "%lld days": {
+      "comment": "Days since last contact",
+      "localizations": {
+        "en-GB": {
+          "variations": {
+            "plural": {
+              "one": { "stringUnit": { "state": "translated", "value": "%lld day" } },
+              "other": { "stringUnit": { "state": "translated", "value": "%lld days" } }
+            }
+          }
+        },
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%lld dáýs ··]" } }
+      }
+    },
+    "%lld weeks": {
+      "comment": "Weeks since last contact",
+      "localizations": {
+        "en-GB": {
+          "variations": {
+            "plural": {
+              "one": { "stringUnit": { "state": "translated", "value": "%lld week" } },
+              "other": { "stringUnit": { "state": "translated", "value": "%lld weeks" } }
+            }
+          }
+        },
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[%lld wééks ··]" } }
+      }
+    },
+    "Birthday today": {
+      "comment": "Birthday notification body without age",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[Bírthdáý tódáý ····]" } }
+      }
+    },
+    "Catch up with %@": {
+      "comment": "Calendar event title for a planned keep-in-touch catch-up",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[Çátçh úp wíth %@ ·····]" } }
+      }
+    },
+    "Turns %lld today": {
+      "comment": "Birthday notification body with age",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[Túrñs %lld tódáý ····]" } }
+      }
+    },
+    "no contact yet": {
+      "comment": "Keep-in-touch: no interaction known",
+      "localizations": {
+        "ga": { "stringUnit": { "state": "needs_review", "value": "[ñó çóñtáçt ýét ····]" } }
+      }
+    }
+  },
+  "version": "1.0"
+}
