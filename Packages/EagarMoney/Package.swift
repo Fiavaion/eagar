@@ -1,0 +1,39 @@
+// swift-tools-version: 6.2
+import PackageDescription
+
+let package = Package(
+    name: "EagarMoney",
+    defaultLocalization: "en-GB",
+    platforms: [.iOS(.v26), .macOS(.v26)],
+    products: [
+        .library(name: "EagarMoney", targets: ["EagarMoney"]),
+    ],
+    dependencies: [
+        .package(path: "../EagarCore"),
+        .package(path: "../EagarStore"),
+        .package(path: "../EagarSync"),
+        .package(path: "../EagarAI"),
+        .package(path: "../EagarCalendar"),
+    ],
+    targets: [
+        .target(
+            name: "EagarMoney",
+            dependencies: [
+                "EagarCore", "EagarStore", "EagarSync", "EagarCalendar",
+                .product(name: "EagarAI", package: "EagarAI"),
+            ],
+            resources: [.process("Resources")],
+            swiftSettings: [.treatAllWarnings(as: .error)]
+        ),
+        .testTarget(
+            name: "EagarMoneyTests",
+            dependencies: [
+                "EagarMoney", "EagarCore", "EagarStore", "EagarSync", "EagarCalendar",
+                .product(name: "EagarAI", package: "EagarAI"),
+                .product(name: "EagarAITestSupport", package: "EagarAI"),
+            ],
+            swiftSettings: [.treatAllWarnings(as: .error)]
+        ),
+    ],
+    swiftLanguageModes: [.v6]
+)

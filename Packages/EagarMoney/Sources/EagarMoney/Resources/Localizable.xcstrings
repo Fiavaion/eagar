@@ -1,0 +1,56 @@
+{
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "A subscription needs cancelling soon": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á súbscrípţíóñ ñééds çáñçéllíñg sóóñ ··········]"
+          }
+        }
+      }
+    },
+    "Cancel %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél %@ ···]"
+          }
+        }
+      }
+    },
+    "Cancel by %@ to avoid being charged %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél bý %1$@ ţó ávóíd béíñg çhárgéd %2$@ ··········]"
+          }
+        }
+      }
+    },
+    "Cancel today to avoid being charged %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél ţódáý ţó ávóíd béíñg çhárgéd %@ ··········]"
+          }
+        }
+      }
+    },
+    "Subscription reminder": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Súbscrípţíóñ rémíñdér ······]"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
