@@ -385,6 +385,48 @@ Alternatives: A CollegeStore model for planned catch-ups (survives relaunch, but
 Consequences: After a relaunch, college catch-ups planned earlier in the week no longer count, so up to that many extra nudges can appear that week. A planned catch-up and a manual "we talked" log for the same meeting both count.
 Refs: FR-PEOPLE-04, FR-PEOPLE-05, FR-PEOPLE-06, FR-TRIAL-02, BD-04, D-028
 
+## D-041  Feed models share the store schema; only CollegeStore accepts them  (2026-10-27, M2)
+Context: `FeedSourceRecord`, `BookingItem` and `CanvasItem` must live only in CollegeStore (B-8). EagarStores builds both stores from one model list, and SwiftData traps when code touches a model missing from a store's schema.
+Decision: **For Mark to confirm.** The feed models join `AppServices.models`, so both stores carry them in their schema. The per-save class check refuses college records in PersonalStore, and no sync adapter exists for them (`AppServices.syncAdapters`, which the B-8 test reuses). Sources are created with the owner profile: college class and local AI, and a college source is clamped to local AI even if a stored record says `cloudAllowed`.
+Alternatives: A CollegeStore-only schema (needs an EagarStore change to split model lists per store).
+Consequences: Safety rests on the save-time class check plus the absence of an adapter; sync is CKSyncEngine with explicit adapters, never automatic CloudKit mirroring. Revisit if PersonalStore ever moves to automatic mirroring.
+Refs: FR-BOOK-01, FR-CANVAS-01, FR-CORE-04, BD-04, B-8, D-030, D-031
+
+## D-042  Feed setup, secrets display and demo secrets  (2026-10-27, M2)
+Context: Settings needs to show which feed is configured without exposing the secret; demo mode must not touch the Keychain or network.
+Decision: **For Mark to confirm.** Settings shows the last four characters of the feed URL and token, the same masking as the Claude key. Demo mode keeps feed secrets in an in-memory store and fetches from a fake transport on `.invalid` hosts. Removing a feed deletes its Keychain items.
+Alternatives: Show nothing beyond "configured" (harder to tell two URLs apart).
+Consequences: Four characters of a feed token are visible on screen.
+Refs: FR-BOOK-01, FR-CANVAS-01, invariant 6, D-038
+
+## D-043  Feed refresh cadence  (2026-10-27, M2)
+Context: Feeds need refreshing without hammering cdbooking or Canvas.
+Decision: Refresh on app activation, at most every 5 minutes; a calendar change only re-reads stored feed data. iOS adds a BGAppRefresh task `app.eagar.feeds.refresh` with a 30-minute earliest start. macOS refreshes on activation only (the hub takes over in M3).
+Alternatives: A timer while open (wastes requests); push (M5).
+Consequences: A loan added on cdbooking appears at the next activation after 5 minutes, or at the next background refresh.
+Refs: FR-CORE-04, FR-BOOK-02, FR-CANVAS-02
+
+## D-044  Loans in the brief, clash acceptance and reopening  (2026-10-27, M2)
+Context: The brief must show loans due; a clash needs an action; cdbooking can correct a wrongly closed loan.
+Decision: **For Mark to confirm.** "Loans due" uses the deadlines' 7-day horizon, and a loan shown there is not repeated under Overdue or Coming up; lines are phrased on device only. Accepting a clash creates a local college deadline "Return …" with reminders 15 minutes before and at the time, rather than a calendar event, because the target calendar may sync to a server. A loan deadline reopens only when cdbooking moves the loan from closed back to open; a loan Mark marked done stays done.
+Alternatives: A calendar event for the return (leaks college data to a synced calendar); reopening whenever the feed shows the loan open (undoes Mark's own "done").
+Consequences: The accepted return slot is visible only in Eagar on that device.
+Refs: FR-BOOK-03, FR-BOOK-04, FR-DL-01, BD-04, D-034
+
+## D-045  Loan Live Activity and all-day overdue  (2026-10-27, M2)
+Context: FR-BOOK-07 asks for a local Live Activity for loans due; Lock Screen content is visible without unlocking. Separately, all-day deadlines at 00:00 showed as overdue on their own day.
+Decision: **For Mark to confirm.** The Live Activity (iOS only, started locally) shows counts and times only, never item names or locations, and ends when no loan is due today; it is not ended at its scheduled end unless the app runs. All-day deadlines count as overdue only after their day ends, fixed in the planner and brief checks rather than by moving Canvas due times to 23:59, so hand-entered all-day deadlines benefit too.
+Alternatives: Item names on the Lock Screen (college content outside the device boundary rules); end-of-day due times in the importer only.
+Consequences: A stale Live Activity can linger past midnight if the app never runs.
+Refs: FR-BOOK-07, FR-DL-01, FR-CANVAS-02, BD-04, D-036
+
+## D-046  Package string catalogs are maintained by hand  (2026-10-27, M2)
+Context: `Tools/sync-strings.py` (D-008) covers the app, widget and share catalogs only; EagarBrief has its own package catalog.
+Decision: New package strings are added to the package catalog by hand, with ga scaffolds, in the same commit.
+Alternatives: Extend sync-strings.py to package catalogs (parked).
+Consequences: Easy to miss; the catalog-completeness check catches gaps.
+Refs: NFR-L10N-01, NFR-L10N-02, D-008
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.
