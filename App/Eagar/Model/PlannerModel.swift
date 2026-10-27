@@ -289,18 +289,24 @@ final class PlannerModel {
         }
     }
 
-    var overdueDeadlines: [DeadlineRow] {
-        let now = clock.now()
-        return deadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt < now }
+    /// Whether a deadline has passed. An all-day deadline (a Canvas due date, a trial's
+    /// cancel-by day) is due for the whole day, so it is overdue only once that day has ended.
+    private func isPast(_ snapshot: DeadlineSnapshot, now: Date) -> Bool {
+        guard snapshot.isAllDay else { return snapshot.dueAt < now }
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: snapshot.dueAt)) ?? snapshot.dueAt
+        return dayEnd <= now
     }
 
-    /// Open deadlines still ahead, with trial cancel-by days (which are all-day, so a trial
-    /// due today counts as upcoming until the day ends).
+    var overdueDeadlines: [DeadlineRow] {
+        let now = clock.now()
+        return deadlines.filter { $0.snapshot.status == .open && isPast($0.snapshot, now: now) }
+    }
+
+    /// Open deadlines still ahead, with trial cancel-by days. All-day ones due today count as
+    /// upcoming until the day ends.
     var upcomingDeadlines: [DeadlineRow] {
         let now = clock.now()
-        let today = calendar.startOfDay(for: now)
-        let trials = trialDeadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt >= today }
-        return (deadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt >= now } + trials)
+        return (deadlines + trialDeadlines).filter { $0.snapshot.status == .open && !isPast($0.snapshot, now: now) }
             .sorted { ($0.snapshot.dueAt, $0.id.uuidString) < ($1.snapshot.dueAt, $1.id.uuidString) }
     }
 

@@ -378,4 +378,17 @@ struct FeedBoundaryTests {
         #expect(h.model.feeds.failure == .invalidURL)
         #expect(h.model.feeds.canvas == nil)
     }
+
+    /// An all-day deadline due today (how Canvas all-day due dates arrive, at 00:00) is
+    /// upcoming until the day ends, not overdue from midnight.
+    @Test func allDayDeadlineDueTodayIsNotOverdue() async throws {
+        let h = try makeHarness()
+        var draft = DeadlineDraft(dueAt: calendar.startOfDay(for: morning))
+        draft.title = "Essay draft"
+        draft.isAllDay = true
+        draft.dataClass = .college
+        #expect(await h.model.planner.save(draft))
+        #expect(h.model.planner.overdueDeadlines.isEmpty)
+        #expect(h.model.planner.upcomingDeadlines.map(\.snapshot.title) == ["Essay draft"])
+    }
 }
