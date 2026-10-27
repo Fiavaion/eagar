@@ -28,7 +28,7 @@ struct PersonEditorDraft: Equatable, Identifiable {
     }
 }
 
-/// A catch-up Mark planned from a nudge: counted against the week's budget until it starts
+/// A catch-up Mark planned from a nudge: counted against the budget of the week it falls in
 /// (`NudgeBudget`). Only an opaque person ID and a time are kept, locally.
 struct PlannedCatchUp: Codable, Equatable {
     let personID: UUID
@@ -70,6 +70,9 @@ final class PeopleModel {
     /// Calendar events for inference and free slots, kept in memory only.
     private var pastEvents: [ClassifiedEvent] = []
     private var weekEvents: [ClassifiedEvent] = []
+    /// Catch-ups planned from college-class nudges (D-028: the slot follows a college event).
+    /// Kept in memory only: standard defaults are in device and iCloud backup (invariant 1).
+    private var collegePlanned: [PlannedCatchUp] = []
 
     static let budgetKey = "people.weeklyBudget"
     static let plannedKey = "people.plannedCatchUps"
@@ -183,8 +186,12 @@ final class PeopleModel {
 
     // MARK: Nudges (FR-PEOPLE-04, 05)
 
-    /// Catch-ups planned from nudges that still count against this week's budget.
-    var plannedCatchUps: [PlannedCatchUp] {
+    /// Catch-ups planned from nudges this week or later: personal ones from defaults, college
+    /// ones from memory.
+    var plannedCatchUps: [PlannedCatchUp] { storedPlannedCatchUps + collegePlanned }
+
+    /// Personal planned catch-ups, the only ones written to defaults.
+    private var storedPlannedCatchUps: [PlannedCatchUp] {
         guard let data = defaults.data(forKey: Self.plannedKey) else { return [] }
         do {
             return try JSONDecoder().decode([PlannedCatchUp].self, from: data)
@@ -195,32 +202,47 @@ final class PeopleModel {
         }
     }
 
-    private func setPlannedCatchUps(_ items: [PlannedCatchUp]) {
+    /// Records a planned catch-up and drops those from earlier weeks. A college one stays in
+    /// memory and never reaches defaults.
+    private func recordPlannedCatchUp(_ item: PlannedCatchUp, dataClass: DataClass) {
+        let weekStart = week.start
+        collegePlanned = collegePlanned.filter { $0.start >= weekStart }
+        var stored = storedPlannedCatchUps.filter { $0.start >= weekStart }
+        if dataClass >= .college {
+            collegePlanned.append(item)
+        } else {
+            stored.append(item)
+        }
         do {
-            defaults.set(try JSONEncoder().encode(items), forKey: Self.plannedKey)
+            defaults.set(try JSONEncoder().encode(stored), forKey: Self.plannedKey)
         } catch {
             log.error("planned catch-ups could not be saved")
         }
     }
 
-    /// Logged contacts this week plus planned catch-ups not yet started (NudgeBudget).
-    var alreadyCommitted: Int {
+    /// Catch-ups planned for this week, whether or not they have started.
+    private var plannedThisWeek: [PlannedCatchUp] {
         let week = week
-        let now = now
-        let planned = plannedCatchUps.filter { week.contains($0.start) && $0.start >= now }.count
-        return NudgeBudget.loggedContacts(logs, in: week) + planned
+        return plannedCatchUps.filter { $0.start >= week.start && $0.start < week.end }
+    }
+
+    /// Logged contacts plus planned catch-ups in this week (NudgeBudget).
+    var alreadyCommitted: Int {
+        NudgeBudget.loggedContacts(logs, in: week) + plannedThisWeek.count
     }
 
     var budgetLeft: Int { max(0, weeklyBudget - alreadyCommitted) }
 
-    /// Plans this week's nudges in real free slots. The generator is seeded with the week, so
-    /// the proposals stay put while nothing changes.
+    /// Plans this week's nudges in real free slots, leaving out people who already have a
+    /// catch-up planned this week. The generator is seeded with the week, so the proposals
+    /// stay put while nothing changes.
     func planNudges() {
         let week = week
         let free = AvailabilityEngine.freeSlots(for: weekEvents, in: week, calendar: calendar)
+        let planned = Set(plannedThisWeek.map(\.personID))
         var generator = SeededGenerator(seed: UInt64(max(0, week.start.timeIntervalSince1970)))
         nudges = NudgePlanner.plan(
-            people: people.map(\.snapshot), inferences: inferences, freeSlots: free, week: week, now: now,
+            people: people.filter { !planned.contains($0.id) }.map(\.snapshot), inferences: inferences, freeSlots: free, week: week, now: now,
             alreadyCommitted: alreadyCommitted, settings: NudgePlannerSettings(weeklyBudget: weeklyBudget),
             calendar: calendar, using: &generator
         )
@@ -239,8 +261,9 @@ final class PeopleModel {
     func perform(_ action: NudgeAction, on nudge: Nudge) async -> Bool {
         let effect = NudgeActions.effect(of: action, for: nudge, now: now, calendar: calendar)
         if let draft = effect.eventDraft {
-            guard await writeCatchUp(draft, eventClass: effect.eventClass ?? nudge.dataClass) else { return false }
-            setPlannedCatchUps(plannedCatchUps.filter { $0.start >= week.start } + [PlannedCatchUp(personID: nudge.personID, start: draft.start)])
+            let eventClass = effect.eventClass ?? nudge.dataClass
+            guard await writeCatchUp(draft, eventClass: eventClass) else { return false }
+            recordPlannedCatchUp(PlannedCatchUp(personID: nudge.personID, start: draft.start), dataClass: max(eventClass, nudge.dataClass))
         }
         if let log = effect.contactLog {
             do {

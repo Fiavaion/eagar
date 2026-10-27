@@ -14,6 +14,14 @@ private struct FixedClock: EagarClock {
     func now() -> Date { date }
 }
 
+/// A clock a test can move forward.
+private final class MovableClock: EagarClock {
+    private let date: Mutex<Date>
+    init(_ date: Date) { self.date = Mutex(date) }
+    func now() -> Date { date.withLock { $0 } }
+    func set(_ newDate: Date) { date.withLock { $0 = newDate } }
+}
+
 /// A people reader whose every read fails.
 private struct FailingPeopleReader: PeopleReading {
     func people() async throws(StoreError) -> [PersonRecord] { throw .fetchFailed(.personal) }
@@ -94,19 +102,117 @@ struct PeopleModelTests {
     private let donor = RecordingDonor()
     private let briefs = SpyBriefContent()
 
-    private func makeModel(store: (any EventStoreAdapting)? = nil) throws -> AppModel {
+    private func makeModel(
+        store: (any EventStoreAdapting)? = nil, clock: (any EagarClock)? = nil, defaults: UserDefaults? = nil
+    ) throws -> AppModel {
         let services = try AppServices.make(
             inMemory: true, secrets: MemorySecrets(),
             eventStore: store ?? DemoEventStore(now: monday, calendar: calendar, richWeek: true),
             deadlineNotifications: SpyDeadlineNotifications(), briefNotifications: briefs, donations: donor, widgets: widgets,
             trialReminders: SpyTrialReminders(), birthdayNotifications: birthdays, pendingImports: PendingTrialImportStore(directory: nil)
         )
-        let defaults = UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)")!
+        let defaults = defaults ?? UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)")!
         var settings = BriefSettings()
         settings.phrasingMode = .off
         settings.save(to: defaults)
         defaults.set(true, forKey: PlannerModel.notificationsRequestedKey)
-        return AppModel(services: services, defaults: defaults, clock: FixedClock(date: monday), calendar: calendar)
+        return AppModel(services: services, defaults: defaults, clock: clock ?? FixedClock(date: monday), calendar: calendar)
+    }
+
+    /// Calendars confirmed, `count` people added and the brief built.
+    private func readyModel(
+        store: (any EventStoreAdapting)? = nil, count: Int, clock: (any EagarClock)? = nil, defaults: UserDefaults? = nil
+    ) async throws -> AppModel {
+        let model = try makeModel(store: store, clock: clock, defaults: defaults)
+        await model.planner.loadCalendars()
+        await model.planner.confirmProposedTags()
+        await addPeople(model, count: count)
+        await model.appBecameActive()
+        return model
+    }
+
+    /// Every string and data value a defaults suite can see, to search for a stored identifier.
+    private func storedText(_ defaults: UserDefaults) -> String {
+        defaults.dictionaryRepresentation().values.compactMap { value in
+            (value as? Data).flatMap { String(data: $0, encoding: .utf8) } ?? (value as? String)
+        }.joined()
+    }
+
+    /// FR-PEOPLE-04: a planned catch-up counts against its whole week, also once it has
+    /// started, so planning three early in the week does not free the budget later on.
+    @Test func FR_PEOPLE_04_plannedCatchUpsCountForTheWholeWeek() async throws {
+        let clock = MovableClock(monday)
+        let model = try await readyModel(count: 8, clock: clock)
+        #expect(model.people.nudges.count == 3)
+        for _ in 0..<3 {
+            let nudge = try #require(model.people.nudges.first)
+            #expect(await model.people.perform(.plan, on: nudge))
+        }
+        #expect(model.people.alreadyCommitted == 3)
+        #expect(model.people.nudges.isEmpty)
+
+        let week = try #require(calendar.dateInterval(of: .weekOfYear, for: monday))
+        let latest = try #require(model.people.plannedCatchUps.map(\.start).max())
+        let later = latest.addingTimeInterval(3600)
+        try #require(later < week.end)
+        clock.set(later)
+        await model.people.refresh()
+        #expect(model.people.alreadyCommitted == 3)
+        #expect(model.people.budgetLeft == 0)
+        #expect(model.people.nudges.isEmpty)
+    }
+
+    /// FR-PEOPLE-05: someone with a catch-up planned this week is not proposed again.
+    @Test func FR_PEOPLE_05_plannedPersonIsNotProposedAgainThisWeek() async throws {
+        let model = try await readyModel(count: 1)
+        let nudge = try #require(model.people.nudges.first)
+        #expect(await model.people.perform(.plan, on: nudge))
+        #expect(model.people.budgetLeft == 2)
+        #expect(!model.people.nudges.contains { $0.personID == nudge.personID })
+    }
+
+    /// Invariant 1, D-028: a catch-up planned from a college nudge counts against the budget
+    /// but never reaches standard defaults (device and iCloud backup); a personal one is stored.
+    @Test func Boundary_collegePlannedCatchUpNeverPersistedToDefaults() async throws {
+        let collegeDefaults = try #require(UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)"))
+        let college = try await readyModel(store: CollegeWeekStore(now: monday, calendar: calendar), count: 1, defaults: collegeDefaults)
+        let collegeNudge = try #require(college.people.nudges.first)
+        #expect(collegeNudge.dataClass == .college)
+        #expect(await college.people.perform(.plan, on: collegeNudge))
+        #expect(college.people.alreadyCommitted == 1)
+        #expect(college.people.plannedCatchUps.map(\.personID) == [collegeNudge.personID])
+        #expect(!storedText(collegeDefaults).contains(collegeNudge.personID.uuidString))
+
+        let personalDefaults = try #require(UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)"))
+        let personal = try await readyModel(count: 8, defaults: personalDefaults)
+        let personalNudge = try #require(personal.people.nudges.first { $0.dataClass == .personal })
+        #expect(await personal.people.perform(.plan, on: personalNudge))
+        let data = try #require(personalDefaults.data(forKey: PeopleModel.plannedKey))
+        let stored = try JSONDecoder().decode([PlannedCatchUp].self, from: data)
+        #expect(stored.map(\.personID) == [personalNudge.personID])
+    }
+
+    /// FR-PEOPLE-06: a failed read leaves every pending birthday reminder alone and shows the
+    /// error, on refresh and after a change.
+    @Test func FR_PEOPLE_06_failedReadKeepsBirthdayReminders() async throws {
+        let model = try makeModel()
+        await model.people.add([ContactImport(contactIdentifier: "x", displayName: "Niamh", birthday: Birthday(month: 11, day: 2))])
+        let before = birthdays.pending.withLock { Set($0.keys) }
+        #expect(before.count == 1)
+        let id = try #require(model.people.people.first?.id)
+        birthdays.removed.withLock { $0.removeAll() }
+
+        let failing = PeopleModel(
+            services: model.services, planner: model.planner, defaults: UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)")!,
+            clock: FixedClock(date: monday), calendar: calendar, reader: FailingPeopleReader()
+        )
+        await failing.refresh()
+        #expect(failing.failure == .read)
+        #expect(birthdays.removed.withLock { $0.isEmpty })
+
+        await failing.logContact(id)
+        #expect(birthdays.removed.withLock { $0.isEmpty })
+        #expect(birthdays.pending.withLock { Set($0.keys) } == before)
     }
 
     private func addPeople(_ model: AppModel, count: Int) async {
@@ -208,29 +314,6 @@ struct PeopleModelTests {
         let id = try #require(model.people.people.first?.id)
         await model.people.delete(id)
         #expect(birthdays.pending.withLock { $0.isEmpty })
-    }
-
-    /// FR-PEOPLE-06: a failed read leaves every pending birthday reminder alone and shows the
-    /// error, on refresh and after a change.
-    @Test func FR_PEOPLE_06_failedReadKeepsBirthdayReminders() async throws {
-        let model = try makeModel()
-        await model.people.add([ContactImport(contactIdentifier: "x", displayName: "Niamh", birthday: Birthday(month: 11, day: 2))])
-        let before = birthdays.pending.withLock { Set($0.keys) }
-        #expect(before.count == 1)
-        let id = try #require(model.people.people.first?.id)
-        birthdays.removed.withLock { $0.removeAll() }
-
-        let failing = PeopleModel(
-            services: model.services, planner: model.planner, defaults: UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)")!,
-            clock: FixedClock(date: monday), calendar: calendar, reader: FailingPeopleReader()
-        )
-        await failing.refresh()
-        #expect(failing.failure == .read)
-        #expect(birthdays.removed.withLock { $0.isEmpty })
-
-        await failing.logContact(id)
-        #expect(birthdays.removed.withLock { $0.isEmpty })
-        #expect(birthdays.pending.withLock { Set($0.keys) } == before)
     }
 
     @Test func notesAreKeptAndManualLogsMoveLastContact() async throws {
