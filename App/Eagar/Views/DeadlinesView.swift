@@ -1,12 +1,15 @@
+import EagarBookings
 import EagarCalendar
 import EagarCore
 import EagarMoney
 import SwiftUI
 
-/// Deadlines, overdue first (FR-DL-01..04), with trial cancel-by days (origin `trial`).
+/// Deadlines, overdue first (FR-DL-01..04), with trial cancel-by days (origin `trial`), loan
+/// returns (origin `booking`, with clash proposals, FR-BOOK-04) and Canvas assignments.
 struct DeadlinesView: View {
     let planner: PlannerModel
     let money: MoneyModel
+    let feeds: FeedsModel
     @State private var editing: DeadlineDraft?
     @State private var rescheduling: DeadlineRow?
     @State private var editingTrial: TrialEditorDraft?
@@ -15,6 +18,12 @@ struct DeadlinesView: View {
 
     var body: some View {
         List {
+            if feeds.needsAttention {
+                Section {
+                    Label("A college feed needs attention. Open Settings to fix it.", systemImage: "exclamationmark.triangle")
+                        .accessibilityIdentifier("deadlines.feedAttention")
+                }
+            }
             if planner.deadlines.isEmpty && planner.trialDeadlines.isEmpty {
                 ContentUnavailableView {
                     Label("No deadlines", systemImage: "flag")
@@ -77,8 +86,10 @@ struct DeadlinesView: View {
                     } else {
                         DeadlineRowView(
                             planner: planner, row: row,
+                            loan: row.snapshot.origin == .booking ? feeds.loanInfo(forDeadline: row.id) : nil,
                             onEdit: { editing = DeadlineDraft(row) },
-                            onReschedule: { rescheduling = row }
+                            onReschedule: { rescheduling = row },
+                            onAcceptReturn: { bookingID in Task { await feeds.acceptProposedReturn(bookingID: bookingID) } }
                         )
                     }
                 }
@@ -131,16 +142,39 @@ private struct TrialDeadlineRowView: View {
 }
 
 /// A deadline with its actions. Swipe actions have button equivalents in the row's menu.
+/// Loan returns add their location, links and a clash proposal under the row.
 private struct DeadlineRowView: View {
     let planner: PlannerModel
     let row: DeadlineRow
+    let loan: LoanRowInfo?
     let onEdit: () -> Void
     let onReschedule: () -> Void
+    let onAcceptReturn: (String) -> Void
+    @Environment(\.openURL) private var openURL
 
     private var snapshot: DeadlineSnapshot { row.snapshot }
     private var isOpen: Bool { snapshot.status == .open }
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            mainRow
+            if isOpen, let loan, let clash = loan.clash {
+                LoanClashProposalView(clash: clash, accepted: loan.proposalAccepted) { onAcceptReturn(loan.bookingID) }
+            }
+        }
+        .swipeActions(edge: .leading) {
+            if isOpen {
+                Button("Done") { Task { await planner.markDone(row.id) } }
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            Button("Delete", role: .destructive) { Task { await planner.delete(row.id) } }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("deadline.row")
+    }
+
+    private var mainRow: some View {
         HStack(alignment: .center, spacing: 8) {
             Button(action: onEdit) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -161,6 +195,7 @@ private struct DeadlineRowView: View {
                     }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    DeadlineOriginCaption(origin: snapshot.origin, location: loan?.location)
                 }
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 .contentShape(Rectangle())
@@ -183,6 +218,12 @@ private struct DeadlineRowView: View {
                     Button("Snooze until tomorrow at 09:00") { Task { await planner.snooze(row.id, until: planner.snoozeTomorrowMorning) } }
                     Button("Reschedule", action: onReschedule)
                 }
+                if let page = loan?.pageURL {
+                    Button("Open in cdbooking") { openURL(page) }
+                }
+                if isOpen, let extend = loan?.extendURL {
+                    Button("Request an extension") { openURL(extend) }
+                }
                 Button("Edit", action: onEdit)
                 Button("Delete", role: .destructive) { Task { await planner.delete(row.id) } }
             } label: {
@@ -192,16 +233,80 @@ private struct DeadlineRowView: View {
             .fixedSize()
             .accessibilityLabel(Text("More actions for \(snapshot.title)"))
         }
-        .swipeActions(edge: .leading) {
-            if isOpen {
-                Button("Done") { Task { await planner.markDone(row.id) } }
+    }
+}
+
+/// Where a feed deadline came from, as a symbol and text.
+private struct DeadlineOriginCaption: View {
+    let origin: DeadlineOrigin
+    let location: String?
+
+    var body: some View {
+        switch origin {
+        case .booking:
+            Group {
+                if let location, !location.isEmpty {
+                    Label("Loan · return to \(location)", systemImage: "camera")
+                } else {
+                    Label("Loan", systemImage: "camera")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        case .canvas:
+            Label("Canvas", systemImage: "graduationcap")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        default:
+            EmptyView()
+        }
+    }
+}
+
+/// FR-BOOK-04: the due time falls in busy time. Proposes the latest free return time before it
+/// (accepting adds a local college reminder; nothing is sent), or the extension page.
+private struct LoanClashProposalView: View {
+    let clash: ReturnClash
+    let accepted: Bool
+    let onAccept: () -> Void
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label("You're busy when this is due.", systemImage: "exclamationmark.triangle")
+                .font(.subheadline)
+            if let slot = clash.proposedSlot {
+                if accepted {
+                    Label("Return reminder set for \(slot.start, format: .dateTime.weekday().hour().minute())", systemImage: "checkmark.circle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Button(action: onAccept) {
+                        Label("Remind me to return it at \(slot.start, format: .dateTime.weekday().hour().minute())", systemImage: "bell")
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityIdentifier("loan.acceptReturn")
+                }
+            } else if let extend = clash.extendURL {
+                Button {
+                    openURL(extend)
+                } label: {
+                    Label("No free time before then. Request an extension", systemImage: "arrow.up.forward.square")
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.borderless)
+            } else {
+                Text("No free time before then. Ask the loans desk for an extension.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
         }
-        .swipeActions(edge: .trailing) {
-            Button("Delete", role: .destructive) { Task { await planner.delete(row.id) } }
-        }
+        .padding(.leading, 4)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("deadline.row")
+        .accessibilityIdentifier("loan.clash")
     }
 }
 

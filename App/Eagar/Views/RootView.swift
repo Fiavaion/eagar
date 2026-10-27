@@ -35,7 +35,7 @@ struct RootView: View {
                 NavigationStack { TodayView(model: model) }
             }
             Tab("Deadlines", systemImage: "flag", value: RootTab.deadlines) {
-                NavigationStack { DeadlinesView(planner: planner, money: model.money) }
+                NavigationStack { DeadlinesView(planner: planner, money: model.money, feeds: model.feeds) }
             }
             Tab("Subscriptions", systemImage: "creditcard", value: RootTab.subscriptions) {
                 NavigationStack { SubscriptionsView(money: model.money) }
@@ -101,6 +101,8 @@ private struct RootTasks: ViewModifier {
             .onChange(of: scenePhase) { _, phase in
                 // Scene activation is the app-open breakpoint (FR-BRIEF-02).
                 if phase == .active { Task { await model.appBecameActive() } }
+                // Feeds refresh in the background on iOS while Eagar is closed (FR-BOOK-02).
+                if phase == .background, model.feeds.hasSources { FeedRefreshSchedule.submit() }
             }
             // A proposed trial from a screenshot or the share extension, wherever Mark is (FR-TRIAL-03).
             .sheet(item: Binding(get: { model.money.review }, set: { if $0 == nil { model.money.review = nil } })) { draft in
@@ -118,6 +120,7 @@ extension AppFailure: UserFacingFailure {}
 extension PlannerFailure: UserFacingFailure {}
 extension MoneyFailure: UserFacingFailure {}
 extension PeopleFailure: UserFacingFailure {}
+extension FeedsFailure: UserFacingFailure {}
 
 /// One "Something went wrong" alert per model.
 private struct RootAlerts: ViewModifier {
@@ -127,11 +130,13 @@ private struct RootAlerts: ViewModifier {
         let planner = model.planner
         let money = model.money
         let people = model.people
+        let feeds = model.feeds
         content
             .failureAlert(Binding(get: { model.failure }, set: { model.failure = $0 }))
             .failureAlert(Binding(get: { planner.failure }, set: { planner.failure = $0 }))
             .failureAlert(Binding(get: { money.failure }, set: { money.failure = $0 }))
             .failureAlert(Binding(get: { people.failure }, set: { people.failure = $0 }))
+            .failureAlert(Binding(get: { feeds.failure }, set: { feeds.failure = $0 }))
     }
 }
 

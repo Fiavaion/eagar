@@ -1,6 +1,9 @@
 import EagarAI
+import EagarBookings
 import EagarCalendar
+import EagarCanvas
 import EagarCore
+import EagarFeeds
 import EagarLedger
 import EagarMoney
 import EagarPeople
@@ -37,12 +40,27 @@ struct AppServices: Sendable {
     let birthdayNotifications: any BirthdayNotificationScheduling
     /// Trials proposed by the share extension, waiting for confirmation (FR-TRIAL-03).
     let pendingImports: PendingTrialImportStore
+    /// The HTTP pipeline for cdbooking and Canvas (timeout, retry with backoff, typed errors).
+    let feedFetcher: FeedFetcher
+    /// The due-day loan Live Activity (FR-BOOK-07).
+    let loanActivities: any LoanActivityPresenting
 
-    /// Every SwiftData model in the app. Both stores share one schema; placement is per record.
+    /// Every SwiftData model in the app. Both stores share one schema; placement is per record,
+    /// by data class. The feed models (M2) are always `college`, so the class check on every
+    /// save keeps them in CollegeStore, and no sync adapter exists for them (B-8).
     static var models: [any PersistentModel.Type] {
         [
             LedgerEntry.self, ConsentRecord.self, CalendarRef.self, Deadline.self, EventLogEntry.self,
             Trial.self, Person.self, ContactLog.self,
+            FeedSourceRecord.self, BookingItem.self, CanvasItem.self,
+        ]
+    }
+
+    /// The record types PersonalStore sync carries (BD-02). Feed records are not among them.
+    static var syncAdapters: [AnySyncAdapter] {
+        [
+            AnySyncAdapter(DeadlineSyncAdapter()), AnySyncAdapter(TrialSyncAdapter()),
+            AnySyncAdapter(PersonSyncAdapter()), AnySyncAdapter(ContactLogSyncAdapter()),
         ]
     }
 
@@ -56,7 +74,10 @@ struct AppServices: Sendable {
         widgets: any WidgetPublishing = SystemWidgetPublisher(),
         trialReminders: any TrialReminderScheduling = UserTrialReminderScheduler(),
         birthdayNotifications: any BirthdayNotificationScheduling = UserBirthdayNotificationScheduler(),
-        pendingImports: PendingTrialImportStore = .appGroup
+        pendingImports: PendingTrialImportStore = .appGroup,
+        providers: [any LLMProvider]? = nil,
+        feedTransport: any HTTPTransport = URLSessionTransport(),
+        loanActivities: (any LoanActivityPresenting)? = nil
     ) throws -> AppServices {
         let location: StoreLocation = inMemory
             ? .inMemory
@@ -67,7 +88,7 @@ struct AppServices: Sendable {
         let catalog = try ModelCatalog.bundled()
         let policy = AppPolicySource(consents: consents, ledger: ledger)
         let router = AIRouter(
-            providers: [AppleOnDeviceProvider(), AnthropicProvider(secrets: secrets)],
+            providers: providers ?? [AppleOnDeviceProvider(), AnthropicProvider(secrets: secrets)],
             ledger: ledger,
             policy: policy,
             catalog: catalog
@@ -78,7 +99,10 @@ struct AppServices: Sendable {
             eventStore: eventStore, calendarTags: CalendarTagStore(stores: stores), eventLog: EventLog(stores: stores),
             deadlineNotifications: deadlineNotifications, briefNotifications: briefNotifications,
             sync: inMemory ? nil : makeSync(stores: stores), donations: donations, widgets: widgets,
-            trialReminders: trialReminders, birthdayNotifications: birthdayNotifications, pendingImports: pendingImports
+            trialReminders: trialReminders, birthdayNotifications: birthdayNotifications, pendingImports: pendingImports,
+            feedFetcher: FeedFetcher(transport: feedTransport),
+            // In-memory stores are tests and previews: no Live Activity unless asked for (demo).
+            loanActivities: loanActivities ?? (inMemory ? NoLoanActivities() : SystemLoanActivityPresenter())
         )
     }
 
@@ -91,11 +115,7 @@ struct AppServices: Sendable {
         #if EAGAR_CLOUDKIT
         let stateURL = URL.applicationSupportDirectory.appending(path: "Eagar/Sync/personal-sync.json")
         do {
-            let adapters = [
-                AnySyncAdapter(DeadlineSyncAdapter()), AnySyncAdapter(TrialSyncAdapter()),
-                AnySyncAdapter(PersonSyncAdapter()), AnySyncAdapter(ContactLogSyncAdapter()),
-            ]
-            let coordinator = try SyncCoordinator(store: stores.personal, adapters: adapters, stateURL: stateURL)
+            let coordinator = try SyncCoordinator(store: stores.personal, adapters: syncAdapters, stateURL: stateURL)
             return PersonalSyncEngine(containerIdentifier: iCloudContainer, coordinator: coordinator)
         } catch {
             EagarLog(.app).error("personal sync not started")

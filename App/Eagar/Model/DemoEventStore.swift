@@ -7,8 +7,9 @@ import Synchronization
 ///
 /// One personal calendar ("Home"), one college calendar on `demo@ncad.ie` ("NCAD") and one
 /// reminder list, with a few events on the day containing `now`. With `richWeek` (the
-/// `-EagarDemoData YES` screenshots), the rest of the week and some past catch-ups with
-/// synthetic attendees are added too, so keep-in-touch has free slots and history.
+/// `-EagarDemoData YES` screenshots), the rest of the week, tomorrow's portfolio reviews and
+/// some past catch-ups with synthetic attendees are added too, so keep-in-touch has free slots
+/// and history and a demo loan has a return clash.
 final class DemoEventStore: EventStoreAdapting {
     static let homeID = "demo.calendar.home"
     static let collegeID = "demo.calendar.ncad"
@@ -64,6 +65,11 @@ final class DemoEventStore: EventStoreAdapting {
             if weekday == 7 {
                 events.append(CalendarEvent(id: "demo.week.market.\(index)", calendarID: homeID, title: "Farmers' market", start: at(day, 10), end: at(day, 11, 30)))
             }
+        }
+        // Tomorrow's reviews overlap the demo loan due at noon, so Deadlines shows a return
+        // clash proposal (FR-BOOK-04) whatever the weekday.
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) {
+            events.append(CalendarEvent(id: "demo.tomorrow.reviews", calendarID: collegeID, title: "Portfolio reviews", start: at(tomorrow, 11), end: at(tomorrow, 13)))
         }
         func past(_ days: Int, _ hour: Int) -> Date {
             at(calendar.date(byAdding: .day, value: -days, to: today) ?? today, hour)

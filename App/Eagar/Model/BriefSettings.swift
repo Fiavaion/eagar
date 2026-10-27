@@ -31,7 +31,7 @@ struct BriefSettings: Codable, Equatable {
     }
 
     /// The sections filled so far (M1, M2), in Mark's order. Overdue is always shown first (FR-DL-04).
-    static let steerableSections: [BriefSectionKind] = [.today, .deadlines, .trials, .keepInTouch]
+    static let steerableSections: [BriefSectionKind] = [.today, .deadlines, .loans, .trials, .keepInTouch]
 
     var orderedSteerableSections: [BriefSectionKind] {
         let ordered = preferences.order.filter(Self.steerableSections.contains)

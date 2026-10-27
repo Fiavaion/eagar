@@ -311,9 +311,14 @@ final class PlannerModel {
 
     func row(for id: UUID) -> DeadlineRow? { deadlines.first { $0.id == id } }
 
+    /// The deadline behind a brief item: a deadline, or a loan's return deadline.
     func row(for item: BriefItem) -> DeadlineRow? {
-        guard item.kind == .deadline else { return nil }
-        let prefix = "deadline."
+        let prefix: String
+        switch item.kind {
+        case .deadline: prefix = "deadline."
+        case .loan: prefix = "loan."
+        default: return nil
+        }
         return UUID(uuidString: String(item.id.dropFirst(prefix.count))).flatMap(row(for:))
     }
 
@@ -598,8 +603,9 @@ final class PlannerModel {
         try await repository.delete(id, in: dataClass)
     }
 
-    /// After any deadline change: reload, resync notifications (FR-DL-02), recompose the brief.
-    private func deadlinesChanged(requestAuthorisation: Bool) async {
+    /// After any deadline change, including feed refreshes that add or move loan and Canvas
+    /// deadlines: reload, resync notifications (FR-DL-02, FR-BOOK-03), recompose the brief.
+    func deadlinesChanged(requestAuthorisation: Bool) async {
         if requestAuthorisation && !defaults.bool(forKey: Self.notificationsRequestedKey) {
             await requestNotificationAuthorisation()
         }

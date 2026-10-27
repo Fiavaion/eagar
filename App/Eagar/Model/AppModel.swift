@@ -24,6 +24,8 @@ final class AppModel {
     let money: MoneyModel
     /// Keep in touch (M2).
     let people: PeopleModel
+    /// cdbooking loans and the Canvas feed (M2).
+    let feeds: FeedsModel
     /// Manual Screen Time entries (FR-GOV-01).
     let pilotMetrics: PilotMetricsModel
     private(set) var maskedKey: String?
@@ -44,39 +46,54 @@ final class AppModel {
         planner = PlannerModel(services: services, defaults: defaults, clock: clock, calendar: calendar)
         money = MoneyModel(services: services, clock: clock, calendar: calendar)
         people = PeopleModel(services: services, planner: planner, defaults: defaults, clock: clock, calendar: calendar)
+        feeds = FeedsModel(services: services, planner: planner, clock: clock, calendar: calendar)
         pilotMetrics = PilotMetricsModel(defaults: defaults, clock: clock, calendar: calendar)
         let cap = defaults.object(forKey: Self.capKey) as? Int64
         services.policy.setMonthlyCap(microUSD: cap)
         loadKeyState()
         money.onChange = { [weak self] in self?.applySources() }
         people.onChange = { [weak self] in self?.applySources() }
+        feeds.onChange = { [weak self] in self?.applySources() }
     }
 
     // MARK: Activation and the brief's sources (M2)
 
-    /// Launch and scene activation: calendars, deadlines and the brief first, then trials and
-    /// people, then the brief again with their sections.
+    /// Launch and scene activation: calendars, deadlines and the brief first, then trials,
+    /// people and the college feeds (fetched at most every few minutes), then the brief again
+    /// with their sections.
     func appBecameActive() async {
         await planner.appBecameActive()
         await money.refresh()
         await people.refresh()
+        await feeds.refresh()
         applySources()
         await planner.scheduleBriefNotifications()
     }
 
-    /// A calendar change or pull to refresh.
+    /// A calendar change or pull to refresh. Feeds are re-read (and clashes rechecked against
+    /// the changed calendar), not fetched.
     func refresh() async {
         await planner.refresh()
         await money.load()
         await people.refresh()
+        await feeds.load()
         applySources()
     }
 
-    /// Hands trials (and their cancel-by deadlines) and nudges to the planner and recomposes
-    /// the brief.
+    /// BGAppRefresh on iOS (FR-BOOK-02): fetch the feeds, which resyncs return reminders and
+    /// the Live Activity, then recompose the brief.
+    func backgroundRefresh() async {
+        await feeds.refresh(force: true)
+        applySources()
+    }
+
+    /// Hands trials (and their cancel-by deadlines), nudges and loans to the planner and
+    /// recomposes the brief.
     func applySources() {
         planner.trialDeadlines = money.deadlineRows
-        planner.sources = BriefSources(trials: money.briefTrials, subscriptionSummary: money.briefSummary, nudges: people.briefNudges)
+        planner.sources = BriefSources(
+            trials: money.briefTrials, subscriptionSummary: money.briefSummary, nudges: people.briefNudges, loans: feeds.briefLoans
+        )
         planner.composeBrief()
     }
 

@@ -1,7 +1,7 @@
 import EagarBrief
 import SwiftUI
 
-/// Settings for M1: calendars and the brief (FR-CAL-02, FR-BRIEF-01, 04, 07).
+/// Settings: college feeds (M2), calendars and the brief (FR-CAL-02, FR-BRIEF-01, 04, 07).
 struct SettingsView: View {
     let model: AppModel
     private var planner: PlannerModel { model.planner }
@@ -32,6 +32,7 @@ struct SettingsView: View {
                     Text("iCloud")
                 }
             }
+            FeedSettingsSections(feeds: model.feeds)
             CalendarSettingsSections(planner: planner)
             BriefSettingsSections(planner: planner)
             Section {

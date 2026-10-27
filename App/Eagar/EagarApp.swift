@@ -17,12 +17,14 @@ struct EagarApp: App {
         let fakeCalendar = demo || UserDefaults.standard.bool(forKey: "EagarFakeCalendar")
         let eventStore: any EventStoreAdapting = fakeCalendar ? DemoEventStore(richWeek: demo) : EventKitAdapter()
         do {
-            // Demo records never schedule real notifications.
+            // Demo records never schedule real notifications, never touch the Keychain and never
+            // reach the network: the feeds are served by a synthetic transport.
             let services = demo
                 ? try AppServices.make(
-                    inMemory: true, eventStore: eventStore, deadlineNotifications: DemoNotificationSink(),
+                    inMemory: true, secrets: EphemeralSecretStore(), eventStore: eventStore, deadlineNotifications: DemoNotificationSink(),
                     briefNotifications: DemoNotificationSink(), trialReminders: DemoNotificationSink(),
-                    birthdayNotifications: DemoNotificationSink()
+                    birthdayNotifications: DemoNotificationSink(), feedTransport: DemoFeedTransport(),
+                    loanActivities: SystemLoanActivityPresenter()
                 )
                 : try AppServices.make(inMemory: inMemory, eventStore: eventStore)
             // App Intents (Shortcuts, Siri) reach the same services (FR-OS-03).
@@ -41,6 +43,19 @@ struct EagarApp: App {
     }
 
     var body: some Scene {
+        #if os(iOS)
+        // FR-BOOK-02: the system wakes Eagar to refresh the college feeds.
+        let model = try? startup.get()
+        window.backgroundTask(.appRefresh(FeedRefreshSchedule.taskIdentifier)) {
+            FeedRefreshSchedule.submit()
+            await model?.backgroundRefresh()
+        }
+        #else
+        window
+        #endif
+    }
+
+    private var window: some Scene {
         WindowGroup {
             switch startup {
             case let .success(model):

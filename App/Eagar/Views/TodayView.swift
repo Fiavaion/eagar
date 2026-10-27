@@ -98,6 +98,9 @@ struct TodayView: View {
         Task { await planner.perform(.open, on: item) }
         if item.kind == .subscriptionSummary {
             NotificationCenter.default.post(name: .eagarShowTab, object: RootTab.subscriptions.rawValue)
+        } else if item.kind == .loan {
+            // The loan's row has its location, links and any clash proposal (FR-BOOK-04).
+            NotificationCenter.default.post(name: .eagarShowTab, object: RootTab.deadlines.rawValue)
         } else if let row = planner.row(for: item) {
             editing = DeadlineDraft(row)
         } else if let event = planner.event(for: item) {
@@ -352,7 +355,7 @@ private struct ItemTime: View {
                 EmptyView()
             } else if item.kind == .nudge, let start = item.start, let end = item.end, end > start {
                 Text(start..<end, format: .interval.weekday().hour().minute())
-            } else if item.kind == .deadline, let start = item.start {
+            } else if item.kind == .deadline || item.kind == .loan, let start = item.start {
                 if item.isAllDay {
                     Text("Due \(start, format: .dateTime.weekday(.wide).day().month())")
                 } else {
