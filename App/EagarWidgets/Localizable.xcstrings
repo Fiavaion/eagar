@@ -61,12 +61,52 @@
         }
       }
     },
+    "Loans due back today: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé báçk tódáý: %lld ··········]"
+          }
+        }
+      }
+    },
+    "Loans due today": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé tódáý ······]"
+          }
+        }
+      }
+    },
+    "Loans due: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé: %lld ······]"
+          }
+        }
+      }
+    },
     "Next deadline": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñéxt déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "Next due at %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéxt dúé át %@ ······]"
           }
         }
       }
@@ -97,6 +137,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ópéñs Éágár óñ tódáý's bríéf. ············]"
+          }
+        }
+      }
+    },
+    "Overdue: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé: %lld ·····]"
           }
         }
       }

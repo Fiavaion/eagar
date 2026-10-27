@@ -71,12 +71,42 @@
         }
       }
     },
+    "Overdue: return it as soon as you can": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé: rétúrñ ít ás sóóñ ás ýóú çáñ ···············]"
+          }
+        }
+      }
+    },
+    "Return to %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rétúrñ tó %@ ·····]"
+          }
+        }
+      }
+    },
     "Subscriptions this month": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Súbsçríptíóñs thís móñth ··········]"
+          }
+        }
+      }
+    },
+    "You are busy when it is due; return it by %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóú áré búsý whéñ ít ís dúé; rétúrñ ít bý %@ ··················]"
           }
         }
       }

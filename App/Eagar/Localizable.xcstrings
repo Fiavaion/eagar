@@ -181,6 +181,16 @@
         }
       }
     },
+    "A college feed needs attention. Open Settings to fix it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Á çóllégé fééd ñééds áttéñtíóñ. Ópéñ Séttíñgs tó fíx ít. ······················]"
+          }
+        }
+      }
+    },
     "A short summary is written on this device or your Mac. Nothing is sent anywhere.": {
       "localizations": {
         "ga": {
@@ -231,6 +241,26 @@
         }
       }
     },
+    "API token": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁPÍ tókéñ ····]"
+          }
+        }
+      }
+    },
+    "API token (optional)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[ÁPÍ tókéñ (óptíóñál) ········]"
+          }
+        }
+      }
+    },
     "Active": {
       "localizations": {
         "ga": {
@@ -241,12 +271,32 @@
         }
       }
     },
+    "Active loans: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áçtívé lóáñs: %lld ·······]"
+          }
+        }
+      }
+    },
     "Add": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ádd ··]"
+          }
+        }
+      }
+    },
+    "Add Canvas": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd Çáñvás ····]"
           }
         }
       }
@@ -297,6 +347,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ádd á wéék ····]"
+          }
+        }
+      }
+    },
+    "Add cdbooking": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd çdbóókíñg ·····]"
           }
         }
       }
@@ -511,6 +571,16 @@
         }
       }
     },
+    "Assignments: %lld, other events: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ássígñméñts: %lld, óthér évéñts: %lld ···············]"
+          }
+        }
+      }
+    },
     "At the due time": {
       "localizations": {
         "ga": {
@@ -701,6 +771,16 @@
         }
       }
     },
+    "Calendar feed address": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáléñdár fééd áddréss ········]"
+          }
+        }
+      }
+    },
     "Calendars": {
       "localizations": {
         "ga": {
@@ -827,6 +907,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çáñçél… ···]"
+          }
+        }
+      }
+    },
+    "Canvas": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñvás ··]"
+          }
+        }
+      }
+    },
+    "Canvas refused this feed address. Copy the current one from Canvas and enter it again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñvás réfúséd thís fééd áddréss. Çópý thé çúrréñt óñé fróm Çáñvás áñd éñtér ít ágáíñ. ··································]"
           }
         }
       }
@@ -1201,6 +1301,16 @@
         }
       }
     },
+    "Counts only. Details stay in cdbooking.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóúñts óñlý. Détáíls stáý íñ çdbóókíñg. ················]"
+          }
+        }
+      }
+    },
     "Create a dedicated workspace for Eagar with a monthly spend limit, then create a key in it that expires. Use a separate key on each device, so you can revoke one without affecting the others.": {
       "localizations": {
         "ga": {
@@ -1541,6 +1651,16 @@
         }
       }
     },
+    "Eagar could not read your loans and Canvas items.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád ýóúr lóáñs áñd Çáñvás ítéms. ····················]"
+          }
+        }
+      }
+    },
     "Eagar could not read your people.": {
       "localizations": {
         "ga": {
@@ -1611,6 +1731,16 @@
         }
       }
     },
+    "Eagar could not save the feed.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thé fééd. ············]"
+          }
+        }
+      }
+    },
     "Eagar could not save the subscription.": {
       "localizations": {
         "ga": {
@@ -1641,12 +1771,32 @@
         }
       }
     },
+    "Eagar could not use the Keychain for the feed address or token.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót úsé thé Kéýçháíñ fór thé fééd áddréss ór tókéñ. ·························]"
+          }
+        }
+      }
+    },
     "Eagar could not use the Keychain on this device. On a Mac, the app must be signed for Keychain access.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár çóúld ñót úsé thé Kéýçháíñ óñ thís dévíçé. Óñ á Máç, thé ápp múst bé sígñéd fór Kéýçháíñ áççéss. ·········································]"
+          }
+        }
+      }
+    },
+    "Eagar couldn't refresh this feed. It will try again later.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúldñ't réfrésh thís fééd. Ít wíll trý ágáíñ látér. ·······················]"
           }
         }
       }
@@ -1827,6 +1977,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éñds ··]"
+          }
+        }
+      }
+    },
+    "Enter a new address or token": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éñtér á ñéw áddréss ór tókéñ ···········]"
           }
         }
       }
@@ -2051,6 +2211,36 @@
         }
       }
     },
+    "Feed address": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fééd áddréss ·····]"
+          }
+        }
+      }
+    },
+    "Feed address (https:// or webcal://)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fééd áddréss (https:// ór wébçál://) ··············]"
+          }
+        }
+      }
+    },
+    "Feed revoked. Create a new feed in cdbooking and enter its address again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fééd révókéd. Çréáté á ñéw fééd íñ çdbóókíñg áñd éñtér íts áddréss ágáíñ. ·····························]"
+          }
+        }
+      }
+    },
     "Filter": {
       "localizations": {
         "ga": {
@@ -2221,6 +2411,26 @@
         }
       }
     },
+    "In Canvas, open Calendar and copy the Calendar Feed link. Anyone with the link can read your calendar, so it is kept in the Keychain. Assignment due dates become college deadlines.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñ Çáñvás, ópéñ Çáléñdár áñd çópý thé Çáléñdár Fééd líñk. Áñýóñé wíth thé líñk çáñ réád ýóúr çáléñdár, só ít ís képt íñ thé Kéýçháíñ. Ássígñméñt dúé dátés béçómé çóllégé déádlíñés. ········································································]"
+          }
+        }
+      }
+    },
+    "In cdbooking, open your profile and copy your calendar feed and API token. Both are kept in the Keychain on this device. Loans stay on your devices and appear as college deadlines with return reminders 24 hours and 2 hours before they are due.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Íñ çdbóókíñg, ópéñ ýóúr prófílé áñd çópý ýóúr çáléñdár fééd áñd ÁPÍ tókéñ. Bóth áré képt íñ thé Kéýçháíñ óñ thís dévíçé. Lóáñs stáý óñ ýóúr dévíçés áñd áppéár ás çóllégé déádlíñés wíth rétúrñ rémíñdérs 24 hóúrs áñd 2 hóúrs béfóré théý áré dúé. ·································································································]"
+          }
+        }
+      }
+    },
     "Include in brief": {
       "localizations": {
         "ga": {
@@ -2321,6 +2531,16 @@
         }
       }
     },
+    "Last updated %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lást úpdátéd %@ ······]"
+          }
+        }
+      }
+    },
     "Leave empty for no limit. Set a hard limit on the workspace in Claude Console as well.": {
       "localizations": {
         "ga": {
@@ -2381,12 +2601,72 @@
         }
       }
     },
+    "Loan": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñ ··]"
+          }
+        }
+      }
+    },
+    "Loan · return to %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñ · rétúrñ tó %@ ········]"
+          }
+        }
+      }
+    },
+    "Loans (cdbooking)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs (çdbóókíñg) ·······]"
+          }
+        }
+      }
+    },
     "Loans due": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Lóáñs dúé ····]"
+          }
+        }
+      }
+    },
+    "Loans due back today: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé báçk tódáý: %lld ··········]"
+          }
+        }
+      }
+    },
+    "Loans due today": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé tódáý ······]"
+          }
+        }
+      }
+    },
+    "Loans due: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóáñs dúé: %lld ······]"
           }
         }
       }
@@ -2721,6 +3001,16 @@
         }
       }
     },
+    "Next due at %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéxt dúé át %@ ······]"
+          }
+        }
+      }
+    },
     "No calendar can take new events. Allow calendar access, or add a calendar in the Calendar app.": {
       "localizations": {
         "ga": {
@@ -2781,6 +3071,26 @@
         }
       }
     },
+    "No free time before then. Ask the loans desk for an extension.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó fréé tímé béfóré théñ. Ásk thé lóáñs désk fór áñ éxtéñsíóñ. ·························]"
+          }
+        }
+      }
+    },
+    "No free time before then. Request an extension": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó fréé tímé béfóré théñ. Réqúést áñ éxtéñsíóñ ··················]"
+          }
+        }
+      }
+    },
     "No key is stored on this device.": {
       "localizations": {
         "ga": {
@@ -2837,6 +3147,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñóñé ··]"
+          }
+        }
+      }
+    },
+    "Not checked yet": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñót çhéçkéd ýét ······]"
           }
         }
       }
@@ -3032,6 +3352,26 @@
         }
       }
     },
+    "Open cdbooking admin": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ çdbóókíñg ádmíñ ········]"
+          }
+        }
+      }
+    },
+    "Open in cdbooking": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ íñ çdbóókíñg ·······]"
+          }
+        }
+      }
+    },
     "Open the cancel page": {
       "localizations": {
         "ga": {
@@ -3122,6 +3462,26 @@
         }
       }
     },
+    "Overdue returns": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé rétúrñs ······]"
+          }
+        }
+      }
+    },
+    "Overdue: %lld": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óvérdúé: %lld ·····]"
+          }
+        }
+      }
+    },
     "Paste your API key": {
       "localizations": {
         "ga": {
@@ -3138,6 +3498,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Péñdíñg ···]"
+          }
+        }
+      }
+    },
+    "Pending approvals": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Péñdíñg áppróváls ·······]"
           }
         }
       }
@@ -3183,6 +3553,7 @@
       }
     },
     "Personal deadlines sync through your iCloud account. College data never does.": {
+      "extractionState": "stale",
       "localizations": {
         "ga": {
           "stringUnit": {
@@ -3512,6 +3883,26 @@
         }
       }
     },
+    "Refresh now": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réfrésh ñów ····]"
+          }
+        }
+      }
+    },
+    "Refreshing…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réfréshíñg… ····]"
+          }
+        }
+      }
+    },
     "Region": {
       "localizations": {
         "ga": {
@@ -3542,6 +3933,16 @@
         }
       }
     },
+    "Remind me to return it at %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémíñd mé tó rétúrñ ít át %@ ···········]"
+          }
+        }
+      }
+    },
     "Reminder lists": {
       "localizations": {
         "ga": {
@@ -3568,6 +3969,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Rémóvé ··]"
+          }
+        }
+      }
+    },
+    "Remove Canvas?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé Çáñvás? ······]"
+          }
+        }
+      }
+    },
+    "Remove cdbooking?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé çdbóókíñg? ·······]"
           }
         }
       }
@@ -3622,6 +4043,26 @@
         }
       }
     },
+    "Replace address or token": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Répláçé áddréss ór tókéñ ··········]"
+          }
+        }
+      }
+    },
+    "Request an extension": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réqúést áñ éxtéñsíóñ ········]"
+          }
+        }
+      }
+    },
     "Requests are processed by Anthropic using your key, in the US or globally. Anthropic stores workspace data in the US.": {
       "localizations": {
         "ga": {
@@ -3658,6 +4099,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Résçhédúléd ····]"
+          }
+        }
+      }
+    },
+    "Return %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rétúrñ %@ ····]"
+          }
+        }
+      }
+    },
+    "Return reminder set for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rétúrñ rémíñdér sét fór %@ ··········]"
           }
         }
       }
@@ -4152,6 +4613,16 @@
         }
       }
     },
+    "That doesn't look like a feed address. Paste the full https:// or webcal:// link.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thát dóésñ't lóók líké á fééd áddréss. Pásté thé fúll https:// ór wébçál:// líñk. ································]"
+          }
+        }
+      }
+    },
     "The brief shows plain lists, with no AI.": {
       "localizations": {
         "ga": {
@@ -4162,12 +4633,32 @@
         }
       }
     },
+    "The cdbooking API was unavailable, so Eagar used the calendar feed instead.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé çdbóókíñg ÁPÍ wás úñáváíláblé, só Éágár úséd thé çáléñdár fééd íñstéád. ······························]"
+          }
+        }
+      }
+    },
     "The deadline needs a title.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Thé déádlíñé ñééds á títlé. ···········]"
+          }
+        }
+      }
+    },
+    "The feed address is missing. Enter it again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé fééd áddréss ís míssíñg. Éñtér ít ágáíñ. ··················]"
           }
         }
       }
@@ -4282,6 +4773,16 @@
         }
       }
     },
+    "This feed address was reset or turned off. Copy the new one from Canvas.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís fééd áddréss wás rését ór túrñéd óff. Çópý thé ñéw óñé fróm Çáñvás. ·····························]"
+          }
+        }
+      }
+    },
     "This month": {
       "localizations": {
         "ga": {
@@ -4358,6 +4859,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Tódáý ··]"
+          }
+        }
+      }
+    },
+    "Token revoked: cdbooking refused it. Copy a new token from cdbooking and enter it again.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tókéñ révókéd: çdbóókíñg réfúséd ít. Çópý á ñéw tókéñ fróm çdbóókíñg áñd éñtér ít ágáíñ. ···································]"
           }
         }
       }
@@ -4583,6 +5094,26 @@
         }
       }
     },
+    "Without an API token, Eagar reads the calendar feed only.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wíthóút áñ ÁPÍ tókéñ, Éágár réáds thé çáléñdár fééd óñlý. ·······················]"
+          }
+        }
+      }
+    },
+    "Working": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wórkíñg ···]"
+          }
+        }
+      }
+    },
     "Yearly": {
       "localizations": {
         "ga": {
@@ -4633,6 +5164,26 @@
         }
       }
     },
+    "You're busy when this is due.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóú'ré búsý whéñ thís ís dúé. ············]"
+          }
+        }
+      }
+    },
+    "Your Canvas items, their deadlines and the feed address are deleted from this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr Çáñvás ítéms, théír déádlíñés áñd thé fééd áddréss áré délétéd fróm thís dévíçé. ··································]"
+          }
+        }
+      }
+    },
     "Your first brief": {
       "localizations": {
         "ga": {
@@ -4663,6 +5214,16 @@
         }
       }
     },
+    "Your loans, their deadlines and reminders, and the feed address and token are deleted from this device.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr lóáñs, théír déádlíñés áñd rémíñdérs, áñd thé fééd áddréss áñd tókéñ áré délétéd fróm thís dévíçé. ·········································]"
+          }
+        }
+      }
+    },
     "Your morning brief arrives after 08:00, at the first natural break. You can change the times in Settings.": {
       "localizations": {
         "ga": {
@@ -4689,6 +5250,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ýóúr ñótés sýñç bétwééñ ýóúr dévíçés éñd-tó-éñd éñçrýptéd íñ íÇlóúd. Éágár ñévér réáds çóñtáçt ñótés. ········································]"
+          }
+        }
+      }
+    },
+    "cdbooking admin": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[çdbóókíñg ádmíñ ······]"
           }
         }
       }
