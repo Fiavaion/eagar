@@ -45,6 +45,19 @@ struct FeedSourceTests {
         #expect(FeedSource(kind: .iCalendar, dataClass: .personal, processingMode: .cloudAllowed).dataClass == .personal)
     }
 
+    /// BD-04: a college source can never carry `cloudAllowed`; it is clamped to local AI.
+    @Test func Boundary_collegeSourcesCannotBeCloudAllowed() {
+        #expect(FeedSource(kind: .cdbooking, dataClass: .personal, processingMode: .cloudAllowed).processingMode == .localAI)
+        #expect(FeedSource(kind: .canvas, dataClass: .college, processingMode: .cloudAllowed).processingMode == .localAI)
+        #expect(FeedSource(kind: .iCalendar, dataClass: .college, processingMode: .cloudAllowed).processingMode == .localAI)
+        #expect(FeedSource(kind: .canvas, dataClass: .college, processingMode: .rulesOnly).processingMode == .rulesOnly)
+        #expect(FeedSource(kind: .iCalendar, dataClass: .personal, processingMode: .cloudAllowed).processingMode == .cloudAllowed)
+        // A record stored with a cloud mode reads back clamped.
+        let record = FeedSourceRecord(source: FeedSource(kind: .canvas, dataClass: .college, processingMode: .localAI), displayName: "C", createdAt: .distantPast)
+        record.processingModeRaw = ProcessingMode.cloudAllowed.rawValue
+        #expect(record.state.source.processingMode == .localAI)
+    }
+
     @Test func extraDomainsCanBeSupplied() {
         let defaults = FeedSourceDefaults.proposed(kind: .iCalendar, host: "canvas.example.edu", profile: .owner, collegeDomains: ["example.edu"])
         #expect(defaults.dataClass == .college)

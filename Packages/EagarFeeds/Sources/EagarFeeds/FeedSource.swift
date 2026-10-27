@@ -81,8 +81,11 @@ public struct FeedSource: Sendable, Hashable, Identifiable, Classified {
         self.id = id
         self.kind = kind
         // cdbooking and Canvas are college whatever the caller passes (BD-15, FR-CANVAS-02).
-        self.dataClass = kind == .iCalendar ? dataClass : .college
-        self.processingMode = processingMode
+        let resolvedClass = kind == .iCalendar ? dataClass : .college
+        self.dataClass = resolvedClass
+        // College data never goes to a cloud model (BD-04): a college source is local AI or
+        // rules only, whatever mode the caller asked for.
+        self.processingMode = resolvedClass.isLocalOnly && processingMode == .cloudAllowed ? .localAI : processingMode
     }
 
     /// A source with FR-CORE-04 defaults for `host`.
