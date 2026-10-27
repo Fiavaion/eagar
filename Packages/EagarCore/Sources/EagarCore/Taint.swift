@@ -15,6 +15,10 @@ public enum DerivationID: String, Sendable, CaseIterable, LogSafe {
     case keepInTouchNudge
     /// The monthly subscriptions summary built from active trials (FR-TRIAL-06).
     case subscriptionSummary
+    /// A deadline derived from a feed record: a cdbooking loan or a Canvas assignment (FR-DL-01).
+    case feedDeadline
+    /// A loan-return clash and its proposed return slot, from a loan and busy blocks (FR-BOOK-04).
+    case bookingReturnClash
 
     public var logDescription: String { rawValue }
 }

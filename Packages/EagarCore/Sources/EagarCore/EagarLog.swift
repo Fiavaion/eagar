@@ -4,7 +4,7 @@ import Synchronization
 
 /// Subsystems that log. One `os.Logger` category each.
 public enum LogCategory: String, Sendable, CaseIterable {
-    case app, ai, store, ledger, security, rules, money, people
+    case app, ai, store, ledger, security, rules, money, people, feeds
 }
 
 /// Severity, mirroring `OSLogType`.
