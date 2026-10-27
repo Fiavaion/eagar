@@ -394,9 +394,9 @@ Refs: FR-BOOK-01, FR-CANVAS-01, FR-CORE-04, BD-04, B-8, D-030, D-031
 
 ## D-042  Feed setup, secrets display and demo secrets  (2026-10-27, M2)
 Context: Settings needs to show which feed is configured without exposing the secret; demo mode must not touch the Keychain or network.
-Decision: **For Mark to confirm.** Settings shows the last four characters of the feed URL and token, the same masking as the Claude key. Demo mode keeps feed secrets in an in-memory store and fetches from a fake transport on `.invalid` hosts. Removing a feed deletes its Keychain items.
+Decision: **For Mark to confirm.** Settings shows a feed address as its host plus the last four characters of the token part of the path (the `.ics` extension excluded), and a token as its last four characters. Setup registers the source before writing the Keychain, and a new source is removed again if the secret cannot be saved, so no secret is left under an ID nothing points to. Demo mode keeps feed secrets in an in-memory store and fetches from a fake transport on `.invalid` hosts. Removing a feed deletes its Keychain items.
 Alternatives: Show nothing beyond "configured" (harder to tell two URLs apart).
-Consequences: Four characters of a feed token are visible on screen.
+Consequences: The host and four characters of a feed token are visible on screen.
 Refs: FR-BOOK-01, FR-CANVAS-01, invariant 6, D-038
 
 ## D-043  Feed refresh cadence  (2026-10-27, M2)
@@ -408,7 +408,7 @@ Refs: FR-CORE-04, FR-BOOK-02, FR-CANVAS-02
 
 ## D-044  Loans in the brief, clash acceptance and reopening  (2026-10-27, M2)
 Context: The brief must show loans due; a clash needs an action; cdbooking can correct a wrongly closed loan.
-Decision: **For Mark to confirm.** "Loans due" uses the deadlines' 7-day horizon and lists loans not yet overdue, without repeating them under Coming up; an overdue loan stays in Overdue with the reschedule action and counts towards the brief notification's level (FR-DL-04 wins over an earlier draft that moved it). Lines are phrased on device only. Accepting a clash creates a local college deadline "Return …" with reminders 15 minutes before and at the time, rather than a calendar event, because the target calendar may sync to a server. A loan deadline reopens only when cdbooking moves the loan from closed back to open; a loan Mark marked done stays done.
+Decision: **For Mark to confirm.** "Loans due" uses the deadlines' 7-day horizon and lists loans not yet overdue, without repeating them under Coming up; an overdue loan stays in Overdue with the reschedule action and counts towards the brief notification's level (FR-DL-04 wins over an earlier draft that moved it). Lines are phrased on device only. Accepting a clash creates one local college return reminder per loan (origin `booking`, the loan's source, a fixed ID from `LoanReminders.returnReminderID`) with notifications 15 minutes before and at the time, rather than a calendar event, because the target calendar may sync to a server. A new slot moves the same reminder; it is deleted when the loan is returned or leaves the feed, or cdbooking is removed, and marking the loan done closes it. A loan deadline reopens only when cdbooking moves the loan from closed back to open; a loan Mark marked done stays done.
 Alternatives: A calendar event for the return (leaks college data to a synced calendar); reopening whenever the feed shows the loan open (undoes Mark's own "done").
 Consequences: The accepted return slot is visible only in Eagar on that device.
 Refs: FR-BOOK-03, FR-BOOK-04, FR-DL-01, FR-DL-04, BD-04, D-034
@@ -426,6 +426,13 @@ Decision: New package strings are added to the package catalog by hand, with ga 
 Alternatives: Extend sync-strings.py to package catalogs (parked).
 Consequences: Easy to miss; the catalog-completeness check catches gaps.
 Refs: NFR-L10N-01, NFR-L10N-02, D-008
+
+## D-047  iOS 26 List rows: no `.fixedSize()` on buttons or menus  (2026-10-27, M2)
+Context: On iPhone, every brief row had about 150 pt of empty space and icon-only actions. `.fixedSize()` on borderless buttons and menus inside an iOS 26 List row makes the control report an oversized height, and the automatic label style drops the title when its ideal width is requested.
+Decision: Fix the label's width (not the button's), set `.labelStyle(.titleAndIcon)` on one line, and draw menus as borderless buttons; `ViewThatFits` falls back to two lines. 44 pt targets and VoiceOver labels are unchanged.
+Alternatives: Replacing `ViewThatFits` (made no difference).
+Consequences: Apply the same pattern to new row actions; checked by simulator screenshots, not a unit test.
+Refs: FR-BRIEF-03, NFR-A11Y-01
 
 ## Parked
 
