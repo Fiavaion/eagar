@@ -46,7 +46,17 @@ struct BriefLoansTests {
         let brief = compose(loans: [loan("b1", "Camera kit", due: at(16), location: "Desk", proposed: at(14, 45))])
         let item = try #require(brief.sections.first { $0.kind == .loans }?.items.first)
         #expect(item.detail?.contains("busy") == true)
-        #expect(item.detail?.contains("14:45") == true)
+        #expect(item.detail?.contains(BriefComposer.timeText(at(14, 45), calendar: dublin)) == true)
+    }
+
+    /// The time is formatted in the calendar's zone and locale, not the machine's.
+    @Test func loanTimeUsesTheCalendarsZoneAndLocale() {
+        var irish = dublin
+        irish.locale = Locale(identifier: "en_IE")
+        #expect(BriefComposer.timeText(at(14, 45), calendar: irish) == "14:45")
+        var utc = irish
+        utc.timeZone = TimeZone(identifier: "America/New_York")!
+        #expect(BriefComposer.timeText(at(14, 45), calendar: utc) != "14:45")
     }
 
     /// The loan's return deadline is shown once, in Loans due, and only while it is open: done
@@ -107,5 +117,15 @@ struct BriefLoansTests {
         }
         let local = providers.filter { !$0.locality.tier.leavesOwnerDevices }.flatMap(\.recordedCalls)
         #expect(local.contains { call in call.payloads.contains { $0.text.contains("Synthetic camera kit") } })
+    }
+
+    /// An all-day deadline (a Canvas due date at 00:00) is due for the whole day: in Coming up
+    /// on its day, overdue only from the next day.
+    @Test func allDayDeadlineIsNotOverdueOnItsDay() throws {
+        let essay = BriefDeadline(id: "c", title: "Essay draft", dueAt: dublin.startOfDay(for: at(8)), isAllDay: true, dataClass: .college)
+        let today = compose(now: at(15), deadlines: [essay], loans: [])
+        #expect(today.sections.map(\.kind) == [.deadlines])
+        let tomorrow = compose(now: at(0, 30, day: 15), deadlines: [essay], loans: [])
+        #expect(tomorrow.sections.map(\.kind) == [.overdue])
     }
 }

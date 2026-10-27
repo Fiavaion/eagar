@@ -37,8 +37,15 @@ public enum BriefComposer {
         // A loan's return deadline is shown in Loans due, not twice.
         let loanDeadlineIDs = Set(sources.loans.compactMap(\.deadlineID))
         let plainDeadlines = deadlines.filter { !loanDeadlineIDs.contains($0.id) }
-        let overdue = plainDeadlines.filter { $0.dueAt <= now }.sorted { $0.dueAt < $1.dueAt }
-        let upcoming = plainDeadlines.filter { $0.dueAt > now && $0.dueAt <= now.addingTimeInterval(horizon) }.sorted { $0.dueAt < $1.dueAt }
+        // An all-day deadline (a Canvas due date) is due for the whole day: overdue only once
+        // that day has ended.
+        func isPast(_ deadline: BriefDeadline) -> Bool {
+            guard deadline.isAllDay else { return deadline.dueAt <= now }
+            let start = calendar.startOfDay(for: deadline.dueAt)
+            return (calendar.date(byAdding: .day, value: 1, to: start) ?? start.addingTimeInterval(86_400)) <= now
+        }
+        let overdue = plainDeadlines.filter(isPast).sorted { $0.dueAt < $1.dueAt }
+        let upcoming = plainDeadlines.filter { !isPast($0) && $0.dueAt <= now.addingTimeInterval(horizon) }.sorted { $0.dueAt < $1.dueAt }
 
         func deadlineItem(_ deadline: BriefDeadline, overdue: Bool) -> BriefItem {
             BriefItem(
@@ -153,9 +160,12 @@ public enum BriefComposer {
             }
     }
 
+    /// A short time in the calendar's time zone and locale (the caller's calendar, never the
+    /// machine's, so the text is stable across devices and test runners).
     static func timeText(_ date: Date, calendar: Calendar) -> String {
         var style = Date.FormatStyle(date: .omitted, time: .shortened)
         style.timeZone = calendar.timeZone
+        if let locale = calendar.locale { style.locale = locale }
         return date.formatted(style)
     }
 
