@@ -98,9 +98,11 @@ public struct FeedDeadlineReconciler: Sendable {
     ///   open (a wrongly scanned return corrected to checked out). Those are opened again if
     ///   done, so their reminders fire. A deadline Mark marked done while the feed still showed
     ///   the item open is never in this set, so his "done" is kept.
+    /// - Parameter preserving: deadlines in the scope that are not feed items themselves but
+    ///   belong to items still in the feed (a loan's accepted return reminder); not deleted.
     public func upsert(
         _ deadlines: [FeedDeadline], replacingAllFrom scope: (origin: DeadlineOrigin, source: SourceID)? = nil,
-        reopening: Set<UUID> = [], now: Date
+        reopening: Set<UUID> = [], preserving: Set<UUID> = [], now: Date
     ) async throws(StoreError) -> DeadlineReconcileCounts {
         var counts = DeadlineReconcileCounts()
         let byStore = Dictionary(grouping: deadlines) { StoreKind.placement(for: $0.dataClass) }
@@ -108,7 +110,7 @@ public struct FeedDeadlineReconciler: Sendable {
             let items = byStore[store.kind] ?? []
             let originRaw = scope?.origin.rawValue
             let sourceUUID = scope?.source.rawValue
-            let keep = Set(deadlines.map(\.id))
+            let keep = Set(deadlines.map(\.id)).union(preserving)
             let result = try await run(in: store) { context in
                 var counts = DeadlineReconcileCounts()
                 for item in items {

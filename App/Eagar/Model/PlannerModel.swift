@@ -89,6 +89,9 @@ final class PlannerModel {
     /// Trials, the subscription summary and keep-in-touch nudges for the brief (M2). Set by
     /// ``AppModel``; call ``composeBrief()`` afterwards.
     var sources = BriefSources.none
+    /// Called after Mark changes a loan deadline (origin `booking`), so the feeds model can
+    /// close the loan's return reminder and update the Live Activity.
+    var onLoanDeadlineChanged: ((UUID) async -> Void)?
     private(set) var brief: Brief?
     /// Optional AI phrasing per section; empty until it arrives, or when off or failed.
     private(set) var phrasing: [BriefSectionKind: PhrasedSection] = [:]
@@ -525,6 +528,7 @@ final class PlannerModel {
             failure = .deadlineSave
         }
         await deadlinesChanged(requestAuthorisation: false)
+        if existing.snapshot.origin == .booking { await onLoanDeadlineChanged?(id) }
     }
 
     /// A deadline notification's Done or Snooze button (FR-OS-05). The app may have been
@@ -599,6 +603,7 @@ final class PlannerModel {
             failure = .deadlineSave
         }
         await deadlinesChanged(requestAuthorisation: false)
+        if existing.snapshot.origin == .booking { await onLoanDeadlineChanged?(id) }
     }
 
     private func mutate(_ id: UUID, in dataClass: DataClass, _ body: @Sendable (Deadline) -> Void) async throws {

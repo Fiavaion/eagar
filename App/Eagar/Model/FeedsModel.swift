@@ -66,6 +66,7 @@ final class FeedsModel {
         self.planner = planner
         self.clock = clock
         self.calendar = calendar
+        planner.onLoanDeadlineChanged = { [weak self] id in await self?.loanDeadlineChanged(id) }
     }
 
     var hasSources: Bool { booking != nil || canvas != nil }
@@ -90,12 +91,13 @@ final class FeedsModel {
             await load()
             return
         }
+        // Claimed before the first suspension, so a second activation meanwhile only reads.
+        lastNetworkRefresh = now
         await loadSources()
         guard hasSources else {
             await load()
             return
         }
-        lastNetworkRefresh = now
         isRefreshing = true
         defer { isRefreshing = false }
         if let id = booking?.source.id { await fetchBooking(id) }
@@ -135,15 +137,26 @@ final class FeedsModel {
         do throws(SecurityError) {
             var bookingCredentials: CDBookingCredentials?
             if let id = booking?.source.id { bookingCredentials = try CDBookingSecrets(store: services.secrets).load(for: id) }
-            maskedBookingFeedURL = bookingCredentials?.feedURL.masked
+            maskedBookingFeedURL = bookingCredentials.map { Self.maskedFeedAddress($0.feedURL) }
             maskedBookingToken = bookingCredentials?.apiToken.flatMap { $0.isEmpty ? nil : $0.masked }
             var canvasURL: Secret?
             if let id = canvas?.source.id { canvasURL = try CanvasSecrets(store: services.secrets).load(for: id) }
-            maskedCanvasFeedURL = canvasURL?.masked
+            maskedCanvasFeedURL = canvasURL.map(Self.maskedFeedAddress)
         } catch {
             log.error("reading feed secrets failed: \(error)")
             failure = .keychain
         }
+    }
+
+    /// A feed address for display: its host and the last four characters of the token in its
+    /// last path component (without the extension), e.g. `cdbooking.com ••••9c2e`. The rest of
+    /// the token is never shown.
+    static func maskedFeedAddress(_ secret: Secret) -> String {
+        let url = URL(string: secret.reveal())
+        let host = url?.host() ?? ""
+        let token = url.map { ($0.lastPathComponent as NSString).deletingPathExtension } ?? ""
+        let tail = token.count > 8 ? String(token.suffix(4)) : ""
+        return host.isEmpty ? "••••\(tail)" : "\(host) ••••\(tail)"
     }
 
     private func bookingSource(_ id: SourceID) -> CDBookingFeedSource {
@@ -198,6 +211,8 @@ final class FeedsModel {
         // cdbooking is college whatever the host (BD-15); Mark is the owner profile (OD-2).
         let source = booking?.source ?? FeedSource.proposed(kind: .cdbooking, host: url.host(), profile: .owner)
         let token = apiToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Register first: a failed registration leaves the Keychain untouched.
+        guard await register(source, displayName: "cdbooking") else { return false }
         do {
             try CDBookingSecrets(store: services.secrets).save(
                 CDBookingCredentials(feedURL: Secret(url.absoluteString), apiToken: token.isEmpty ? nil : Secret(token)), for: source.id
@@ -205,9 +220,9 @@ final class FeedsModel {
         } catch {
             log.error("saving cdbooking secrets failed: \(error)")
             failure = .keychain
+            if booking == nil { await unregister(source.id) }
             return false
         }
-        guard await register(source, displayName: "cdbooking") else { return false }
         lastNetworkRefresh = clock.now()
         await fetchBooking(source.id)
         await changed(requestNotifications: requestNotifications)
@@ -222,14 +237,15 @@ final class FeedsModel {
             return false
         }
         let source = canvas?.source ?? FeedSource.proposed(kind: .canvas, host: url.host(), profile: .owner)
+        guard await register(source, displayName: "Canvas") else { return false }
         do {
             try CanvasSecrets(store: services.secrets).save(feedURL: Secret(url.absoluteString), for: source.id)
         } catch {
             log.error("saving the Canvas feed URL failed: \(error)")
             failure = .keychain
+            if canvas == nil { await unregister(source.id) }
             return false
         }
-        guard await register(source, displayName: "Canvas") else { return false }
         lastNetworkRefresh = clock.now()
         await fetchCanvas(source.id)
         await changed(requestNotifications: requestNotifications)
@@ -247,7 +263,16 @@ final class FeedsModel {
         }
     }
 
-    /// Deletes cdbooking's bookings, loan deadlines, record and both secrets.
+    /// Undoes the registration of a new source whose secret could not be saved.
+    private func unregister(_ id: SourceID) async {
+        do {
+            try await FeedSourceRegistry(stores: services.stores).remove(id)
+        } catch {
+            log.error("removing a half-added feed failed: \(error)")
+        }
+    }
+
+    /// Deletes cdbooking's bookings, loan deadlines, return reminders, record and both secrets.
     func removeBooking() async {
         guard let id = booking?.source.id else { return }
         do {
@@ -310,7 +335,7 @@ final class FeedsModel {
         return LoanRowInfo(
             bookingID: loan.booking.id, status: loan.booking.status, location: loan.booking.location, pageURL: loan.booking.pageURL,
             extendURL: loan.booking.extendURL, clash: clash,
-            proposalAccepted: clash.flatMap { returnReminderID(loan, clash: $0) }.flatMap(planner.row(for:)) != nil
+            proposalAccepted: isAccepted(loan, clash: clash)
         )
     }
 
@@ -331,25 +356,44 @@ final class FeedsModel {
         clashes = found
     }
 
-    /// The return reminder for a proposed slot: one per loan and slot, so accepting twice
-    /// adds nothing.
-    private func returnReminderID(_ loan: BookingSnapshot, clash: ReturnClash) -> UUID? {
-        guard let slot = clash.proposedSlot, let source = loan.sourceID else { return nil }
-        return StableID.uuid("loan-return", source.rawValue.uuidString, loan.booking.id, String(Int(slot.start.timeIntervalSince1970)))
+    /// The loan's open return reminder is at the currently proposed slot.
+    private func isAccepted(_ loan: BookingSnapshot, clash: ReturnClash?) -> Bool {
+        guard let slot = clash?.proposedSlot, let source = loan.sourceID,
+              let row = planner.row(for: LoanReminders.returnReminderID(source: source, bookingID: loan.booking.id))
+        else { return false }
+        return row.snapshot.status == .open && row.snapshot.dueAt == slot.start
     }
 
-    /// Accepts the proposed return time: a college deadline at the start of the slot, with a
-    /// reminder 15 minutes before and at the time. Local only; nothing is sent to cdbooking.
+    /// Accepts the proposed return time: the loan's return reminder (origin `booking`, the
+    /// loan's source) at the start of the slot, reminding 15 minutes before and at the time.
+    /// A later slot moves the same reminder. It goes when the loan is returned, marked done or
+    /// cdbooking is removed. Local only; nothing is sent to cdbooking.
     func acceptProposedReturn(bookingID: String) async {
-        guard let loan = loans.first(where: { $0.booking.id == bookingID }), let clash = clashes[bookingID],
-              let slot = clash.proposedSlot, let id = returnReminderID(loan, clash: clash), planner.row(for: id) == nil
+        guard let loan = loans.first(where: { $0.booking.id == bookingID }), let source = loan.sourceID,
+              let slot = clashes[bookingID]?.proposedSlot, loansStillOpen.contains(loan)
         else { return }
-        var draft = DeadlineDraft(dueAt: slot.start)
-        draft.id = id
-        draft.title = String(localized: "Return \(loan.booking.title)")
-        draft.dataClass = .college
-        draft.offsetsMinutes = [15, 0]
-        await planner.save(draft)
+        let item = LoanReminders.returnReminder(
+            bookingID: bookingID, title: String(localized: "Return \(loan.booking.title)"), source: source, at: slot.start
+        )
+        do {
+            _ = try await FeedDeadlineReconciler(stores: services.stores).upsert([item], reopening: [item.id], now: clock.now())
+        } catch {
+            log.error("saving a return reminder failed: \(error)")
+            failure = .save
+            return
+        }
+        await planner.deadlinesChanged(requestAuthorisation: true)
+        onChange?()
+    }
+
+    /// Mark changed a loan deadline (done, snoozed, rescheduled, deleted): a loan he dealt
+    /// with closes its return reminder, and the Live Activity follows (FR-BOOK-07).
+    func loanDeadlineChanged(_ id: UUID) async {
+        if let loan = loan(forDeadline: id), let source = loan.sourceID, planner.row(for: id)?.snapshot.status != .open {
+            let reminder = LoanReminders.returnReminderID(source: source, bookingID: loan.booking.id)
+            if planner.row(for: reminder)?.snapshot.status == .open { await planner.markDone(reminder) }
+        }
+        await load()
         onChange?()
     }
 

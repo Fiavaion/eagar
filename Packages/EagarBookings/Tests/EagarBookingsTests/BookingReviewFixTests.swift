@@ -86,3 +86,64 @@ struct BookingReviewFixTests {
         }
     }
 }
+
+/// FR-BOOK-04: an accepted return reminder belongs to its loan.
+struct ReturnReminderLifecycleTests {
+    private func reminder(_ h: BookingHarness) async throws -> DeadlineSnapshot? {
+        let id = LoanReminders.returnReminderID(source: h.sourceID, bookingID: "b_789")
+        return try await h.stores.college.fetch(FetchDescriptor<Deadline>(predicate: #Predicate { $0.deadlineUUID == id })) { $0.snapshot }.first
+    }
+
+    private func accept(_ h: BookingHarness, at date: Date) async throws {
+        let item = LoanReminders.returnReminder(bookingID: "b_789", title: "Return Synthetic camera kit", source: h.sourceID, at: date)
+        _ = try await FeedDeadlineReconciler(stores: h.stores).upsert([item], now: h.clock.now())
+    }
+
+    @Test func acceptingANewSlotMovesTheReminder() async throws {
+        let h = try BookingHarness()
+        try await h.register()
+        h.seed()
+        try await h.sync.refresh(h.source)
+        try await accept(h, at: utcDate(2026, 10, 28, 11))
+        try await accept(h, at: utcDate(2026, 10, 28, 10))
+        let all = try await h.stores.college.fetch(FetchDescriptor<Deadline>()) { $0.snapshot }
+        #expect(all.count == 2) // the loan and one reminder
+        #expect(try await reminder(h)?.dueAt == utcDate(2026, 10, 28, 10))
+        #expect(try await reminder(h)?.origin == .booking)
+    }
+
+    @Test func reminderSurvivesAFullRefreshWhileTheLoanIsActive() async throws {
+        let h = try BookingHarness(withAPIToken: false) // iCal: every refresh is a full snapshot
+        try await h.register()
+        h.seed()
+        try await h.sync.refresh(h.source)
+        try await accept(h, at: utcDate(2026, 10, 28, 11))
+        h.clock.advance(by: 3600)
+        h.server.put(.init(id: "b_793", title: "Synthetic extra", start: utcDate(2026, 10, 26, 10), due: utcDate(2026, 10, 29, 16), updatedAt: h.clock.now()))
+        try await h.sync.refresh(h.source)
+        #expect(try await reminder(h) != nil)
+    }
+
+    @Test func reminderGoesWhenTheLoanIsReturned() async throws {
+        let h = try BookingHarness()
+        try await h.register()
+        h.seed()
+        try await h.sync.refresh(h.source)
+        try await accept(h, at: utcDate(2026, 10, 28, 11))
+        h.clock.advance(by: 3600)
+        h.server.put(.init(id: "b_789", status: "returned", title: "Synthetic camera kit", start: utcDate(2026, 10, 26, 10),
+                           due: utcDate(2026, 10, 28, 16), returnedAt: h.clock.now(), updatedAt: h.clock.now()))
+        try await h.sync.refresh(h.source)
+        #expect(try await reminder(h) == nil)
+    }
+
+    @Test func reminderGoesOnDisconnect() async throws {
+        let h = try BookingHarness()
+        try await h.register()
+        h.seed()
+        try await h.sync.refresh(h.source)
+        try await accept(h, at: utcDate(2026, 10, 28, 11))
+        try await h.sync.disconnect(h.sourceID)
+        #expect(try await reminder(h) == nil)
+    }
+}

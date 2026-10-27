@@ -64,6 +64,8 @@ private final class StubFeeds: HTTPTransport {
     let now: Date
     let calendar: Calendar
     let revoked = Mutex(false)
+    /// Paths of every cdbooking request, to count fetches.
+    let bookingRequests = Mutex<[String]>([])
 
     init(now: Date, calendar: Calendar) {
         self.now = now
@@ -76,6 +78,7 @@ private final class StubFeeds: HTTPTransport {
             return HTTPResponse(status: 200, body: Data(DemoFeedTransport.canvasFeed(now: now, calendar: calendar).utf8))
         }
         guard url.host() == "cdbooking.example.invalid" else { return HTTPResponse(status: 404) }
+        bookingRequests.withLock { $0.append(url.path()) }
         if revoked.withLock({ $0 }) { return HTTPResponse(status: 401) }
         let path = url.path()
         if path.contains("/ical/") {
@@ -119,9 +122,26 @@ private func rows<T: PersistentModel, R: Sendable>(_ store: ClassifiedStore, _: 
     try await store.fetch(FetchDescriptor<T>(), map: map)
 }
 
-private struct FixedTestClock: EagarClock {
-    let date: Date
-    func now() -> Date { date }
+/// A clock tests can move forward.
+private final class TestClock: EagarClock {
+    private let current: Mutex<Date>
+    init(_ date: Date) { current = Mutex(date) }
+    func now() -> Date { current.withLock { $0 } }
+    func advance(by interval: TimeInterval) { current.withLock { $0 = $0.addingTimeInterval(interval) } }
+}
+
+/// Records every Live Activity plan the app asks for.
+private final class SpyLoanActivities: LoanActivityPresenting {
+    let shown = Mutex<[LoanActivityPlan?]>([])
+    func show(_ plan: LoanActivityPlan?) async { shown.withLock { $0.append(plan) } }
+    var last: LoanActivityPlan?? { shown.withLock { $0.last } }
+}
+
+/// A secret store whose writes fail.
+private final class FailingSecrets: SecretStore {
+    func set(_ secret: Secret, for key: SecretKey) throws(SecurityError) { throw .keychain(status: -1) }
+    func get(_ key: SecretKey) throws(SecurityError) -> Secret? { nil }
+    func delete(_ key: SecretKey) throws(SecurityError) {}
 }
 
 /// M2 acceptance: B-8 end to end through the app (cdbooking and Canvas records are college,
@@ -146,6 +166,8 @@ struct FeedBoundaryTests {
     @MainActor
     private struct Harness {
         let model: AppModel
+        let clock: TestClock
+        let activities: SpyLoanActivities
         let secrets: MemorySecrets
         let feeds: StubFeeds
         let scheduler: SpyDeadlineScheduler
@@ -154,23 +176,25 @@ struct FeedBoundaryTests {
         var services: AppServices { model.services }
     }
 
-    private func makeHarness(phrasing: BriefPhrasingMode = .off) throws -> Harness {
+    private func makeHarness(phrasing: BriefPhrasingMode = .off, failingSecrets: Bool = false) throws -> Harness {
         let secrets = MemorySecrets()
+        let activities = SpyLoanActivities()
+        let clock = TestClock(morning)
         let feeds = StubFeeds(now: morning, calendar: calendar)
         let scheduler = SpyDeadlineScheduler()
         let local = SpyProvider(.onDevice)
         let cloud = SpyProvider(.anthropicCloud(region: "global"))
         let services = try AppServices.make(
-            inMemory: true, secrets: secrets, eventStore: DemoEventStore(now: morning, calendar: calendar, richWeek: true),
-            deadlineNotifications: scheduler, providers: [local, cloud], feedTransport: feeds
+            inMemory: true, secrets: failingSecrets ? FailingSecrets() : secrets, eventStore: DemoEventStore(now: morning, calendar: calendar, richWeek: true),
+            deadlineNotifications: scheduler, providers: [local, cloud], feedTransport: feeds, loanActivities: activities
         )
         let defaults = UserDefaults(suiteName: "eagar.tests.\(UUID().uuidString)")!
         defaults.set(true, forKey: PlannerModel.notificationsRequestedKey)
         var settings = BriefSettings()
         settings.phrasingMode = phrasing
         settings.save(to: defaults)
-        let model = AppModel(services: services, defaults: defaults, clock: FixedTestClock(date: morning), calendar: calendar)
-        return Harness(model: model, secrets: secrets, feeds: feeds, scheduler: scheduler, local: local, cloud: cloud)
+        let model = AppModel(services: services, defaults: defaults, clock: clock, calendar: calendar)
+        return Harness(model: model, clock: clock, activities: activities, secrets: secrets, feeds: feeds, scheduler: scheduler, local: local, cloud: cloud)
     }
 
     /// Connects cdbooking (with an API token: the JSON path) and Canvas.
@@ -285,6 +309,9 @@ struct FeedBoundaryTests {
         #expect(h.model.feeds.maskedBookingToken?.contains(StubFeeds.apiToken) == false)
         #expect(h.model.feeds.maskedBookingFeedURL?.contains(StubFeeds.feedToken) == false)
         #expect(h.model.feeds.maskedCanvasFeedURL?.contains("canary-5b8e") == false)
+        // Host plus the last four characters of the token, never just "••••.ics".
+        #expect(h.model.feeds.maskedBookingFeedURL == "cdbooking.example.invalid ••••3a9c")
+        #expect(h.model.feeds.maskedCanvasFeedURL == "canvas.example.invalid ••••5b8e")
 
         var stored: [String] = []
         for store in [h.services.stores.college, h.services.stores.personal] {
@@ -353,9 +380,74 @@ struct FeedBoundaryTests {
         #expect(reminder.snapshot.dataClass == .college)
         #expect(reminder.snapshot.dueAt == slot.start)
         #expect(h.model.feeds.loanInfo(forDeadline: row.id)?.proposalAccepted == true)
-        // Accepting again adds nothing.
+        // The reminder belongs to the loan: origin booking, the loan's source, its stable ID.
+        let source = try #require(tripod.sourceID)
+        #expect(reminder.snapshot.origin == .booking)
+        #expect(reminder.id == LoanReminders.returnReminderID(source: source, bookingID: tripod.booking.id))
+        let reminderID = reminder.id
+        let stored = try await rows(h.services.stores.college, Deadline.self) { ($0.deadlineUUID, $0.sourceUUID) }
+        #expect(stored.first { $0.0 == reminderID }?.1 == source.rawValue)
+        // Accepting again changes nothing: same number of deadlines, one reminder.
+        let before = h.model.planner.deadlines.count
         await h.model.feeds.acceptProposedReturn(bookingID: tripod.booking.id)
+        #expect(h.model.planner.deadlines.count == before)
         #expect(h.model.planner.deadlines.filter { $0.snapshot.title == "Return Tripod and lights (demo)" }.count == 1)
+
+        // Marking the loan done closes its reminder, so it stops notifying.
+        await h.model.planner.markDone(row.id)
+        #expect(h.model.planner.row(for: reminderID)?.snapshot.status == .done)
+        // Removing cdbooking deletes the reminder with the loan.
+        await h.model.feeds.removeBooking()
+        #expect(h.model.planner.row(for: reminderID) == nil)
+    }
+
+    /// FR-BOOK-07: marking today's loan done ends the Live Activity at once.
+    @Test func FR_BOOK_07_markingTheLoanDoneUpdatesTheLiveActivity() async throws {
+        let h = try makeHarness()
+        try await connectBoth(h)
+        let plan = try #require(h.activities.last ?? nil)
+        #expect(plan.content.loansDueToday == 1)
+        let loan = try #require(h.model.planner.deadlines.first { $0.snapshot.title == "Canary camera kit" })
+        await h.model.planner.markDone(loan.id)
+        #expect(h.activities.last == .some(nil))
+    }
+
+    /// Two activations close together fetch the feeds once.
+    @Test func concurrentActivationsFetchOnce() async throws {
+        let h = try makeHarness()
+        try await connectBoth(h)
+        h.clock.advance(by: FeedsModel.minimumRefreshInterval + 60)
+        let before = h.feeds.bookingRequests.withLock { $0.filter { $0.hasSuffix("/bookings") }.count }
+        async let first: Void = h.model.feeds.refresh()
+        async let second: Void = h.model.feeds.refresh()
+        _ = await (first, second)
+        let after = h.feeds.bookingRequests.withLock { $0.filter { $0.hasSuffix("/bookings") }.count }
+        #expect(after - before == 1)
+    }
+
+    /// A Keychain failure on a new feed leaves no source behind.
+    @Test func failedSecretSaveLeavesNoSource() async throws {
+        let h = try makeHarness(failingSecrets: true)
+        #expect(await !h.model.feeds.connectCanvas(feedURL: StubFeeds.canvasURL))
+        #expect(h.model.feeds.failure == .keychain)
+        #expect(try await rows(h.services.stores.college, FeedSourceRecord.self) { $0.kindRaw }.isEmpty)
+    }
+
+    /// A failed registration when replacing the address leaves the old secret untouched.
+    @Test func failedRegistrationLeavesTheSecretUntouched() async throws {
+        let h = try makeHarness()
+        try await connectBoth(h)
+        let canvas = try #require(h.model.feeds.canvas?.source.id)
+        // Change the record behind the store's back, so the store's class check refuses the
+        // registration's save.
+        let context = ModelContext(h.services.stores.college.modelContainer)
+        let id = canvas.rawValue
+        try context.fetch(FetchDescriptor<FeedSourceRecord>(predicate: #Predicate { $0.sourceUUID == id })).forEach {
+            $0.dataClassRaw = DataClass.personal.rawValue
+        }
+        try context.save()
+        #expect(await !h.model.feeds.connectCanvas(feedURL: "https://canvas.example.invalid/feeds/calendars/user_replacement-0000.ics"))
+        #expect(try h.secrets.get(.canvasFeedURL(canvas))?.reveal() == StubFeeds.canvasURL)
     }
 
     /// FR-BOOK-02 / Appendix E.2: a revoked token is a visible health state, not a silent failure.

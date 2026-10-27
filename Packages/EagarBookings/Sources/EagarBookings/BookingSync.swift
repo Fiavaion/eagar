@@ -163,13 +163,18 @@ public struct BookingSync: Sendable {
         let reconciler = FeedDeadlineReconciler(stores: stores)
         let deadlines = records.compactMap { LoanReminders.deadline(for: $0, source: source, offsetsMinutes: reminderOffsetsMinutes) }
         let reopening = Set(counts.reopened.map { FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: $0) })
+        // Accepted return reminders (FR-BOOK-04) live while their loan is active, and go when it
+        // closes or leaves the feed.
+        let activeReminders = Set(records.filter(\.isActiveLoan).map { LoanReminders.returnReminderID(source: source, bookingID: $0.id) })
         var deadlineCounts = try await reconciler.upsert(
-            deadlines, replacingAllFrom: replaceAll ? (.booking, source) : nil, reopening: reopening, now: now
+            deadlines, replacingAllFrom: replaceAll ? (.booking, source) : nil, reopening: reopening, preserving: activeReminders, now: now
         )
+        var gone = records.filter(\.isClosed).map { LoanReminders.returnReminderID(source: source, bookingID: $0.id) }
         if !replaceAll {
-            let ids = deletedIDs.map { FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: $0) }
-            deadlineCounts.deleted += try await reconciler.remove(ids: ids)
+            gone += deletedIDs.map { FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: $0) }
+            gone += deletedIDs.map { LoanReminders.returnReminderID(source: source, bookingID: $0) }
         }
+        deadlineCounts.deleted += try await reconciler.remove(ids: gone)
         return BookingRefreshOutcome(path: path, changed: true, upserted: counts.upserted, deleted: counts.deleted, deadlines: deadlineCounts)
     }
 }

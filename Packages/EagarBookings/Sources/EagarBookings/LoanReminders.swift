@@ -22,6 +22,22 @@ public enum LoanReminders {
         )
     }
 
+    /// The ID of a loan's accepted return reminder (FR-BOOK-04): one per loan, so accepting a
+    /// new slot moves it instead of adding a second. It has origin `booking` and the loan's
+    /// source, so it is deleted with the loan, on close and on disconnect.
+    public static func returnReminderID(source: SourceID, bookingID: String) -> UUID {
+        FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: "return:\(bookingID)")
+    }
+
+    /// The return reminder for an accepted earlier slot: a college deadline at the slot's
+    /// start, reminding 15 minutes before and at the time.
+    public static func returnReminder(bookingID: String, title: String, source: SourceID, at start: Date) -> FeedDeadline {
+        FeedDeadline(
+            origin: .booking, sourceID: source, externalID: "return:\(bookingID)", title: title, dueAt: start, isAllDay: false,
+            itemClass: .college, reminderOffsetsMinutes: [15, 0]
+        )
+    }
+
     /// The return reminders for `loans`, as the M1 planner would schedule them from the
     /// persisted deadlines. Identifiers match (`deadline.<uuid>.<offset>`), so using both never
     /// schedules a reminder twice.
