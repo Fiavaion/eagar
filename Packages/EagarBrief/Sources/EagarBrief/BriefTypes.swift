@@ -50,10 +50,10 @@ public enum BriefAction: String, Sendable, Codable, CaseIterable {
     public var dealsWithItem: Bool { self != .open && self != .cancelSubscription }
 }
 
-/// What a brief item refers to. M2 adds trials, the monthly subscription summary and
-/// keep-in-touch nudges; loans (cdbooking) are the next kind to join.
+/// What a brief item refers to. M2 adds trials, the monthly subscription summary, keep-in-touch
+/// nudges and cdbooking loans.
 public enum BriefItemKind: String, Sendable, Codable {
-    case event, deadline, trial, subscriptionSummary, nudge
+    case event, deadline, trial, subscriptionSummary, nudge, loan
 }
 
 /// One brief line. `title` is shown only inside the app; notifications and widgets use
@@ -123,7 +123,7 @@ public struct BriefPreferences: Sendable, Hashable, Codable {
         self.maxItems = maxItems
     }
 
-    public static let `default` = BriefPreferences(maxItems: [.today: 8, .deadlines: 6, .overdue: 6, .trials: 5, .keepInTouch: 3])
+    public static let `default` = BriefPreferences(maxItems: [.today: 8, .deadlines: 6, .overdue: 6, .loans: 5, .trials: 5, .keepInTouch: 3])
 
     /// Sections in display order. Overdue always comes first when present (FR-DL-04).
     func orderedKinds() -> [BriefSectionKind] {
@@ -220,18 +220,54 @@ public struct BriefNudge: Sendable, Hashable {
     }
 }
 
+/// An active cdbooking loan as the brief needs it (FR-BOOK-03, FR-BOOK-04). Always `college`
+/// (BD-15): its title is shown only inside the app, and phrasing keeps it on device.
+public struct BriefLoan: Sendable, Hashable {
+    /// cdbooking's booking ID.
+    public let id: String
+    /// The loan's return deadline (``BriefDeadline/id``). While set, the loan is shown only
+    /// while that deadline is in the brief's open deadlines (not done, not snoozed), and the
+    /// deadline is shown here instead of under Overdue or Coming up, so it never appears twice.
+    public let deadlineID: String?
+    public let title: String
+    public let dueAt: Date
+    public let location: String?
+    /// An earlier return time when the due time falls in busy time (``ReturnClash``).
+    public let proposedReturn: Date?
+    public let dataClass: DataClass
+
+    public init(
+        id: String, deadlineID: String?, title: String, dueAt: Date, location: String? = nil, proposedReturn: Date? = nil,
+        dataClass: DataClass = .college
+    ) {
+        self.id = id
+        self.deadlineID = deadlineID
+        self.title = title
+        self.dueAt = dueAt
+        self.location = location
+        self.proposedReturn = proposedReturn
+        self.dataClass = dataClass
+    }
+}
+
 /// Everything beyond the calendar and deadlines that feeds the brief. Each source fills its
-/// own section; a new source (cdbooking loans next, `.loans`) adds a field here and a section
-/// builder in ``BriefComposer``, so callers that don't have it yet keep compiling.
+/// own section; a new source adds a field here and a section builder in ``BriefComposer``, so
+/// callers that don't have it yet keep compiling.
 public struct BriefSources: Sendable, Hashable {
     public var trials: [BriefTrial]
     public var subscriptionSummary: BriefSubscriptionSummary?
     public var nudges: [BriefNudge]
+    /// Active loans (M2, FR-BOOK-03).
+    public var loans: [BriefLoan]
 
-    public init(trials: [BriefTrial] = [], subscriptionSummary: BriefSubscriptionSummary? = nil, nudges: [BriefNudge] = []) {
+    public init(
+        trials: [BriefTrial] = [], subscriptionSummary: BriefSubscriptionSummary? = nil, nudges: [BriefNudge] = [],
+        loans: [BriefLoan] = []
+    ) {
         self.trials = trials
         self.subscriptionSummary = subscriptionSummary
         self.nudges = nudges
+        self.loans = loans
     }
 
     public static let none = BriefSources()

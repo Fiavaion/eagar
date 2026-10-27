@@ -8,7 +8,7 @@ public enum BriefComposer {
     ///   - events: today's events, already classified by calendar tag. Events on calendars Mark
     ///     excluded from the brief should be filtered out by the caller.
     ///   - deadlines: open deadlines.
-    ///   - sources: trials, the subscription summary and keep-in-touch nudges (M2).
+    ///   - sources: trials, the subscription summary, keep-in-touch nudges and loans (M2).
     ///   - horizon: how far ahead the deadlines section looks.
     public static func compose(
         slot: BriefSlot,
@@ -34,8 +34,11 @@ public enum BriefComposer {
                 )
             }
 
-        let overdue = deadlines.filter { $0.dueAt <= now }.sorted { $0.dueAt < $1.dueAt }
-        let upcoming = deadlines.filter { $0.dueAt > now && $0.dueAt <= now.addingTimeInterval(horizon) }.sorted { $0.dueAt < $1.dueAt }
+        // A loan's return deadline is shown in Loans due, not twice.
+        let loanDeadlineIDs = Set(sources.loans.compactMap(\.deadlineID))
+        let plainDeadlines = deadlines.filter { !loanDeadlineIDs.contains($0.id) }
+        let overdue = plainDeadlines.filter { $0.dueAt <= now }.sorted { $0.dueAt < $1.dueAt }
+        let upcoming = plainDeadlines.filter { $0.dueAt > now && $0.dueAt <= now.addingTimeInterval(horizon) }.sorted { $0.dueAt < $1.dueAt }
 
         func deadlineItem(_ deadline: BriefDeadline, overdue: Bool) -> BriefItem {
             BriefItem(
@@ -49,6 +52,7 @@ public enum BriefComposer {
             .overdue: overdue.map { deadlineItem($0, overdue: true) },
             .today: todayItems,
             .deadlines: upcoming.map { deadlineItem($0, overdue: false) },
+            .loans: loanItems(sources.loans, openDeadlineIDs: Set(deadlines.map(\.id)), now: now, horizon: horizon, calendar: calendar),
             .trials: trialItems(sources, now: now, calendar: calendar),
             .keepInTouch: nudgeItems(sources.nudges, now: now),
         ]
@@ -118,6 +122,41 @@ public enum BriefComposer {
         var style = Date.FormatStyle(date: .omitted, time: .omitted).weekday(.abbreviated).day().month(.abbreviated)
         style.timeZone = calendar.timeZone
         return day.formatted(style)
+    }
+
+    // MARK: Loans (FR-BOOK-03, FR-BOOK-04)
+
+    /// Loans overdue or due within `horizon`, soonest first. A loan with a return deadline is
+    /// shown only while that deadline is open and not snoozed (it is in `openDeadlineIDs`).
+    /// The detail is the earlier return time when the due time clashes, else the location.
+    static func loanItems(_ loans: [BriefLoan], openDeadlineIDs: Set<String>, now: Date, horizon: TimeInterval, calendar: Calendar) -> [BriefItem] {
+        loans
+            .filter { loan in
+                loan.dueAt <= now.addingTimeInterval(horizon) && (loan.deadlineID.map(openDeadlineIDs.contains) ?? true)
+            }
+            .sorted { ($0.dueAt, $0.id) < ($1.dueAt, $1.id) }
+            .map { loan in
+                let overdue = loan.dueAt <= now
+                let detail: String? = if overdue {
+                    String(localized: "Overdue: return it as soon as you can", bundle: .module)
+                } else if let proposed = loan.proposedReturn, proposed < loan.dueAt {
+                    String(localized: "You are busy when it is due; return it by \(timeText(proposed, calendar: calendar))", bundle: .module)
+                } else if let location = loan.location, !location.isEmpty {
+                    String(localized: "Return to \(location)", bundle: .module)
+                } else {
+                    nil
+                }
+                return BriefItem(
+                    id: "loan.\(loan.deadlineID ?? loan.id)", kind: .loan, title: loan.title, start: loan.dueAt,
+                    dataClass: loan.dataClass, actions: overdue ? [.done, .snooze, .open] : [.done, .open], detail: detail
+                )
+            }
+    }
+
+    static func timeText(_ date: Date, calendar: Calendar) -> String {
+        var style = Date.FormatStyle(date: .omitted, time: .shortened)
+        style.timeZone = calendar.timeZone
+        return date.formatted(style)
     }
 
     // MARK: Keep in touch (FR-PEOPLE-05)
