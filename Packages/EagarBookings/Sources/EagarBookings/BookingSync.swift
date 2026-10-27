@@ -66,7 +66,7 @@ public struct BookingSync: Sendable {
         } catch {
             log.notice("booking refresh failed: \(error)")
             state.health = error.health
-            try? await registry.save(state)
+            try await saveHealth(state, registry)
             throw .source(error)
         }
 
@@ -86,7 +86,7 @@ public struct BookingSync: Sendable {
             }
         } catch {
             state.health = .failing
-            try? await registry.save(state)
+            try await saveHealth(state, registry)
             throw .store(error)
         }
 
@@ -111,9 +111,18 @@ public struct BookingSync: Sendable {
         do {
             summary = try await source.adminSummary()
         } catch {
-            if error == .unauthorised || error == .revoked, var state = try? await registry.state(of: source.sourceID) {
-                state.health = error.health
-                try? await registry.save(state)
+            if error == .unauthorised || error == .revoked {
+                let loaded: FeedSourceState?
+                do {
+                    loaded = try await registry.state(of: source.sourceID)
+                } catch {
+                    log.error("booking source not readable to record its health: \(error)")
+                    throw .store(error)
+                }
+                if var state = loaded {
+                    state.health = error.health
+                    try await saveHealth(state, registry)
+                }
             }
             throw .source(error)
         }
@@ -126,6 +135,17 @@ public struct BookingSync: Sendable {
             throw .store(error)
         }
         return summary
+    }
+
+    /// Saves a failure's health so Settings can show it ("token revoked"). If that save fails,
+    /// the store error is thrown instead, so the failure is never silent.
+    private func saveHealth(_ state: FeedSourceState, _ registry: FeedSourceRegistry) async throws(BookingSyncError) {
+        do {
+            try await registry.save(state)
+        } catch {
+            log.error("booking source health not saved: \(error)")
+            throw .store(error)
+        }
     }
 
     /// Deletes a source's bookings, deadlines and record. The caller deletes its secrets
@@ -142,7 +162,10 @@ public struct BookingSync: Sendable {
         let counts = try await BookingRepository(stores: stores).apply(records, deletedIDs: deletedIDs, replaceAll: replaceAll, source: source, now: now)
         let reconciler = FeedDeadlineReconciler(stores: stores)
         let deadlines = records.compactMap { LoanReminders.deadline(for: $0, source: source, offsetsMinutes: reminderOffsetsMinutes) }
-        var deadlineCounts = try await reconciler.upsert(deadlines, replacingAllFrom: replaceAll ? (.booking, source) : nil, now: now)
+        let reopening = Set(counts.reopened.map { FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: $0) })
+        var deadlineCounts = try await reconciler.upsert(
+            deadlines, replacingAllFrom: replaceAll ? (.booking, source) : nil, reopening: reopening, now: now
+        )
         if !replaceAll {
             let ids = deletedIDs.map { FeedDeadline.deadlineID(origin: .booking, sourceID: source, externalID: $0) }
             deadlineCounts.deleted += try await reconciler.remove(ids: ids)

@@ -73,6 +73,12 @@ public final class Deadline: Classified {
         snoozedUntil = nil
     }
 
+    /// Undoes ``markDone(at:)``: open again, no completion time.
+    public func reopen() {
+        statusRaw = DeadlineStatus.open.rawValue
+        completedAt = nil
+    }
+
     public func snooze(until date: Date) {
         snoozedUntil = date
     }

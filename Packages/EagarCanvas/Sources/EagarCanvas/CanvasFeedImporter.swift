@@ -189,7 +189,13 @@ public struct CanvasFeedImporter: Sendable {
         } catch {
             log.notice("canvas refresh failed: \(error)")
             state.health = error.health
-            try? await registry.save(state)
+            do {
+                try await registry.save(state)
+            } catch {
+                // The health ("feed reset") could not be recorded: report the store failure.
+                log.error("canvas source health not saved: \(error)")
+                throw .store(error)
+            }
             throw error
         }
         state.health = .ok

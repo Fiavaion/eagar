@@ -288,3 +288,38 @@ struct CanvasBoundaryTests {
         }
     }
 }
+
+/// Changes the stored source record's class behind the store's back, then answers 404 (feed
+/// reset), so recording the "revoked" health fails the store's class check.
+private struct HealthSaveSaboteur: HTTPTransport {
+    let sourceID: SourceID
+    let container: ModelContainer
+
+    func send(_ request: URLRequest) async throws(FeedFetchError) -> HTTPResponse {
+        let context = ModelContext(container)
+        let id = sourceID.rawValue
+        if let records = try? context.fetch(FetchDescriptor<FeedSourceRecord>(predicate: #Predicate { $0.sourceUUID == id })) {
+            records.forEach { $0.dataClassRaw = DataClass.personal.rawValue }
+            try? context.save()
+        }
+        return HTTPResponse(status: 404)
+    }
+}
+
+struct CanvasReviewFixTests {
+    /// A failed health save is not swallowed: the store failure is thrown instead.
+    @Test func failedHealthSaveIsReported() async throws {
+        let h = try CanvasHarness()
+        try await FeedSourceRegistry(stores: h.stores).register(
+            FeedSource(id: h.sourceID, kind: .canvas, dataClass: .college, processingMode: .localAI), displayName: "Canvas", at: now
+        )
+        let importer = CanvasFeedImporter(
+            sourceID: h.sourceID, secrets: h.secrets, stores: h.stores,
+            fetcher: FeedFetcher(transport: HealthSaveSaboteur(sourceID: h.sourceID, container: h.stores.college.modelContainer), policy: RetryPolicy(maxAttempts: 1), sleep: { _ in }),
+            clock: FixedClock(now), timeZone: dublin
+        )
+        await #expect(throws: CanvasImportError.store(.classMismatch(store: .college, dataClass: .personal))) {
+            try await importer.refresh()
+        }
+    }
+}

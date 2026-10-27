@@ -163,12 +163,16 @@ final class FeedsModel {
             lastBookingPath = try await sync.refresh(source).path
         } catch {
             log.notice("cdbooking refresh failed: \(error)")
+            // A fetch failure is shown as the source's health; a store failure (the health
+            // itself could not be saved) is shown as an alert.
+            if case .store = error { failure = .save }
             return
         }
         do {
             adminSummary = try await sync.refreshAdminSummary(source)
         } catch {
             log.notice("cdbooking admin summary failed: \(error)")
+            if case .store = error { failure = .save }
         }
     }
 
@@ -177,6 +181,7 @@ final class FeedsModel {
             try await canvasImporter(id).refresh()
         } catch {
             log.notice("canvas refresh failed: \(error)")
+            if case .store = error { failure = .save }
         }
     }
 

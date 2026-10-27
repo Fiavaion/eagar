@@ -72,6 +72,8 @@ public struct DeadlineReconcileCounts: Sendable, Hashable {
     public var inserted = 0
     public var updated = 0
     public var closed = 0
+    /// Done deadlines opened again because their item reopened in the feed.
+    public var reopened = 0
     public var deleted = 0
 
     public init() {}
@@ -91,8 +93,14 @@ public struct FeedDeadlineReconciler: Sendable {
     /// Upserts `deadlines`. A closed item marks its deadline done, and creates none if it had
     /// none. With `replacingAllFrom` set, deadlines of that origin and source
     /// that are not in `deadlines` are deleted (the feed was read in full).
+    ///
+    /// - Parameter reopening: deadlines whose item the feed itself moved from closed back to
+    ///   open (a wrongly scanned return corrected to checked out). Those are opened again if
+    ///   done, so their reminders fire. A deadline Mark marked done while the feed still showed
+    ///   the item open is never in this set, so his "done" is kept.
     public func upsert(
-        _ deadlines: [FeedDeadline], replacingAllFrom scope: (origin: DeadlineOrigin, source: SourceID)? = nil, now: Date
+        _ deadlines: [FeedDeadline], replacingAllFrom scope: (origin: DeadlineOrigin, source: SourceID)? = nil,
+        reopening: Set<UUID> = [], now: Date
     ) async throws(StoreError) -> DeadlineReconcileCounts {
         var counts = DeadlineReconcileCounts()
         let byStore = Dictionary(grouping: deadlines) { StoreKind.placement(for: $0.dataClass) }
@@ -112,6 +120,9 @@ public struct FeedDeadlineReconciler: Sendable {
                         if item.isClosed, deadline.status == .open {
                             deadline.markDone(at: now)
                             counts.closed += 1
+                        } else if !item.isClosed, deadline.status == .done, reopening.contains(item.id) {
+                            deadline.reopen()
+                            counts.reopened += 1
                         }
                     } else if !item.isClosed {
                         // A closed item with no deadline yet (a loan already returned) adds nothing.
@@ -138,6 +149,7 @@ public struct FeedDeadlineReconciler: Sendable {
             counts.inserted += result.inserted
             counts.updated += result.updated
             counts.closed += result.closed
+            counts.reopened += result.reopened
             counts.deleted += result.deleted
         }
         return counts

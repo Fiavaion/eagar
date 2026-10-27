@@ -101,16 +101,18 @@ public struct BookingRepository: Sendable {
     }
 
     /// Upserts `records` for `source` by booking ID and deletes `deletedIDs`. With
-    /// `replaceAll`, bookings of the source not in `records` are deleted too.
+    /// `replaceAll`, bookings of the source not in `records` are deleted too. Returns the IDs
+    /// of stored bookings that were closed and are open again in `records`.
     func apply(
         _ records: [BookingRecord], deletedIDs: [String], replaceAll: Bool, source: SourceID, now: Date
-    ) async throws(StoreError) -> (upserted: Int, deleted: Int) {
+    ) async throws(StoreError) -> (upserted: Int, deleted: Int, reopened: [String]) {
         let sourceUUID = source.rawValue
         do {
             return try await stores.college.perform { context in
                 let existing = try context.fetch(FetchDescriptor<BookingItem>(predicate: #Predicate { $0.sourceUUID == sourceUUID }))
                 var byID: [String: BookingItem] = [:]
                 var deleted = 0
+                var reopened: [String] = []
                 for item in existing {
                     if byID[item.bookingID] == nil {
                         byID[item.bookingID] = item
@@ -120,6 +122,7 @@ public struct BookingRepository: Sendable {
                 }
                 for record in records {
                     if let item = byID[record.id] {
+                        if item.record.isClosed, !record.isClosed { reopened.append(record.id) }
                         item.apply(record, fetchedAt: now)
                     } else {
                         let item = BookingItem(record, source: source, fetchedAt: now)
@@ -135,7 +138,7 @@ public struct BookingRepository: Sendable {
                         deleted += 1
                     }
                 }
-                return (records.count, deleted)
+                return (records.count, deleted, reopened)
             }
         } catch let error as StoreError {
             throw error
