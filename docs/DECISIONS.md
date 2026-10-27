@@ -408,10 +408,10 @@ Refs: FR-CORE-04, FR-BOOK-02, FR-CANVAS-02
 
 ## D-044  Loans in the brief, clash acceptance and reopening  (2026-10-27, M2)
 Context: The brief must show loans due; a clash needs an action; cdbooking can correct a wrongly closed loan.
-Decision: **For Mark to confirm.** "Loans due" uses the deadlines' 7-day horizon, and a loan shown there is not repeated under Overdue or Coming up; lines are phrased on device only. Accepting a clash creates a local college deadline "Return …" with reminders 15 minutes before and at the time, rather than a calendar event, because the target calendar may sync to a server. A loan deadline reopens only when cdbooking moves the loan from closed back to open; a loan Mark marked done stays done.
+Decision: **For Mark to confirm.** "Loans due" uses the deadlines' 7-day horizon and lists loans not yet overdue, without repeating them under Coming up; an overdue loan stays in Overdue with the reschedule action and counts towards the brief notification's level (FR-DL-04 wins over an earlier draft that moved it). Lines are phrased on device only. Accepting a clash creates a local college deadline "Return …" with reminders 15 minutes before and at the time, rather than a calendar event, because the target calendar may sync to a server. A loan deadline reopens only when cdbooking moves the loan from closed back to open; a loan Mark marked done stays done.
 Alternatives: A calendar event for the return (leaks college data to a synced calendar); reopening whenever the feed shows the loan open (undoes Mark's own "done").
 Consequences: The accepted return slot is visible only in Eagar on that device.
-Refs: FR-BOOK-03, FR-BOOK-04, FR-DL-01, BD-04, D-034
+Refs: FR-BOOK-03, FR-BOOK-04, FR-DL-01, FR-DL-04, BD-04, D-034
 
 ## D-045  Loan Live Activity and all-day overdue  (2026-10-27, M2)
 Context: FR-BOOK-07 asks for a local Live Activity for loans due; Lock Screen content is visible without unlocking. Separately, all-day deadlines at 00:00 showed as overdue on their own day.
