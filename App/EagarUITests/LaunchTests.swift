@@ -21,6 +21,27 @@ private func expectSummary(in app: XCUIApplication) {
     XCTAssertTrue(summary.label.contains("Blocked attempts: 0"), summary.label)
 }
 
+/// Taps a tab by name. On iPhone, tabs past the fifth (M2 added Subscriptions and People)
+/// sit behind "More" or the sidebar-adaptable tab bar's sidebar.
+@MainActor
+private func openTab(_ name: String, in app: XCUIApplication) {
+    let direct = app.buttons[name].firstMatch
+    if direct.waitForExistence(timeout: 3), direct.isHittable {
+        direct.tap()
+        return
+    }
+    for overflow in ["More", "Show Sidebar", "Sidebar"] {
+        let button = app.buttons[overflow].firstMatch
+        if button.exists, button.isHittable {
+            button.tap()
+            break
+        }
+    }
+    let item = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", name)).firstMatch
+    XCTAssertTrue(item.waitForExistence(timeout: 5), "tab \(name) not found; element tree:\n\(app.debugDescription)")
+    item.tap()
+}
+
 final class LaunchTests: XCTestCase {
     @MainActor
     func testLaunchShowsKeySetup() throws {
@@ -40,7 +61,7 @@ final class LaunchTests: XCTestCase {
     func testTappingLedgerTabShowsSummary() throws {
         let app = launch(["-EagarInitialTab", "key"])
         XCTAssertTrue(app.descendants(matching: .any)["key.test"].waitForExistence(timeout: 15))
-        app.buttons["Privacy ledger"].firstMatch.tap()
+        openTab("Privacy ledger", in: app)
         expectSummary(in: app)
     }
     #endif
