@@ -378,6 +378,13 @@ Alternatives: Reuse existing categories (mixes content-free counts from differen
 Consequences: Any new derivation must add its case and test.
 Refs: FR-CORE-03, BD-25, BD-03
 
+## D-040  Planned catch-ups: college ones in memory only, counted for the whole week  (2026-10-27, M2)
+Context: Review found PeopleModel wrote every planned catch-up, college-slotted ones included, to standard defaults (device and iCloud backup), and stopped counting a catch-up against the weekly budget once it started, so the budget refilled mid-week and a just-planned person was proposed again.
+Decision: **For Mark to confirm.** A catch-up is college if the event or the nudge is college (taint rule); college ones are kept in memory only, personal ones in defaults under `people.plannedCatchUps.v2`. The old `people.plannedCatchUps` key is removed on every launch. Planned catch-ups count for the whole week they fall in (supersedes the "until they start" wording in D-028), and anyone with one planned this week is not nudged again. A failed PersonalStore read skips reminder reconciliation instead of treating the empty list as truth.
+Alternatives: A CollegeStore model for planned catch-ups (survives relaunch, but needs a new model and an AppServices change); dropping persistence altogether.
+Consequences: After a relaunch, college catch-ups planned earlier in the week no longer count, so up to that many extra nudges can appear that week. A planned catch-up and a manual "we talked" log for the same meeting both count.
+Refs: FR-PEOPLE-04, FR-PEOPLE-05, FR-PEOPLE-06, FR-TRIAL-02, BD-04, D-028
+
 ## Parked
 
 - **Tier-pin settings (BD-05):** UI and storage to narrow per-(class, kind) maximum tiers; defaults already enforced. With Settings in M1.

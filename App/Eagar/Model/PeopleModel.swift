@@ -75,7 +75,10 @@ final class PeopleModel {
     private var collegePlanned: [PlannedCatchUp] = []
 
     static let budgetKey = "people.weeklyBudget"
-    static let plannedKey = "people.plannedCatchUps"
+    static let plannedKey = "people.plannedCatchUps.v2"
+    /// Written by builds before the college fix, which stored college catch-ups too; removed
+    /// on launch so none stays in backup.
+    static let legacyPlannedKey = "people.plannedCatchUps"
     /// How far back calendar events count as interactions.
     static let inferenceLookbackDays = 180
 
@@ -93,6 +96,7 @@ final class PeopleModel {
         self.clock = clock
         self.calendar = calendar
         weeklyBudget = defaults.object(forKey: Self.budgetKey) as? Int ?? NudgePlannerSettings().weeklyBudget
+        defaults.removeObject(forKey: Self.legacyPlannedKey)
     }
 
     var now: Date { clock.now() }

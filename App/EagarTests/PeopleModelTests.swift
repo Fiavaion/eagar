@@ -173,6 +173,16 @@ struct PeopleModelTests {
 
     /// Invariant 1, D-028: a catch-up planned from a college nudge counts against the budget
     /// but never reaches standard defaults (device and iCloud backup); a personal one is stored.
+    /// Builds before the college fix wrote every planned catch-up, college ones included, to
+    /// defaults; launch removes that key so none stays in backup.
+    @Test func Boundary_legacyPlannedCatchUpsArePurgedOnLaunch() throws {
+        let defaults = try #require(UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)"))
+        let legacy = [PlannedCatchUp(personID: UUID(), start: monday)]
+        defaults.set(try JSONEncoder().encode(legacy), forKey: PeopleModel.legacyPlannedKey)
+        _ = try makeModel(defaults: defaults)
+        #expect(defaults.object(forKey: PeopleModel.legacyPlannedKey) == nil)
+    }
+
     @Test func Boundary_collegePlannedCatchUpNeverPersistedToDefaults() async throws {
         let collegeDefaults = try #require(UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)"))
         let college = try await readyModel(store: CollegeWeekStore(now: monday, calendar: calendar), count: 1, defaults: collegeDefaults)
