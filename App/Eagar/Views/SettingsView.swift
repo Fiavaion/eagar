@@ -26,7 +26,7 @@ struct SettingsView: View {
                         Button("Sync with this iCloud account") { Task { await model.confirmICloudAccount() } }
                             .frame(minHeight: 44)
                     } else {
-                        Label("Personal deadlines sync through your iCloud account. College data never does.", systemImage: "icloud")
+                        Label("Personal deadlines, subscriptions and people sync through your iCloud account. College data never does.", systemImage: "icloud")
                     }
                 } header: {
                     Text("iCloud")
@@ -43,6 +43,17 @@ struct SettingsView: View {
                 Text("Notifications")
             } footer: {
                 Text("Brief notifications show counts only. Personal deadline reminders show their title; college ones say \"College deadline\" without a title.")
+            }
+            Section {
+                NavigationLink {
+                    PilotMetricsView(metrics: model.pilotMetrics)
+                } label: {
+                    Label("Pilot metrics", systemImage: "chart.line.uptrend.xyaxis")
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("settings.pilotMetrics")
+            } header: {
+                Text("Pilot")
             }
         }
         .navigationTitle(Text("Settings"))
