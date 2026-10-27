@@ -227,7 +227,8 @@ public struct BriefLoan: Sendable, Hashable {
     public let id: String
     /// The loan's return deadline (``BriefDeadline/id``). While set, the loan is shown only
     /// while that deadline is in the brief's open deadlines (not done, not snoozed), and the
-    /// deadline is shown here instead of under Overdue or Coming up, so it never appears twice.
+    /// deadline is shown here instead of under Coming up, so it never appears twice. Once the
+    /// loan is overdue it is shown only as an overdue deadline (FR-DL-04).
     public let deadlineID: String?
     public let title: String
     public let dueAt: Date

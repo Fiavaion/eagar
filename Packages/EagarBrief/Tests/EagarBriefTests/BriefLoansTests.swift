@@ -33,13 +33,18 @@ struct BriefLoansTests {
         #expect(section.items[0].id == "loan.b1")
     }
 
-    @Test func overdueLoanSaysSoAndCanBeSnoozed() throws {
-        let brief = compose(loans: [loan("b1", "Camera kit", due: at(7))])
-        let item = try #require(brief.sections.first { $0.kind == .loans }?.items.first)
-        #expect(item.detail?.hasPrefix("Overdue") == true)
-        #expect(item.actions == [.done, .snooze, .open])
-        // Overdue loans stay in Loans due; Overdue holds only other deadlines.
-        #expect(!brief.sections.contains { $0.kind == .overdue })
+    /// FR-DL-04: an overdue loan is an overdue deadline (Reschedule, active notification), not
+    /// a Loans due item.
+    @Test func FR_DL_04_overdueLoanStaysInOverdue() throws {
+        let brief = compose(
+            deadlines: [deadline("d-loan", "Camera kit", due: at(7))],
+            loans: [loan("b1", "Camera kit", due: at(7), deadline: "d-loan")]
+        )
+        #expect(!brief.sections.contains { $0.kind == .loans })
+        let item = try #require(brief.sections.first { $0.kind == .overdue }?.items.first)
+        #expect(item.id == "deadline.d-loan")
+        #expect(item.actions == [.done, .snooze, .reschedule])
+        #expect(BriefNotificationContent.make(for: brief).level == .active)
     }
 
     @Test func FR_BOOK_04_clashShowsTheEarlierReturnTime() throws {

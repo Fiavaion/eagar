@@ -34,8 +34,9 @@ public enum BriefComposer {
                 )
             }
 
-        // A loan's return deadline is shown in Loans due, not twice.
-        let loanDeadlineIDs = Set(sources.loans.compactMap(\.deadlineID))
+        // A loan not yet due is shown in Loans due, not twice. An overdue loan stays an
+        // ordinary overdue deadline, with Reschedule and the active notification (FR-DL-04).
+        let loanDeadlineIDs = Set(sources.loans.filter { $0.dueAt > now }.compactMap(\.deadlineID))
         let plainDeadlines = deadlines.filter { !loanDeadlineIDs.contains($0.id) }
         // An all-day deadline (a Canvas due date) is due for the whole day: overdue only once
         // that day has ended.
@@ -133,20 +134,18 @@ public enum BriefComposer {
 
     // MARK: Loans (FR-BOOK-03, FR-BOOK-04)
 
-    /// Loans overdue or due within `horizon`, soonest first. A loan with a return deadline is
-    /// shown only while that deadline is open and not snoozed (it is in `openDeadlineIDs`).
-    /// The detail is the earlier return time when the due time clashes, else the location.
+    /// Loans due within `horizon` and not yet overdue, soonest first (overdue loans are in
+    /// Overdue, FR-DL-04). A loan with a return deadline is shown only while that deadline is
+    /// open and not snoozed (it is in `openDeadlineIDs`). The detail is the earlier return time
+    /// when the due time clashes, else the location.
     static func loanItems(_ loans: [BriefLoan], openDeadlineIDs: Set<String>, now: Date, horizon: TimeInterval, calendar: Calendar) -> [BriefItem] {
         loans
             .filter { loan in
-                loan.dueAt <= now.addingTimeInterval(horizon) && (loan.deadlineID.map(openDeadlineIDs.contains) ?? true)
+                loan.dueAt > now && loan.dueAt <= now.addingTimeInterval(horizon) && (loan.deadlineID.map(openDeadlineIDs.contains) ?? true)
             }
             .sorted { ($0.dueAt, $0.id) < ($1.dueAt, $1.id) }
             .map { loan in
-                let overdue = loan.dueAt <= now
-                let detail: String? = if overdue {
-                    String(localized: "Overdue: return it as soon as you can", bundle: .module)
-                } else if let proposed = loan.proposedReturn, proposed < loan.dueAt {
+                let detail: String? = if let proposed = loan.proposedReturn, proposed < loan.dueAt {
                     String(localized: "You are busy when it is due; return it by \(timeText(proposed, calendar: calendar))", bundle: .module)
                 } else if let location = loan.location, !location.isEmpty {
                     String(localized: "Return to \(location)", bundle: .module)
@@ -155,7 +154,7 @@ public enum BriefComposer {
                 }
                 return BriefItem(
                     id: "loan.\(loan.deadlineID ?? loan.id)", kind: .loan, title: loan.title, start: loan.dueAt,
-                    dataClass: loan.dataClass, actions: overdue ? [.done, .snooze, .open] : [.done, .open], detail: detail
+                    dataClass: loan.dataClass, actions: [.done, .open], detail: detail
                 )
             }
     }

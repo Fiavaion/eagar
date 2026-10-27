@@ -71,16 +71,6 @@
         }
       }
     },
-    "Overdue: return it as soon as you can": {
-      "localizations": {
-        "ga": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "[Óvérdúé: rétúrñ ít ás sóóñ ás ýóú çáñ ···············]"
-          }
-        }
-      }
-    },
     "Return to %@": {
       "localizations": {
         "ga": {
