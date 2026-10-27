@@ -9,11 +9,22 @@ struct EagarApp: App {
     @State private var notifications: NotificationResponder?
 
     init() {
-        let inMemory = UserDefaults.standard.bool(forKey: "EagarInMemoryStores")
+        // `-EagarDemoData YES`: synthetic trials, people and a rich demo week in memory, for
+        // screenshots (see DemoData); implies the three flags below.
+        let demo = DemoData.isEnabled
+        let inMemory = demo || UserDefaults.standard.bool(forKey: "EagarInMemoryStores")
         // `-EagarFakeCalendar YES`: synthetic calendars for UI tests and screenshots.
-        let eventStore: any EventStoreAdapting = UserDefaults.standard.bool(forKey: "EagarFakeCalendar") ? DemoEventStore() : EventKitAdapter()
+        let fakeCalendar = demo || UserDefaults.standard.bool(forKey: "EagarFakeCalendar")
+        let eventStore: any EventStoreAdapting = fakeCalendar ? DemoEventStore(richWeek: demo) : EventKitAdapter()
         do {
-            let services = try AppServices.make(inMemory: inMemory, eventStore: eventStore)
+            // Demo records never schedule real notifications.
+            let services = demo
+                ? try AppServices.make(
+                    inMemory: true, eventStore: eventStore, deadlineNotifications: DemoNotificationSink(),
+                    briefNotifications: DemoNotificationSink(), trialReminders: DemoNotificationSink(),
+                    birthdayNotifications: DemoNotificationSink()
+                )
+                : try AppServices.make(inMemory: inMemory, eventStore: eventStore)
             // App Intents (Shortcuts, Siri) reach the same services (FR-OS-03).
             AppDependencyManager.shared.add(dependency: services)
             let model = AppModel(services: services)

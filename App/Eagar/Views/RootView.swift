@@ -17,7 +17,7 @@ struct RootView: View {
     @State private var tab = UserDefaults.standard.string(forKey: "EagarInitialTab").flatMap(RootTab.init(rawValue:)) ?? .today
     /// First run (FR-CORE-05). `-EagarSkipOnboarding YES` skips it for UI tests.
     @State private var showingOnboarding = !UserDefaults.standard.bool(forKey: OnboardingView.completedKey)
-        && !UserDefaults.standard.bool(forKey: "EagarSkipOnboarding")
+        && !UserDefaults.standard.bool(forKey: "EagarSkipOnboarding") && !DemoData.isEnabled
 
     var body: some View {
         tabs
@@ -75,6 +75,7 @@ private struct RootTasks: ViewModifier {
     func body(content: Content) -> some View {
         content
             .task {
+                if DemoData.isEnabled { await DemoData.seed(model) }
                 await model.refreshLedger()
                 await model.startSync()
                 await model.appBecameActive()
