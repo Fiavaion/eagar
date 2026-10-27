@@ -62,6 +62,7 @@ final class PeopleModel {
     private let services: AppServices
     private let planner: PlannerModel
     private let repository: PeopleRepository
+    private let reader: any PeopleReading
     private let defaults: UserDefaults
     private let clock: any EagarClock
     private let calendar: Calendar
@@ -75,10 +76,16 @@ final class PeopleModel {
     /// How far back calendar events count as interactions.
     static let inferenceLookbackDays = 180
 
-    init(services: AppServices, planner: PlannerModel, defaults: UserDefaults, clock: any EagarClock, calendar: Calendar) {
+    /// `reader` defaults to PersonalStore; tests pass one that fails.
+    init(
+        services: AppServices, planner: PlannerModel, defaults: UserDefaults, clock: any EagarClock, calendar: Calendar,
+        reader: (any PeopleReading)? = nil
+    ) {
         self.services = services
         self.planner = planner
-        repository = PeopleRepository(stores: services.stores)
+        let repository = PeopleRepository(stores: services.stores)
+        self.repository = repository
+        self.reader = reader ?? repository
         self.defaults = defaults
         self.clock = clock
         self.calendar = calendar
@@ -125,21 +132,28 @@ final class PeopleModel {
     // MARK: Loading
 
     /// Launch, activation and calendar changes: records, inference, nudges and birthdays.
+    /// After a failed read nothing else runs, so pending birthday reminders are kept.
     func refresh() async {
-        await load()
+        guard await load() else { return }
         await loadEvents()
         await infer()
         planNudges()
         await reconcileBirthdays()
     }
 
-    func load() async {
+    /// Returns false when the read failed; the lists keep their last values and `failure` is set.
+    @discardableResult
+    func load() async -> Bool {
         do {
-            people = try await repository.people()
-            logs = try await repository.logs()
+            let people = try await reader.people()
+            let logs = try await reader.logs()
+            self.people = people
+            self.logs = logs
+            return true
         } catch {
             log.error("reading people failed: \(error)")
             failure = .read
+            return false
         }
     }
 
@@ -161,7 +175,7 @@ final class PeopleModel {
         inferences = result
         do {
             try await repository.apply(result)
-            people = try await repository.people()
+            people = try await reader.people()
         } catch {
             log.error("saving inferred interactions failed: \(StoreFailureKind(error))")
         }
@@ -354,15 +368,17 @@ final class PeopleModel {
 
     // MARK: Birthdays (FR-PEOPLE-06)
 
-    func reconcileBirthdays() async {
+    private func reconcileBirthdays() async {
         await BirthdayNotificationSync.sync(people: people.map(\.snapshot), now: now, scheduler: services.birthdayNotifications, calendar: calendar)
     }
 
+    /// After a failed read, inference, nudges and birthday reminders are left as they were.
     private func changed() async {
-        await load()
-        await infer()
-        planNudges()
-        await reconcileBirthdays()
+        if await load() {
+            await infer()
+            planNudges()
+            await reconcileBirthdays()
+        }
         onChange?()
         await services.sync?.syncLocalChanges()
     }

@@ -4,10 +4,16 @@ import EagarStore
 import Foundation
 import SwiftData
 
+/// Reads every trial. `TrialRepository` is the app's reader; tests substitute one that fails,
+/// to check that a failed read changes nothing else.
+protocol TrialReading: Sendable {
+    func all() async throws(StoreError) -> [TrialSnapshot]
+}
+
 /// Reads and changes `Trial` records in PersonalStore. Trials are personal (Mark enters or
 /// imports them himself), so CollegeStore never holds one. Not main-actor isolated, so its
 /// closures run on the store's own executor.
-struct TrialRepository: Sendable {
+struct TrialRepository: TrialReading {
     let stores: EagarStores
 
     func all() async throws(StoreError) -> [TrialSnapshot] {

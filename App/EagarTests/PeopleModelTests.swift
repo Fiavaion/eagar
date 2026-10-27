@@ -3,6 +3,7 @@ import EagarCalendar
 import EagarCore
 import EagarMoney
 import EagarPeople
+import EagarStore
 import Foundation
 import Synchronization
 import Testing
@@ -13,12 +14,22 @@ private struct FixedClock: EagarClock {
     func now() -> Date { date }
 }
 
+/// A people reader whose every read fails.
+private struct FailingPeopleReader: PeopleReading {
+    func people() async throws(StoreError) -> [PersonRecord] { throw .fetchFailed(.personal) }
+    func logs() async throws(StoreError) -> [ContactLogSnapshot] { throw .fetchFailed(.personal) }
+}
+
 /// Records birthday notification calls.
 final class SpyBirthdays: BirthdayNotificationScheduling {
     let pending = Mutex<[String: PlannedBirthdayNotification]>([:])
+    let removed = Mutex<[String]>([])
     func pendingIdentifiers() async -> [String] { pending.withLock { Array($0.keys) } }
     func add(_ planned: PlannedBirthdayNotification) async throws { pending.withLock { $0[planned.id] = planned } }
-    func remove(identifiers: [String]) async { pending.withLock { p in identifiers.forEach { p[$0] = nil } } }
+    func remove(identifiers: [String]) async {
+        removed.withLock { $0 += identifiers }
+        pending.withLock { p in identifiers.forEach { p[$0] = nil } }
+    }
 }
 
 /// Records widget snapshots.
@@ -197,6 +208,29 @@ struct PeopleModelTests {
         let id = try #require(model.people.people.first?.id)
         await model.people.delete(id)
         #expect(birthdays.pending.withLock { $0.isEmpty })
+    }
+
+    /// FR-PEOPLE-06: a failed read leaves every pending birthday reminder alone and shows the
+    /// error, on refresh and after a change.
+    @Test func FR_PEOPLE_06_failedReadKeepsBirthdayReminders() async throws {
+        let model = try makeModel()
+        await model.people.add([ContactImport(contactIdentifier: "x", displayName: "Niamh", birthday: Birthday(month: 11, day: 2))])
+        let before = birthdays.pending.withLock { Set($0.keys) }
+        #expect(before.count == 1)
+        let id = try #require(model.people.people.first?.id)
+        birthdays.removed.withLock { $0.removeAll() }
+
+        let failing = PeopleModel(
+            services: model.services, planner: model.planner, defaults: UserDefaults(suiteName: "eagar.people.\(UUID().uuidString)")!,
+            clock: FixedClock(date: monday), calendar: calendar, reader: FailingPeopleReader()
+        )
+        await failing.refresh()
+        #expect(failing.failure == .read)
+        #expect(birthdays.removed.withLock { $0.isEmpty })
+
+        await failing.logContact(id)
+        #expect(birthdays.removed.withLock { $0.isEmpty })
+        #expect(birthdays.pending.withLock { Set($0.keys) } == before)
     }
 
     @Test func notesAreKeptAndManualLogsMoveLastContact() async throws {
