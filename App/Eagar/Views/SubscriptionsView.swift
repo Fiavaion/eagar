@@ -242,7 +242,8 @@ private struct TrialRow: View {
                 Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
             }
             .menuIndicator(.hidden)
-            .fixedSize()
+            .menuStyle(.button)
+            .buttonStyle(.borderless)
             .accessibilityLabel(Text("More actions for \(trial.service)"))
         }
         .swipeActions(edge: .trailing) {
@@ -298,7 +299,7 @@ struct TrialEditor: View {
                             }
                         }
                         .labelsHidden()
-                        .fixedSize()
+                        .fixedSize(horizontal: true, vertical: false)
                     }
                     Picker("Billed", selection: $draft.period) {
                         ForEach(BillingPeriod.allCases, id: \.self) { Text(MoneyText.period($0)).tag($0) }

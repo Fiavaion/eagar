@@ -133,7 +133,8 @@ private struct TrialDeadlineRowView: View {
                 Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
             }
             .menuIndicator(.hidden)
-            .fixedSize()
+            .menuStyle(.button)
+            .buttonStyle(.borderless)
             .accessibilityLabel(Text("More actions for \(row.snapshot.title)"))
         }
         .accessibilityElement(children: .contain)
@@ -230,7 +231,8 @@ private struct DeadlineRowView: View {
                 Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
             }
             .menuIndicator(.hidden)
-            .fixedSize()
+            .menuStyle(.button)
+            .buttonStyle(.borderless)
             .accessibilityLabel(Text("More actions for \(snapshot.title)"))
         }
     }

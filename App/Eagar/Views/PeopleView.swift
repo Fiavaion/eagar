@@ -114,22 +114,30 @@ struct NudgeActionButtons: View {
         secondary
     }
 
+    // D-047: no `.fixedSize()` on buttons or menus in an iOS 26 List row (icon-only labels and
+    // tall gaps); the labels fix their own width and menus are borderless buttons.
     @ViewBuilder private var primary: some View {
         Button {
             perform(.plan)
         } label: {
-            Label("Plan", systemImage: "calendar.badge.plus").frame(minHeight: 44)
+            Label("Plan", systemImage: "calendar.badge.plus")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
         .buttonStyle(.borderless)
-        .fixedSize()
         .accessibilityLabel(Text("Plan a catch-up with \(name)"))
         Button {
             perform(.logContact(at: .now))
         } label: {
-            Label("We talked", systemImage: "checkmark.bubble").frame(minHeight: 44)
+            Label("We talked", systemImage: "checkmark.bubble")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
         .buttonStyle(.borderless)
-        .fixedSize()
         .accessibilityLabel(Text("Log that you talked to \(name)"))
     }
 
@@ -139,18 +147,28 @@ struct NudgeActionButtons: View {
                 Button { perform(.snooze(days: days)) } label: { Text(PersonLabels.snooze(days)) }
             }
         } label: {
-            Label("Snooze", systemImage: "moon.zzz").frame(minHeight: 44)
+            Label("Snooze", systemImage: "moon.zzz")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
-        .fixedSize()
+        .menuStyle(.button)
+        .buttonStyle(.borderless)
         .accessibilityLabel(Text("Snooze suggestions for \(name)"))
         Menu {
             ForEach(Self.cadenceChoices, id: \.self) { days in
                 Button { perform(.changeCadence(days: days)) } label: { Text(PersonLabels.cadence(days)) }
             }
         } label: {
-            Label("Cadence", systemImage: "arrow.triangle.2.circlepath").frame(minHeight: 44)
+            Label("Cadence", systemImage: "arrow.triangle.2.circlepath")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
-        .fixedSize()
+        .menuStyle(.button)
+        .buttonStyle(.borderless)
         .accessibilityLabel(Text("Change how often to see \(name)"))
     }
 }
@@ -228,7 +246,8 @@ private struct PersonRow: View {
                 Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
             }
             .menuIndicator(.hidden)
-            .fixedSize()
+            .menuStyle(.button)
+            .buttonStyle(.borderless)
             .accessibilityLabel(Text("More actions for \(record.snapshot.displayName)"))
         }
         .swipeActions(edge: .leading) {
