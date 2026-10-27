@@ -8,5 +8,8 @@ struct EagarWidgetsBundle: WidgetBundle {
         NextDeadlineWidget()
         KillSwitchControl()
         StartBriefControl()
+        #if os(iOS)
+        LoanLiveActivityWidget()
+        #endif
     }
 }
