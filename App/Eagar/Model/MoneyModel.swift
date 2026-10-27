@@ -113,13 +113,17 @@ final class MoneyModel {
 
     private let services: AppServices
     private let repository: TrialRepository
+    private let reader: any TrialReading
     private let clock: any EagarClock
     private let calendar: Calendar
     private let log = EagarLog(.money)
 
-    init(services: AppServices, clock: any EagarClock, calendar: Calendar) {
+    /// `reader` defaults to PersonalStore; tests pass one that fails.
+    init(services: AppServices, clock: any EagarClock, calendar: Calendar, reader: (any TrialReading)? = nil) {
         self.services = services
-        repository = TrialRepository(stores: services.stores)
+        let repository = TrialRepository(stores: services.stores)
+        self.repository = repository
+        self.reader = reader ?? repository
         self.clock = clock
         self.calendar = calendar
     }
@@ -147,23 +151,28 @@ final class MoneyModel {
     // MARK: Loading
 
     /// Launch and activation: reload, reconcile reminders, pick up share-extension imports.
+    /// After a failed read the pending reminders are kept.
     func refresh() async {
-        await load()
-        await reconcileReminders()
+        if await load() { await reconcileReminders() }
         checkPendingImports()
     }
 
-    func load() async {
+    /// Returns false when the read failed; the list keeps its last value and `failure` is set.
+    @discardableResult
+    func load() async -> Bool {
         do {
-            trials = try await repository.all()
+            trials = try await reader.all()
+            return true
         } catch {
             log.error("reading trials failed: \(error)")
             failure = .read
+            return false
         }
     }
 
-    /// Removes stale reminders and schedules every planned one (FR-TRIAL-02).
-    func reconcileReminders() async {
+    /// Removes stale reminders and schedules every planned one (FR-TRIAL-02). Only after a
+    /// successful read: an empty list from a failed one would remove every reminder.
+    private func reconcileReminders() async {
         await TrialReminderSync.sync(trials: trials, now: now, scheduler: services.trialReminders, calendar: calendar)
     }
 
@@ -241,8 +250,7 @@ final class MoneyModel {
     }
 
     private func changed() async {
-        await load()
-        await reconcileReminders()
+        if await load() { await reconcileReminders() }
         onChange?()
         await services.sync?.syncLocalChanges()
     }

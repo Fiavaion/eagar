@@ -180,8 +180,8 @@ public enum NudgePlanner {
 
 /// How much of the weekly budget is already spent.
 public enum NudgeBudget {
-    /// Contact logs that fall inside `week`. Add catch-ups Mark planned from nudges this week
-    /// (events not yet past) to get the planner's `alreadyCommitted`.
+    /// Contact logs that fall inside `week`. Add catch-ups Mark planned from nudges for this
+    /// week (started or not) to get the planner's `alreadyCommitted`.
     public static func loggedContacts(_ logs: [ContactLogSnapshot], in week: DateInterval) -> Int {
         logs.filter { $0.occurredAt >= week.start && $0.occurredAt < week.end }.count
     }

@@ -13,10 +13,17 @@ struct PersonRecord: Sendable, Hashable, Identifiable {
     var id: UUID { snapshot.id }
 }
 
+/// Reads people and contact logs. `PeopleRepository` is the app's reader; tests substitute
+/// one that fails, to check that a failed read changes nothing else.
+protocol PeopleReading: Sendable {
+    func people() async throws(StoreError) -> [PersonRecord]
+    func logs() async throws(StoreError) -> [ContactLogSnapshot]
+}
+
 /// Reads and changes `Person` and `ContactLog` records in PersonalStore. Keep-in-touch
 /// records are personal by construction (BD-26); college-derived interaction dates are never
 /// written to them. Not main-actor isolated, so closures run on the store's executor.
-struct PeopleRepository: Sendable {
+struct PeopleRepository: PeopleReading {
     let stores: EagarStores
 
     func people() async throws(StoreError) -> [PersonRecord] {

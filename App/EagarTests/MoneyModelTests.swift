@@ -1,6 +1,7 @@
 import EagarCalendar
 import EagarCore
 import EagarMoney
+import EagarStore
 import Foundation
 import Synchronization
 import Testing
@@ -14,9 +15,18 @@ private struct FixedClock: EagarClock {
 /// Records trial reminder calls.
 final class SpyTrialReminders: TrialReminderScheduling {
     let pending = Mutex<[String: PlannedTrialReminder]>([:])
+    let removed = Mutex<[String]>([])
     func pendingIdentifiers() async -> [String] { pending.withLock { Array($0.keys) } }
     func add(_ planned: PlannedTrialReminder) async throws { pending.withLock { $0[planned.id] = planned } }
-    func remove(identifiers: [String]) async { pending.withLock { p in identifiers.forEach { p[$0] = nil } } }
+    func remove(identifiers: [String]) async {
+        removed.withLock { $0 += identifiers }
+        pending.withLock { p in identifiers.forEach { p[$0] = nil } }
+    }
+}
+
+/// A trial reader whose every read fails.
+private struct FailingTrialReader: TrialReading {
+    func all() async throws(StoreError) -> [TrialSnapshot] { throw .fetchFailed(.personal) }
 }
 
 /// Records deadline notification calls.
@@ -88,6 +98,25 @@ struct MoneyModelTests {
         #expect(model.money.trial(id)?.status == .cancelled)
         #expect(trialReminders.pending.withLock { $0.isEmpty })
         #expect(model.planner.upcomingDeadlines.allSatisfy { $0.id != id })
+    }
+
+    /// FR-TRIAL-02: a failed read leaves every pending trial reminder alone and shows the
+    /// error, on refresh and after a change.
+    @Test func FR_TRIAL_02_failedReadKeepsPendingReminders() async throws {
+        let model = try makeModel()
+        #expect(await model.money.save(draft(model)))
+        let before = trialReminders.pending.withLock { Set($0.keys) }
+        #expect(before.count == 4)
+        trialReminders.removed.withLock { $0.removeAll() }
+
+        let failing = MoneyModel(services: model.services, clock: FixedClock(date: morning), calendar: calendar, reader: FailingTrialReader())
+        await failing.refresh()
+        #expect(failing.failure == .read)
+        #expect(trialReminders.removed.withLock { $0.isEmpty })
+
+        #expect(await failing.save(draft(model, service: "Other")))
+        #expect(trialReminders.removed.withLock { $0.isEmpty })
+        #expect(trialReminders.pending.withLock { Set($0.keys) } == before)
     }
 
     @Test func trialsAboutToBillReachTheBrief() async throws {
