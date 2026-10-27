@@ -116,6 +116,27 @@
         "identifier": "EagarPeopleTests",
         "name": "EagarPeopleTests"
       }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarFeeds",
+        "identifier": "EagarFeedsTests",
+        "name": "EagarFeedsTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarBookings",
+        "identifier": "EagarBookingsTests",
+        "name": "EagarBookingsTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:../Packages/EagarCanvas",
+        "identifier": "EagarCanvasTests",
+        "name": "EagarCanvasTests"
+      }
     }
   ],
   "version": 1
