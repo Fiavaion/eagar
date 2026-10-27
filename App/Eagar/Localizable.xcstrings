@@ -1,12 +1,72 @@
 {
   "sourceLanguage": "en-GB",
   "strings": {
+    "%@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%@ ··]"
+          }
+        }
+      }
+    },
+    "%@ · %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%@ · %@ ···]"
+          }
+        }
+      }
+    },
+    "%lld days before": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%lld dáýs béfóré ······]"
+          }
+        }
+      }
+    },
+    "%lld min": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%lld míñ ···]"
+          }
+        }
+      }
+    },
     "%lld minutes before": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[%lld míñútés béfóré ········]"
+          }
+        }
+      }
+    },
+    "%lld pickups": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%lld píçkúps ·····]"
+          }
+        }
+      }
+    },
+    "%lld · %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[%lld · %@ ····]"
           }
         }
       }
@@ -171,6 +231,16 @@
         }
       }
     },
+    "Active": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áçtívé ··]"
+          }
+        }
+      }
+    },
     "Add": {
       "localizations": {
         "ga": {
@@ -201,6 +271,36 @@
         }
       }
     },
+    "Add a free trial or subscription and Eagar reminds you 7, 3 and 1 days before you need to cancel, and on the day.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd á fréé tríál ór súbsçríptíóñ áñd Éágár rémíñds ýóú 7, 3 áñd 1 dáýs béfóré ýóú ñééd tó çáñçél, áñd óñ thé dáý. ·············································]"
+          }
+        }
+      }
+    },
+    "Add a trial": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd á tríál ····]"
+          }
+        }
+      }
+    },
+    "Add a week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd á wéék ····]"
+          }
+        }
+      }
+    },
     "Add deadline": {
       "localizations": {
         "ga": {
@@ -211,12 +311,92 @@
         }
       }
     },
+    "Add manually": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd máñúállý ·····]"
+          }
+        }
+      }
+    },
+    "Add people and Eagar suggests catch-ups in your free time.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd péóplé áñd Éágár súggésts çátçh-úps íñ ýóúr fréé tímé. ·······················]"
+          }
+        }
+      }
+    },
+    "Add someone": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd sóméóñé ····]"
+          }
+        }
+      }
+    },
+    "Add subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd súbsçríptíóñ ······]"
+          }
+        }
+      }
+    },
+    "Add to Eagar": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd tó Éágár ·····]"
+          }
+        }
+      }
+    },
+    "Add trial": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd tríál ····]"
+          }
+        }
+      }
+    },
     "Added.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Áddéd. ··]"
+          }
+        }
+      }
+    },
+    "Added. Eagar will remind you before it bills.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Áddéd. Éágár wíll rémíñd ýóú béfóré ít bílls. ··················]"
+          }
+        }
+      }
+    },
+    "Adds a free trial or subscription to Eagar and reminds you before it bills.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádds á fréé tríál ór súbsçríptíóñ tó Éágár áñd rémíñds ýóú béfóré ít bílls. ······························]"
           }
         }
       }
@@ -351,12 +531,42 @@
         }
       }
     },
+    "Average per week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ávérágé pér wéék ······]"
+          }
+        }
+      }
+    },
     "Before you start": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Béfóré ýóú stárt ······]"
+          }
+        }
+      }
+    },
+    "Billed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bílléd ··]"
+          }
+        }
+      }
+    },
+    "Birthday": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bírthdáý ···]"
           }
         }
       }
@@ -417,6 +627,36 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Bríéf tímés ····]"
+          }
+        }
+      }
+    },
+    "By name": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Bý ñámé ···]"
+          }
+        }
+      }
+    },
+    "Cadence": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çádéñçé ···]"
+          }
+        }
+      }
+    },
+    "Cadence changed": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çádéñçé çháñgéd ······]"
           }
         }
       }
@@ -501,12 +741,172 @@
         }
       }
     },
+    "Cancel by": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél bý ····]"
+          }
+        }
+      }
+    },
+    "Cancel by %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél bý %@ ·····]"
+          }
+        }
+      }
+    },
+    "Cancel page (optional)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél págé (óptíóñál) ·········]"
+          }
+        }
+      }
+    },
+    "Cancel page opened": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél págé ópéñéd ·······]"
+          }
+        }
+      }
+    },
+    "Cancel-by is the renewal date minus the safety margin.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél-bý ís thé réñéwál dáté míñús thé sáfétý márgíñ. ······················]"
+          }
+        }
+      }
+    },
+    "Cancelled": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçélléd ····]"
+          }
+        }
+      }
+    },
+    "Cancelled %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçélléd %@ ·····]"
+          }
+        }
+      }
+    },
+    "Cancelling": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçéllíñg ····]"
+          }
+        }
+      }
+    },
+    "Cancel…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çáñçél… ···]"
+          }
+        }
+      }
+    },
+    "Catch-ups left this week: %lld. Suggestions use real gaps in your calendar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çátçh-úps léft thís wéék: %lld. Súggéstíóñs úsé réál gáps íñ ýóúr çáléñdár. ······························]"
+          }
+        }
+      }
+    },
+    "Change how often to see %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çháñgé hów óftéñ tó séé %@ ··········]"
+          }
+        }
+      }
+    },
+    "Change how often to see this person": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çháñgé hów óftéñ tó séé thís pérsóñ ··············]"
+          }
+        }
+      }
+    },
+    "Charges this month": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çhárgés thís móñth ·······]"
+          }
+        }
+      }
+    },
     "Check your calendars": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çhéçk ýóúr çáléñdárs ········]"
+          }
+        }
+      }
+    },
+    "Choose people from Contacts": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çhóósé péóplé fróm Çóñtáçts ···········]"
+          }
+        }
+      }
+    },
+    "Choose someone from Contacts…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çhóósé sóméóñé fróm Çóñtáçts… ············]"
+          }
+        }
+      }
+    },
+    "Choose the people you want to keep in touch with. Eagar never reads contact notes.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çhóósé thé péóplé ýóú wáñt tó kéép íñ tóúçh wíth. Éágár ñévér réáds çóñtáçt ñótés. ·································]"
           }
         }
       }
@@ -681,6 +1081,16 @@
         }
       }
     },
+    "College signals": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóllégé sígñáls ······]"
+          }
+        }
+      }
+    },
     "College, stays on your devices": {
       "localizations": {
         "ga": {
@@ -711,6 +1121,16 @@
         }
       }
     },
+    "Confirm subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóñfírm súbsçríptíóñ ········]"
+          }
+        }
+      }
+    },
     "Confirm tags": {
       "localizations": {
         "ga": {
@@ -727,6 +1147,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Çóñfírm thát ýóú wáñt tó érásé príváçý lédgér éñtríés. ······················]"
+          }
+        }
+      }
+    },
+    "Contacts access is off. You can turn it on in Settings, or add people by name.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóñtáçts áççéss ís óff. Ýóú çáñ túrñ ít óñ íñ Séttíñgs, ór ádd péóplé bý ñámé. ·······························]"
           }
         }
       }
@@ -761,6 +1191,16 @@
         }
       }
     },
+    "Count college calendar events": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çóúñt çóllégé çáléñdár évéñts ············]"
+          }
+        }
+      }
+    },
     "Create a dedicated workspace for Eagar with a monthly spend limit, then create a key in it that expires. Use a separate key on each device, so you can revoke one without affecting the others.": {
       "localizations": {
         "ga": {
@@ -771,12 +1211,32 @@
         }
       }
     },
+    "Currency": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Çúrréñçý ···]"
+          }
+        }
+      }
+    },
     "Data class": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Dátá çláss ····]"
+          }
+        }
+      }
+    },
+    "Dates": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dátés ··]"
           }
         }
       }
@@ -821,12 +1281,32 @@
         }
       }
     },
+    "Delete subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Délété súbsçríptíóñ ········]"
+          }
+        }
+      }
+    },
     "Delete this deadline?": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Délété thís déádlíñé? ········]"
+          }
+        }
+      }
+    },
+    "Delete this subscription?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Délété thís súbsçríptíóñ? ··········]"
           }
         }
       }
@@ -847,6 +1327,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Détáíl ··]"
+          }
+        }
+      }
+    },
+    "Did you cancel %@?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Díd ýóú çáñçél %@? ·······]"
+          }
+        }
+      }
+    },
+    "Discard": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dísçárd ···]"
           }
         }
       }
@@ -941,6 +1441,16 @@
         }
       }
     },
+    "Eagar could not add the catch-up to your calendar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót ádd thé çátçh-úp tó ýóúr çáléñdár. ····················]"
+          }
+        }
+      }
+    },
     "Eagar could not add the reminder.": {
       "localizations": {
         "ga": {
@@ -981,6 +1491,26 @@
         }
       }
     },
+    "Eagar could not read that image.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád thát ímágé. ·············]"
+          }
+        }
+      }
+    },
+    "Eagar could not read the contacts you chose.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád thé çóñtáçts ýóú çhósé. ··················]"
+          }
+        }
+      }
+    },
     "Eagar could not read the privacy ledger.": {
       "localizations": {
         "ga": {
@@ -1011,12 +1541,42 @@
         }
       }
     },
+    "Eagar could not read your people.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád ýóúr péóplé. ·············]"
+          }
+        }
+      }
+    },
+    "Eagar could not read your subscriptions.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót réád ýóúr súbsçríptíóñs. ················]"
+          }
+        }
+      }
+    },
     "Eagar could not remove a mirrored reminder. It will try again the next time it refreshes.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár çóúld ñót rémóvé á mírróréd rémíñdér. Ít wíll trý ágáíñ thé ñéxt tímé ít réfréshés. ····································]"
+          }
+        }
+      }
+    },
+    "Eagar could not save that change.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thát çháñgé. ·············]"
           }
         }
       }
@@ -1047,6 +1607,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár çóúld ñót sávé thé évéñt. ············]"
+          }
+        }
+      }
+    },
+    "Eagar could not save the subscription.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thé súbsçríptíóñ. ···············]"
+          }
+        }
+      }
+    },
+    "Eagar could not save this item. Try again, or add it in Eagar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thís ítém. Trý ágáíñ, ór ádd ít íñ Éágár. ·························]"
           }
         }
       }
@@ -1091,6 +1671,26 @@
         }
       }
     },
+    "Eagar found no subscription details in this item.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár fóúñd ñó súbsçríptíóñ détáíls íñ thís ítém. ····················]"
+          }
+        }
+      }
+    },
+    "Eagar found no text in that image. Try a clearer screenshot of the receipt or confirmation.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár fóúñd ñó téxt íñ thát ímágé. Trý á çléárér sçrééñshót óf thé réçéípt ór çóñfírmátíóñ. ····································]"
+          }
+        }
+      }
+    },
     "Eagar gathers your calendars and deadlines into one brief, delivered at a natural break in your day.": {
       "localizations": {
         "ga": {
@@ -1111,6 +1711,16 @@
         }
       }
     },
+    "Eagar reads only the name, email addresses and birthday of the people you choose, never their notes.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár réáds óñlý thé ñámé, émáíl áddréssés áñd bírthdáý óf thé péóplé ýóú çhóósé, ñévér théír ñótés. ········································]"
+          }
+        }
+      }
+    },
     "Eagar reads your calendars to build your brief and find free time, and reads your reminder lists so you can mirror deadlines to them. It adds events and reminders only when you ask.": {
       "localizations": {
         "ga": {
@@ -1121,12 +1731,42 @@
         }
       }
     },
+    "Eagar records a cancellation only when you confirm it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár réçórds á çáñçéllátíóñ óñlý whéñ ýóú çóñfírm ít. ······················]"
+          }
+        }
+      }
+    },
     "Eagar uses your own Claude API key for personal data you choose to send to Claude. College data never leaves your devices.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Éágár úsés ýóúr ówñ Çláúdé ÁPÍ kéý fór pérsóñál dátá ýóú çhóósé tó séñd tó Çláúdé. Çóllégé dátá ñévér léávés ýóúr dévíçés. ·················································]"
+          }
+        }
+      }
+    },
+    "Eagar will ask you to confirm %@ the next time you open it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár wíll ásk ýóú tó çóñfírm %@ thé ñéxt tímé ýóú ópéñ ít. ························]"
+          }
+        }
+      }
+    },
+    "Eagar will ask you to confirm the subscription the next time you open it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár wíll ásk ýóú tó çóñfírm thé súbsçríptíóñ thé ñéxt tímé ýóú ópéñ ít. ·····························]"
           }
         }
       }
@@ -1147,6 +1787,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Édít déádlíñé ·····]"
+          }
+        }
+      }
+    },
+    "Edit person": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Édít pérsóñ ····]"
+          }
+        }
+      }
+    },
+    "Edit subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Édít súbsçríptíóñ ·······]"
           }
         }
       }
@@ -1251,12 +1911,82 @@
         }
       }
     },
+    "Every %lld days": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý %lld dáýs ······]"
+          }
+        }
+      }
+    },
+    "Every 2 months": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý 2 móñths ······]"
+          }
+        }
+      }
+    },
+    "Every 2 weeks": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý 2 wééks ·····]"
+          }
+        }
+      }
+    },
+    "Every 3 months": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý 3 móñths ······]"
+          }
+        }
+      }
+    },
+    "Every 6 months": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý 6 móñths ······]"
+          }
+        }
+      }
+    },
     "Every call off this device is in the privacy ledger.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Évérý çáll óff thís dévíçé ís íñ thé príváçý lédgér. ·····················]"
+          }
+        }
+      }
+    },
+    "Every month": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý móñth ····]"
+          }
+        }
+      }
+    },
+    "Every week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Évérý wéék ····]"
           }
         }
       }
@@ -1331,12 +2061,62 @@
         }
       }
     },
+    "For %lld weeks": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fór %lld wééks ······]"
+          }
+        }
+      }
+    },
+    "For a week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fór á wéék ····]"
+          }
+        }
+      }
+    },
+    "Free trial": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fréé tríál ····]"
+          }
+        }
+      }
+    },
     "From": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Fróm ··]"
+          }
+        }
+      }
+    },
+    "From Contacts": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fróm Çóñtáçts ·····]"
+          }
+        }
+      }
+    },
+    "From Screen Time, add the total minutes and pickups for Gmail, Mail, Outlook, Calendar, Podcasts, YouTube, Canvas and Safari (cdbooking). Two weeks before the mail milestone make the baseline.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Fróm Sçrééñ Tímé, ádd thé tótál míñútés áñd píçkúps fór Gmáíl, Máíl, Óútlóók, Çáléñdár, Pódçásts, ÝóúTúbé, Çáñvás áñd Sáfárí (çdbóókíñg). Twó wééks béfóré thé máíl míléstóñé máké thé básélíñé. ·············································································]"
           }
         }
       }
@@ -1361,6 +2141,16 @@
         }
       }
     },
+    "How often": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Hów óftéñ ····]"
+          }
+        }
+      }
+    },
     "How to create an API key": {
       "localizations": {
         "ga": {
@@ -1377,6 +2167,46 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Hów tó sét úp á wórkspáçé áñd spéñd límít ················]"
+          }
+        }
+      }
+    },
+    "I've cancelled %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Í'vé çáñçélléd %@ ·······]"
+          }
+        }
+      }
+    },
+    "I've cancelled it": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Í'vé çáñçélléd ít ·······]"
+          }
+        }
+      }
+    },
+    "Import a screenshot": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ímpórt á sçrééñshót ········]"
+          }
+        }
+      }
+    },
+    "Import an image file": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ímpórt áñ ímágé fílé ········]"
           }
         }
       }
@@ -1481,6 +2311,16 @@
         }
       }
     },
+    "Last in touch %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lást íñ tóúçh %@ ······]"
+          }
+        }
+      }
+    },
     "Leave empty for no limit. Set a hard limit on the workspace in Claude Console as well.": {
       "localizations": {
         "ga": {
@@ -1561,6 +2401,66 @@
         }
       }
     },
+    "Log contact": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóg çóñtáçt ····]"
+          }
+        }
+      }
+    },
+    "Log that you talked to %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóg thát ýóú tálkéd tó %@ ··········]"
+          }
+        }
+      }
+    },
+    "Log that you were in touch": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóg thát ýóú wéré íñ tóúçh ··········]"
+          }
+        }
+      }
+    },
+    "Logged": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóggéd ··]"
+          }
+        }
+      }
+    },
+    "Logged contact": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóggéd çóñtáçt ······]"
+          }
+        }
+      }
+    },
+    "Logged.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Lóggéd. ···]"
+          }
+        }
+      }
+    },
     "MCP call": {
       "localizations": {
         "ga": {
@@ -1591,6 +2491,16 @@
         }
       }
     },
+    "Mark as active again": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Márk ás áçtívé ágáíñ ········]"
+          }
+        }
+      }
+    },
     "Meitheal (NCAD)": {
       "localizations": {
         "ga": {
@@ -1607,6 +2517,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Míddáý bríéf ·····]"
+          }
+        }
+      }
+    },
+    "Minutes": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Míñútés ···]"
           }
         }
       }
@@ -1647,6 +2567,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Módéls ··]"
+          }
+        }
+      }
+    },
+    "Monthly": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Móñthlý ···]"
           }
         }
       }
@@ -1731,6 +2661,16 @@
         }
       }
     },
+    "Name": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñámé ··]"
+          }
+        }
+      }
+    },
     "New deadline": {
       "localizations": {
         "ga": {
@@ -1761,6 +2701,16 @@
         }
       }
     },
+    "New subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñéw súbsçríptíóñ ······]"
+          }
+        }
+      }
+    },
     "Next deadline": {
       "localizations": {
         "ga": {
@@ -1787,6 +2737,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñó çáléñdárs fóúñd. ········]"
+          }
+        }
+      }
+    },
+    "No catch-ups to suggest this week.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó çátçh-úps tó súggést thís wéék. ··············]"
+          }
+        }
+      }
+    },
+    "No contact yet": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó çóñtáçt ýét ······]"
           }
         }
       }
@@ -1831,6 +2801,46 @@
         }
       }
     },
+    "No people yet": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó péóplé ýét ·····]"
+          }
+        }
+      }
+    },
+    "No subscriptions": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó súbsçríptíóñs ······]"
+          }
+        }
+      }
+    },
+    "No weeks yet.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñó wééks ýét. ·····]"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñóñé ··]"
+          }
+        }
+      }
+    },
     "Not now": {
       "localizations": {
         "ga": {
@@ -1847,6 +2857,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ñót úséfúl ····]"
+          }
+        }
+      }
+    },
+    "Not yet": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñót ýét ···]"
+          }
+        }
+      }
+    },
+    "Notes": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ñótés ··]"
           }
         }
       }
@@ -1902,6 +2932,7 @@
       }
     },
     "Notifications show counts only. College deadlines say \"College deadline\" without a title.": {
+      "extractionState": "stale",
       "localizations": {
         "ga": {
           "stringUnit": {
@@ -1951,6 +2982,16 @@
         }
       }
     },
+    "On the cancel-by day": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Óñ thé çáñçél-bý dáý ········]"
+          }
+        }
+      }
+    },
     "On this device": {
       "localizations": {
         "ga": {
@@ -1987,6 +3028,26 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Ópéñ %@ ···]"
+          }
+        }
+      }
+    },
+    "Open the cancel page": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ thé çáñçél págé ········]"
+          }
+        }
+      }
+    },
+    "Open the cancel page for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ópéñ thé çáñçél págé fór %@ ···········]"
           }
         }
       }
@@ -2081,6 +3142,36 @@
         }
       }
     },
+    "People": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Péóplé ··]"
+          }
+        }
+      }
+    },
+    "Per month": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pér móñth ····]"
+          }
+        }
+      }
+    },
+    "Person": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñ ··]"
+          }
+        }
+      }
+    },
     "Personal": {
       "localizations": {
         "ga": {
@@ -2097,6 +3188,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Pérsóñál déádlíñés sýñç thróúgh ýóúr íÇlóúd áççóúñt. Çóllégé dátá ñévér dóés. ·······························]"
+          }
+        }
+      }
+    },
+    "Personal deadlines, subscriptions and people sync through your iCloud account. College data never does.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pérsóñál déádlíñés, súbsçríptíóñs áñd péóplé sýñç thróúgh ýóúr íÇlóúd áççóúñt. Çóllégé dátá ñévér dóés. ·········································]"
           }
         }
       }
@@ -2131,12 +3232,102 @@
         }
       }
     },
+    "Pickups": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Píçkúps ···]"
+          }
+        }
+      }
+    },
+    "Pilot": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pílót ··]"
+          }
+        }
+      }
+    },
+    "Pilot metrics": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pílót métríçs ·····]"
+          }
+        }
+      }
+    },
+    "Plan": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pláñ ··]"
+          }
+        }
+      }
+    },
+    "Plan a catch-up with %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pláñ á çátçh-úp wíth %@ ·········]"
+          }
+        }
+      }
+    },
+    "Plan this catch-up": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pláñ thís çátçh-úp ·······]"
+          }
+        }
+      }
+    },
+    "Planned": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Pláññéd ···]"
+          }
+        }
+      }
+    },
+    "Price": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Príçé ··]"
+          }
+        }
+      }
+    },
     "Prices checked on %@.": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Príçés çhéçkéd óñ %@. ········]"
+          }
+        }
+      }
+    },
+    "Privacy and AI": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Príváçý áñd ÁÍ ······]"
           }
         }
       }
@@ -2177,6 +3368,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Própóséd ···]"
+          }
+        }
+      }
+    },
+    "Proposed from your %@. Check every field before saving; nothing is stored until you do.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Própóséd fróm ýóúr %@. Çhéçk évérý fíéld béfóré sávíñg; ñóthíñg ís stóréd úñtíl ýóú dó. ···································]"
           }
         }
       }
@@ -2231,6 +3432,56 @@
         }
       }
     },
+    "Read on this device with text recognition and the on-device model.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réád óñ thís dévíçé wíth téxt réçógñítíóñ áñd thé óñ-dévíçé módél. ··························]"
+          }
+        }
+      }
+    },
+    "Read on this device with text recognition.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réád óñ thís dévíçé wíth téxt réçógñítíóñ. ·················]"
+          }
+        }
+      }
+    },
+    "Read on this device with the on-device model.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réád óñ thís dévíçé wíth thé óñ-dévíçé módél. ··················]"
+          }
+        }
+      }
+    },
+    "Reading on this device…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réádíñg óñ thís dévíçé… ·········]"
+          }
+        }
+      }
+    },
+    "Reading the screenshot on this device…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réádíñg thé sçrééñshót óñ thís dévíçé… ···············]"
+          }
+        }
+      }
+    },
     "Recorded": {
       "localizations": {
         "ga": {
@@ -2251,12 +3502,32 @@
         }
       }
     },
+    "Records that you were in touch with someone today.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réçórds thát ýóú wéré íñ tóúçh wíth sóméóñé tódáý. ····················]"
+          }
+        }
+      }
+    },
     "Region": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Régíóñ ··]"
+          }
+        }
+      }
+    },
+    "Relationship notes": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rélátíóñshíp ñótés ·······]"
           }
         }
       }
@@ -2291,12 +3562,62 @@
         }
       }
     },
+    "Remove": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé ··]"
+          }
+        }
+      }
+    },
+    "Remove from keep in touch": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé fróm kéép íñ tóúçh ··········]"
+          }
+        }
+      }
+    },
     "Remove key from this device": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Rémóvé kéý fróm thís dévíçé ···········]"
+          }
+        }
+      }
+    },
+    "Remove this person?": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Rémóvé thís pérsóñ? ········]"
+          }
+        }
+      }
+    },
+    "Renews": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réñéws ··]"
+          }
+        }
+      }
+    },
+    "Renews on": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réñéws óñ ····]"
           }
         }
       }
@@ -2341,6 +3662,16 @@
         }
       }
     },
+    "Safety margin: %lld days": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sáfétý márgíñ: %lld dáýs ··········]"
+          }
+        }
+      }
+    },
     "Save": {
       "localizations": {
         "ga": {
@@ -2371,6 +3702,36 @@
         }
       }
     },
+    "Save week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sávé wéék ····]"
+          }
+        }
+      }
+    },
+    "Screen Time (SM1)": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sçrééñ Tímé (SM1) ·······]"
+          }
+        }
+      }
+    },
+    "Search Contacts": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Séárçh Çóñtáçts ······]"
+          }
+        }
+      }
+    },
     "Sections": {
       "localizations": {
         "ga": {
@@ -2387,6 +3748,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Séléçtéd ···]"
+          }
+        }
+      }
+    },
+    "Service": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sérvíçé ···]"
           }
         }
       }
@@ -2471,6 +3842,26 @@
         }
       }
     },
+    "Snooze suggestions for %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé súggéstíóñs fór %@ ··········]"
+          }
+        }
+      }
+    },
+    "Snooze this suggestion": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Sñóózé thís súggéstíóñ ·········]"
+          }
+        }
+      }
+    },
     "Snooze until tomorrow at 09:00": {
       "localizations": {
         "ga": {
@@ -2547,6 +3938,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Stárt úsíñg Éágár ·······]"
+          }
+        }
+      }
+    },
+    "Started": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stártéd ···]"
           }
         }
       }
@@ -2657,6 +4058,36 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Stóréd kéý, éñdíñg %@ ········]"
+          }
+        }
+      }
+    },
+    "Stored on this device only. Numbers only, no app content.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Stóréd óñ thís dévíçé óñlý. Ñúmbérs óñlý, ñó ápp çóñtéñt. ·······················]"
+          }
+        }
+      }
+    },
+    "Subscription": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Súbsçríptíóñ ·····]"
+          }
+        }
+      }
+    },
+    "Subscriptions": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Súbsçríptíóñs ·····]"
           }
         }
       }
@@ -2791,6 +4222,46 @@
         }
       }
     },
+    "The trial needs a service name.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thé tríál ñééds á sérvíçé ñámé. ············]"
+          }
+        }
+      }
+    },
+    "Their logged contact is removed too. The contact in Contacts is not changed.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Théír lóggéd çóñtáçt ís rémóvéd tóó. Thé çóñtáçt íñ Çóñtáçts ís ñót çháñgéd. ······························]"
+          }
+        }
+      }
+    },
+    "There is no calendar Eagar can add this catch-up to. Confirm a calendar's tag in Settings first.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Théré ís ñó çáléñdár Éágár çáñ ádd thís çátçh-úp tó. Çóñfírm á çáléñdár's tág íñ Séttíñgs fírst. ······································]"
+          }
+        }
+      }
+    },
+    "This build of Eagar can't receive shared items. Add the subscription in Eagar instead.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís búíld óf Éágár çáñ't réçéívé sháréd ítéms. Ádd thé súbsçríptíóñ íñ Éágár íñstéád. ··································]"
+          }
+        }
+      }
+    },
     "This calendar cannot be changed. Choose another calendar.": {
       "localizations": {
         "ga": {
@@ -2817,6 +4288,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Thís móñth ····]"
+          }
+        }
+      }
+    },
+    "This week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís wéék ····]"
           }
         }
       }
@@ -2891,12 +4372,53 @@
         }
       }
     },
+    "Trial ends": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tríál éñds ····]"
+          }
+        }
+      }
+    },
     "Trials about to bill": {
+      "extractionState": "stale",
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Tríáls ábóút tó bíll ········]"
+          }
+        }
+      }
+    },
+    "Trials and subscriptions": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Tríáls áñd súbsçríptíóñs ··········]"
+          }
+        }
+      }
+    },
+    "Unnamed contact": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úññáméd çóñtáçt ······]"
+          }
+        }
+      }
+    },
+    "Up to %lld catch-ups a week": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úp tó %lld çátçh-úps á wéék ···········]"
           }
         }
       }
@@ -2917,6 +4439,16 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "[Úságé ··]"
+          }
+        }
+      }
+    },
+    "Use a web address starting with https://.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Úsé á wéb áddréss stártíñg wíth https://. ················]"
           }
         }
       }
@@ -2951,6 +4483,56 @@
         }
       }
     },
+    "We talked": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wé tálkéd ····]"
+          }
+        }
+      }
+    },
+    "We talked today": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wé tálkéd tódáý ······]"
+          }
+        }
+      }
+    },
+    "Week of": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wéék óf ···]"
+          }
+        }
+      }
+    },
+    "Week of %@": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wéék óf %@ ····]"
+          }
+        }
+      }
+    },
+    "Weekly": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wééklý ··]"
+          }
+        }
+      }
+    },
     "Welcome to Eagar": {
       "localizations": {
         "ga": {
@@ -2961,12 +4543,72 @@
         }
       }
     },
+    "When on, meetings with this person in college calendars count as contact. That information stays on this device and is never synced.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Whéñ óñ, méétíñgs wíth thís pérsóñ íñ çóllégé çáléñdárs çóúñt ás çóñtáçt. Thát íñfórmátíóñ stáýs óñ thís dévíçé áñd ís ñévér sýñçéd. ·····················································]"
+          }
+        }
+      }
+    },
     "Where your data goes": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[Whéré ýóúr dátá góés ········]"
+          }
+        }
+      }
+    },
+    "With no days chosen, any day works.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wíth ñó dáýs çhóséñ, áñý dáý wórks. ··············]"
+          }
+        }
+      }
+    },
+    "Without a cancel page, Cancel opens your App Store subscriptions.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Wíthóút á çáñçél págé, Çáñçél ópéñs ýóúr Ápp Stóré súbsçríptíóñs. ··························]"
+          }
+        }
+      }
+    },
+    "Yearly": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýéárlý ··]"
+          }
+        }
+      }
+    },
+    "Yearly plans count a twelfth per month. Totals are per currency, without exchange rates.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýéárlý pláñs çóúñt á twélfth pér móñth. Tótáls áré pér çúrréñçý, wíthóút éxçháñgé rátés. ···································]"
+          }
+        }
+      }
+    },
+    "Yes, I cancelled it": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýés, Í çáñçélléd ít ········]"
           }
         }
       }
@@ -3041,12 +4683,42 @@
         }
       }
     },
+    "Your notes sync between your devices end-to-end encrypted in iCloud. Eagar never reads contact notes.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ýóúr ñótés sýñç bétwééñ ýóúr dévíçés éñd-tó-éñd éñçrýptéd íñ íÇlóúd. Éágár ñévér réáds çóñtáçt ñótés. ········································]"
+          }
+        }
+      }
+    },
     "iCloud": {
       "localizations": {
         "ga": {
           "stringUnit": {
             "state": "needs_review",
             "value": "[íÇlóúd ··]"
+          }
+        }
+      }
+    },
+    "screenshot": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[sçrééñshót ····]"
+          }
+        }
+      }
+    },
+    "shared item": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[sháréd ítém ····]"
           }
         }
       }

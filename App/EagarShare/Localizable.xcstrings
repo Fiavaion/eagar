@@ -1,6 +1,86 @@
 {
-  "sourceLanguage" : "en-GB",
-  "strings" : {
+  "sourceLanguage": "en-GB",
+  "strings": {
+    "Add to Eagar": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Ádd tó Éágár ·····]"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Dóñé ··]"
+          }
+        }
+      }
+    },
+    "Eagar could not save this item. Try again, or add it in Eagar.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár çóúld ñót sávé thís ítém. Trý ágáíñ, ór ádd ít íñ Éágár. ·························]"
+          }
+        }
+      }
+    },
+    "Eagar found no subscription details in this item.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár fóúñd ñó súbsçríptíóñ détáíls íñ thís ítém. ····················]"
+          }
+        }
+      }
+    },
+    "Eagar will ask you to confirm %@ the next time you open it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár wíll ásk ýóú tó çóñfírm %@ thé ñéxt tímé ýóú ópéñ ít. ························]"
+          }
+        }
+      }
+    },
+    "Eagar will ask you to confirm the subscription the next time you open it.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Éágár wíll ásk ýóú tó çóñfírm thé súbsçríptíóñ thé ñéxt tímé ýóú ópéñ ít. ·····························]"
+          }
+        }
+      }
+    },
+    "Reading on this device…": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Réádíñg óñ thís dévíçé… ·········]"
+          }
+        }
+      }
+    },
+    "This build of Eagar can't receive shared items. Add the subscription in Eagar instead.": {
+      "localizations": {
+        "ga": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "[Thís búíld óf Éágár çáñ't réçéívé sháréd ítéms. Ádd thé súbsçríptíóñ íñ Éágár íñstéád. ··································]"
+          }
+        }
+      }
+    }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
