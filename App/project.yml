@@ -80,6 +80,8 @@ targets:
         # FR-CAL-01: EventKit offers no read-only mode, so the strings justify full access.
         INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Eagar reads your calendars to build your brief and find free time. It adds or changes events only when you ask."
         INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Eagar reads your reminder lists so you can choose where deadlines are mirrored. It adds or changes reminders only when you ask."
+        # FR-PEOPLE-01: only the contacts Mark picks; names, email addresses and birthdays, never notes.
+        INFOPLIST_KEY_NSContactsUsageDescription: "Eagar reads the name, email addresses and birthday of the people you choose, so it can remind you to keep in touch. It never reads contact notes."
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Eagar asks for Face ID before erasing ledger entries and, later, before sending each email."
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic

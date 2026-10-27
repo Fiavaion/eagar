@@ -21,6 +21,13 @@ public struct ContactLogDraft: Sendable, Hashable {
     public let kind: ContactLogKind
     public let note: String
 
+    public init(personID: UUID, occurredAt: Date, kind: ContactLogKind = .manual, note: String = "") {
+        self.personID = personID
+        self.occurredAt = occurredAt
+        self.kind = kind
+        self.note = note
+    }
+
     /// The model to insert into PersonalStore.
     public func makeLog(createdAt: Date) -> ContactLog {
         ContactLog(personUUID: personID, occurredAt: occurredAt, kind: kind, note: note, createdAt: createdAt)

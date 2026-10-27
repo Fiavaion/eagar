@@ -2,7 +2,7 @@ import EventKit
 import SwiftUI
 
 enum RootTab: String, Hashable {
-    case today, deadlines, subscriptions, settings, key, ledger, spending
+    case today, deadlines, subscriptions, people, settings, key, ledger, spending
 }
 
 extension Notification.Name {
@@ -39,6 +39,9 @@ struct RootView: View {
             }
             Tab("Subscriptions", systemImage: "creditcard", value: RootTab.subscriptions) {
                 NavigationStack { SubscriptionsView(money: model.money) }
+            }
+            Tab("People", systemImage: "person.2", value: RootTab.people) {
+                NavigationStack { PeopleView(people: model.people) }
             }
             Tab("Settings", systemImage: "gearshape", value: RootTab.settings) {
                 NavigationStack { SettingsView(model: model) }
@@ -113,6 +116,7 @@ protocol UserFacingFailure: Identifiable, Equatable {
 extension AppFailure: UserFacingFailure {}
 extension PlannerFailure: UserFacingFailure {}
 extension MoneyFailure: UserFacingFailure {}
+extension PeopleFailure: UserFacingFailure {}
 
 /// One "Something went wrong" alert per model.
 private struct RootAlerts: ViewModifier {
@@ -121,10 +125,12 @@ private struct RootAlerts: ViewModifier {
     func body(content: Content) -> some View {
         let planner = model.planner
         let money = model.money
+        let people = model.people
         content
             .failureAlert(Binding(get: { model.failure }, set: { model.failure = $0 }))
             .failureAlert(Binding(get: { planner.failure }, set: { planner.failure = $0 }))
             .failureAlert(Binding(get: { money.failure }, set: { money.failure = $0 }))
+            .failureAlert(Binding(get: { people.failure }, set: { people.failure = $0 }))
     }
 }
 

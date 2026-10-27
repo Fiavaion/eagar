@@ -6,7 +6,9 @@ import Synchronization
 /// is launched with `-EagarFakeCalendar YES`. Never touches EventKit; holds no real data.
 ///
 /// One personal calendar ("Home"), one college calendar on `demo@ncad.ie` ("NCAD") and one
-/// reminder list, with a few events on the day containing `now`.
+/// reminder list, with a few events on the day containing `now`. With `richWeek` (the
+/// `-EagarDemoData YES` screenshots), the rest of the week and some past catch-ups with
+/// synthetic attendees are added too, so keep-in-touch has free slots and history.
 final class DemoEventStore: EventStoreAdapting {
     static let homeID = "demo.calendar.home"
     static let collegeID = "demo.calendar.ncad"
@@ -26,8 +28,52 @@ final class DemoEventStore: EventStoreAdapting {
     ]
     private let state: Mutex<State>
 
-    init(now: Date = Date(), calendar: Calendar = .current, access: CalendarAccess = .fullAccess) {
-        state = Mutex(State(access: access, events: Self.events(on: now, calendar: calendar)))
+    init(now: Date = Date(), calendar: Calendar = .current, access: CalendarAccess = .fullAccess, richWeek: Bool = false) {
+        let events = Self.events(on: now, calendar: calendar) + (richWeek ? Self.weekEvents(around: now, calendar: calendar) : [])
+        state = Mutex(State(access: access, events: events))
+    }
+
+    /// The other days of the week containing `now`, and past catch-ups whose attendees match
+    /// the demo people (synthetic `example.ie` addresses).
+    static func weekEvents(around now: Date, calendar: Calendar) -> [CalendarEvent] {
+        let today = calendar.startOfDay(for: now)
+        let week = calendar.dateInterval(of: .weekOfYear, for: now) ?? DateInterval(start: today, duration: 7 * 86_400)
+        func at(_ day: Date, _ hour: Int, _ minute: Int = 0) -> Date {
+            calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day) ?? day
+        }
+        var events: [CalendarEvent] = []
+        var day = week.start
+        var index = 0
+        while day < week.end {
+            defer {
+                day = calendar.date(byAdding: .day, value: 1, to: day) ?? week.end
+                index += 1
+            }
+            guard day != today else { continue }
+            let weekday = calendar.component(.weekday, from: day)
+            let isWeekend = weekday == 1 || weekday == 7
+            if !isWeekend {
+                events.append(CalendarEvent(id: "demo.week.lecture.\(index)", calendarID: collegeID, title: "Design history lecture", start: at(day, 10), end: at(day, 12)))
+            }
+            if weekday == 3 || weekday == 5 {
+                events.append(CalendarEvent(id: "demo.week.studio.\(index)", calendarID: collegeID, title: "Studio supervision", start: at(day, 14), end: at(day, 18, 30)))
+            }
+            if weekday == 4 {
+                events.append(CalendarEvent(id: "demo.week.football.\(index)", calendarID: homeID, title: "Five-a-side", start: at(day, 19), end: at(day, 20, 30)))
+            }
+            if weekday == 7 {
+                events.append(CalendarEvent(id: "demo.week.market.\(index)", calendarID: homeID, title: "Farmers' market", start: at(day, 10), end: at(day, 11, 30)))
+            }
+        }
+        func past(_ days: Int, _ hour: Int) -> Date {
+            at(calendar.date(byAdding: .day, value: -days, to: today) ?? today, hour)
+        }
+        events += [
+            CalendarEvent(id: "demo.past.aoife", calendarID: homeID, title: "Coffee with Aoife", start: past(45, 11), end: past(45, 12), attendeeEmails: ["aoife@example.ie"]),
+            CalendarEvent(id: "demo.past.cian", calendarID: homeID, title: "Dinner with Cian", start: past(10, 19), end: past(10, 21), attendeeEmails: ["cian@example.ie"]),
+            CalendarEvent(id: "demo.past.ciara", calendarID: collegeID, title: "Research meeting", start: past(20, 15), end: past(20, 16), attendeeEmails: ["ciara@example.ie"]),
+        ]
+        return events
     }
 
     /// Two all-day events (so the brief always has a personal and a college item, whatever the

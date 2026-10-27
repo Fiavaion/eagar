@@ -1,6 +1,7 @@
 import EagarBrief
 import EagarCalendar
 import EagarCore
+import EagarPeople
 import SwiftUI
 
 /// The Brief for the current slot and the day timeline (FR-BRIEF-01..08, FR-CAL-05).
@@ -24,7 +25,8 @@ struct TodayView: View {
             if let brief = planner.brief {
                 BriefSections(
                     planner: planner, brief: brief,
-                    onOpen: open, onReschedule: { rescheduling = $0 }, onExtra: perform
+                    onOpen: open, onReschedule: { rescheduling = $0 }, onExtra: perform,
+                    onNudge: { perform($0, logged: $1, on: $2) }
                 )
             }
             Section {
@@ -123,6 +125,15 @@ struct TodayView: View {
         }
     }
 
+    /// Nudge actions (FR-PEOPLE-05): logged as brief actions, applied by the people model.
+    private func perform(_ action: NudgeAction, logged: BriefAction, on item: BriefItem) {
+        guard let nudge = model.people.nudge(item.id) else { return }
+        Task {
+            await planner.record(logged, on: item)
+            _ = await model.people.perform(action, on: nudge)
+        }
+    }
+
     static func trialID(_ item: BriefItem) -> UUID? {
         guard item.kind == .trial else { return nil }
         return UUID(uuidString: String(item.id.dropFirst("trial.".count)))
@@ -136,6 +147,7 @@ private struct BriefSections: View {
     let onOpen: (BriefItem) -> Void
     let onReschedule: (BriefItem) -> Void
     let onExtra: (BriefAction, BriefItem) -> Void
+    let onNudge: (NudgeAction, BriefAction, BriefItem) -> Void
 
     var body: some View {
         if brief.isEmpty {
@@ -152,7 +164,7 @@ private struct BriefSections: View {
                     PhrasingView(section: phrased)
                 }
                 ForEach(section.items) { item in
-                    BriefItemRow(planner: planner, item: item, onOpen: onOpen, onReschedule: onReschedule, onExtra: onExtra)
+                    BriefItemRow(planner: planner, item: item, onOpen: onOpen, onReschedule: onReschedule, onExtra: onExtra, onNudge: onNudge)
                 }
                 if section.hiddenCount > 0 {
                     Text("More not shown: \(section.hiddenCount)")
@@ -203,6 +215,7 @@ private struct BriefItemRow: View {
     let onOpen: (BriefItem) -> Void
     let onReschedule: (BriefItem) -> Void
     let onExtra: (BriefAction, BriefItem) -> Void
+    let onNudge: (NudgeAction, BriefAction, BriefItem) -> Void
 
     private var state: BriefAction? { planner.itemStates[item.id] }
     private var isSettled: Bool { state.map { $0.dealsWithItem && $0 != .snooze } ?? false }
@@ -258,6 +271,8 @@ private struct BriefItemRow: View {
                 }
             case .reschedule:
                 ActionButton(title: "Reschedule", systemImage: "calendar", label: "Reschedule \(item.title)") { onReschedule(item) }
+            case .snooze where item.kind == .nudge:
+                NudgeSnoozeMenu(item: item, onNudge: onNudge)
             case .snooze:
                 Menu {
                     Button("In 1 hour") { Task { await planner.snooze(item, until: planner.snoozeInAnHour) } }
@@ -272,8 +287,12 @@ private struct BriefItemRow: View {
                 ActionButton(title: "Cancel…", systemImage: "creditcard", label: "Open the cancel page for \(item.title)") { onExtra(.cancelSubscription, item) }
             case .confirmCancelled:
                 ActionButton(title: "Cancelled", systemImage: "checkmark", label: "I've cancelled \(item.title)") { onExtra(.confirmCancelled, item) }
-            case .plan, .logContact, .changeCadence:
-                EmptyView()
+            case .plan:
+                ActionButton(title: "Plan", systemImage: "calendar.badge.plus", label: "Plan this catch-up") { onNudge(.plan, .plan, item) }
+            case .logContact:
+                ActionButton(title: "We talked", systemImage: "checkmark.bubble", label: "Log that you were in touch") { onNudge(.logContact(at: .now), .logContact, item) }
+            case .changeCadence:
+                NudgeCadenceMenu(item: item, onNudge: onNudge)
             }
         }
         .disabled(isSettled)
@@ -460,5 +479,41 @@ struct RescheduleSheet: View {
         #if os(macOS)
         .frame(minWidth: 360, minHeight: 200)
         #endif
+    }
+}
+
+/// Snooze a nudge's person for a week or two (FR-PEOPLE-05).
+private struct NudgeSnoozeMenu: View {
+    let item: BriefItem
+    let onNudge: (NudgeAction, BriefAction, BriefItem) -> Void
+
+    var body: some View {
+        Menu {
+            ForEach(NudgeActionButtons.snoozeChoices, id: \.self) { days in
+                Button { onNudge(.snooze(days: days), .snooze, item) } label: { Text(PersonLabels.snooze(days)) }
+            }
+        } label: {
+            Label("Snooze", systemImage: "moon.zzz").frame(minHeight: 44)
+        }
+        .fixedSize()
+        .accessibilityLabel(Text("Snooze this suggestion"))
+    }
+}
+
+/// Change how often to see a nudge's person (FR-PEOPLE-05).
+private struct NudgeCadenceMenu: View {
+    let item: BriefItem
+    let onNudge: (NudgeAction, BriefAction, BriefItem) -> Void
+
+    var body: some View {
+        Menu {
+            ForEach(NudgeActionButtons.cadenceChoices, id: \.self) { days in
+                Button { onNudge(.changeCadence(days: days), .changeCadence, item) } label: { Text(PersonLabels.cadence(days)) }
+            }
+        } label: {
+            Label("Cadence", systemImage: "arrow.triangle.2.circlepath").frame(minHeight: 44)
+        }
+        .fixedSize()
+        .accessibilityLabel(Text("Change how often to see this person"))
     }
 }
