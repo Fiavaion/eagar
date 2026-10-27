@@ -282,9 +282,13 @@ private struct BriefItemRow: View {
                     Button("Tomorrow at 09:00") { Task { await planner.snooze(item, until: planner.snoozeTomorrowMorning) } }
                 } label: {
                     Label("Snooze", systemImage: "moon.zzz")
+                        .labelStyle(.titleAndIcon)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
                         .frame(minHeight: 44)
                 }
-                .fixedSize()
+                .menuStyle(.button)
+        .buttonStyle(.borderless)
                 .accessibilityLabel(Text("Snooze \(item.title)"))
             case .cancelSubscription:
                 ActionButton(title: "Cancel…", systemImage: "creditcard", label: "Open the cancel page for \(item.title)") { onExtra(.cancelSubscription, item) }
@@ -327,6 +331,10 @@ private struct BriefItemRow: View {
 }
 
 /// A bordered action with a 44 pt target and a specific VoiceOver label.
+///
+/// No `.fixedSize()` here or on the menus: inside an iOS 26 List row it asks the control for its
+/// ideal size, which comes back as an icon-only label with ~150 pt of padding above and below
+/// (the M1 Today-row gap). Menus are drawn as borderless buttons for the same reason.
 private struct ActionButton: View {
     let title: LocalizedStringKey
     let systemImage: String
@@ -336,11 +344,13 @@ private struct ActionButton: View {
     var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)
-        .fixedSize()
         .accessibilityLabel(Text(label))
     }
 }
@@ -496,9 +506,14 @@ private struct NudgeSnoozeMenu: View {
                 Button { onNudge(.snooze(days: days), .snooze, item) } label: { Text(PersonLabels.snooze(days)) }
             }
         } label: {
-            Label("Snooze", systemImage: "moon.zzz").frame(minHeight: 44)
+            Label("Snooze", systemImage: "moon.zzz")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
-        .fixedSize()
+        .menuStyle(.button)
+        .buttonStyle(.borderless)
         .accessibilityLabel(Text("Snooze this suggestion"))
     }
 }
@@ -514,9 +529,14 @@ private struct NudgeCadenceMenu: View {
                 Button { onNudge(.changeCadence(days: days), .changeCadence, item) } label: { Text(PersonLabels.cadence(days)) }
             }
         } label: {
-            Label("Cadence", systemImage: "arrow.triangle.2.circlepath").frame(minHeight: 44)
+            Label("Cadence", systemImage: "arrow.triangle.2.circlepath")
+                .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 44)
         }
-        .fixedSize()
+        .menuStyle(.button)
+        .buttonStyle(.borderless)
         .accessibilityLabel(Text("Change how often to see this person"))
     }
 }
