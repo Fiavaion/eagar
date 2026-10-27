@@ -5,8 +5,11 @@ import SwiftUI
 
 /// The Brief for the current slot and the day timeline (FR-BRIEF-01..08, FR-CAL-05).
 struct TodayView: View {
-    let planner: PlannerModel
+    let model: AppModel
+    private var planner: PlannerModel { model.planner }
     @State private var editing: DeadlineDraft?
+    @State private var confirmingCancel: BriefItem?
+    @Environment(\.openURL) private var openURL
     @State private var rescheduling: BriefItem?
     @State private var viewingEvent: ClassifiedEvent?
     @State private var addingEvent = false
@@ -21,7 +24,7 @@ struct TodayView: View {
             if let brief = planner.brief {
                 BriefSections(
                     planner: planner, brief: brief,
-                    onOpen: open, onReschedule: { rescheduling = $0 }
+                    onOpen: open, onReschedule: { rescheduling = $0 }, onExtra: perform
                 )
             }
             Section {
@@ -58,7 +61,7 @@ struct TodayView: View {
                 .accessibilityIdentifier("today.add")
             }
         }
-        .refreshable { await planner.refresh() }
+        .refreshable { await model.refresh() }
         // Re-run whenever the shown brief changes, so the open is logged once the brief exists
         // (FR-BRIEF-08, SM2), not only on first appearance.
         .task(id: planner.brief?.id) { await planner.briefOpened() }
@@ -76,15 +79,53 @@ struct TodayView: View {
         .sheet(item: $viewingEvent) { event in
             EventDetailView(event: event, calendarTitle: planner.eventCalendars.first { $0.id == event.event.calendarID }?.title)
         }
+        .confirmationDialog(
+            Text("Did you cancel \(confirmingCancel?.title ?? "")?"),
+            isPresented: Binding(get: { confirmingCancel != nil }, set: { if !$0 { confirmingCancel = nil } }),
+            titleVisibility: .visible,
+            presenting: confirmingCancel
+        ) { item in
+            Button("Yes, I cancelled it") { perform(.confirmCancelled, on: item) }
+            Button("Not yet", role: .cancel) {}
+        } message: { _ in
+            Text("Eagar records a cancellation only when you confirm it.")
+        }
     }
 
     private func open(_ item: BriefItem) {
         Task { await planner.perform(.open, on: item) }
-        if let row = planner.row(for: item) {
+        if item.kind == .subscriptionSummary {
+            NotificationCenter.default.post(name: .eagarShowTab, object: RootTab.subscriptions.rawValue)
+        } else if let row = planner.row(for: item) {
             editing = DeadlineDraft(row)
         } else if let event = planner.event(for: item) {
             viewingEvent = event
         }
+    }
+
+    /// Trial actions (FR-TRIAL-05). Cancel opens the cancel page and then asks Mark to
+    /// confirm; only his confirmation records the cancellation.
+    private func perform(_ action: BriefAction, on item: BriefItem) {
+        switch action {
+        case .cancelSubscription:
+            guard let id = Self.trialID(item) else { return }
+            openURL(model.money.cancelTarget(id))
+            confirmingCancel = item
+            Task { await planner.record(.cancelSubscription, on: item) }
+        case .confirmCancelled:
+            guard let id = Self.trialID(item) else { return }
+            Task {
+                await planner.record(.confirmCancelled, on: item)
+                await model.money.confirmCancelled(id)
+            }
+        default:
+            break
+        }
+    }
+
+    static func trialID(_ item: BriefItem) -> UUID? {
+        guard item.kind == .trial else { return nil }
+        return UUID(uuidString: String(item.id.dropFirst("trial.".count)))
     }
 }
 
@@ -94,6 +135,7 @@ private struct BriefSections: View {
     let brief: Brief
     let onOpen: (BriefItem) -> Void
     let onReschedule: (BriefItem) -> Void
+    let onExtra: (BriefAction, BriefItem) -> Void
 
     var body: some View {
         if brief.isEmpty {
@@ -110,7 +152,7 @@ private struct BriefSections: View {
                     PhrasingView(section: phrased)
                 }
                 ForEach(section.items) { item in
-                    BriefItemRow(planner: planner, item: item, onOpen: onOpen, onReschedule: onReschedule)
+                    BriefItemRow(planner: planner, item: item, onOpen: onOpen, onReschedule: onReschedule, onExtra: onExtra)
                 }
                 if section.hiddenCount > 0 {
                     Text("More not shown: \(section.hiddenCount)")
@@ -160,17 +202,23 @@ private struct BriefItemRow: View {
     let item: BriefItem
     let onOpen: (BriefItem) -> Void
     let onReschedule: (BriefItem) -> Void
+    let onExtra: (BriefAction, BriefItem) -> Void
 
     private var state: BriefAction? { planner.itemStates[item.id] }
+    private var isSettled: Bool { state.map { $0.dealsWithItem && $0 != .snooze } ?? false }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(item.title)
                     .font(.body.weight(.medium))
-                    .strikethrough(state == .done || state == .dismiss)
+                    .strikethrough(isSettled)
                 Spacer(minLength: 8)
                 if item.dataClass == .college { BoundaryBadge() }
+            }
+            if let detail = item.detail {
+                Text(detail)
+                    .font(.subheadline)
             }
             ItemTime(item: item)
             if let state {
@@ -220,11 +268,15 @@ private struct BriefItemRow: View {
                 }
                 .fixedSize()
                 .accessibilityLabel(Text("Snooze \(item.title)"))
-            case .cancelSubscription, .confirmCancelled, .plan, .logContact, .changeCadence:
+            case .cancelSubscription:
+                ActionButton(title: "Cancel…", systemImage: "creditcard", label: "Open the cancel page for \(item.title)") { onExtra(.cancelSubscription, item) }
+            case .confirmCancelled:
+                ActionButton(title: "Cancelled", systemImage: "checkmark", label: "I've cancelled \(item.title)") { onExtra(.confirmCancelled, item) }
+            case .plan, .logContact, .changeCadence:
                 EmptyView()
             }
         }
-        .disabled(state == .done || state == .dismiss)
+        .disabled(isSettled)
     }
 
     @ViewBuilder private var thumbs: some View {
@@ -277,7 +329,11 @@ private struct ItemTime: View {
 
     var body: some View {
         Group {
-            if item.kind == .deadline, let start = item.start {
+            if item.kind == .trial || item.kind == .subscriptionSummary {
+                EmptyView()
+            } else if item.kind == .nudge, let start = item.start, let end = item.end, end > start {
+                Text(start..<end, format: .interval.weekday().hour().minute())
+            } else if item.kind == .deadline, let start = item.start {
                 if item.isAllDay {
                     Text("Due \(start, format: .dateTime.weekday(.wide).day().month())")
                 } else {

@@ -31,6 +31,12 @@ struct AppServices: Sendable {
     let sync: PersonalSyncEngine?
     let donations: any IntentDonating
     let widgets: any WidgetPublishing
+    /// Trial reminders at 7/3/1/0 days before cancel-by (FR-TRIAL-02).
+    let trialReminders: any TrialReminderScheduling
+    /// Birthday reminders (FR-PEOPLE-06).
+    let birthdayNotifications: any BirthdayNotificationScheduling
+    /// Trials proposed by the share extension, waiting for confirmation (FR-TRIAL-03).
+    let pendingImports: PendingTrialImportStore
 
     /// Every SwiftData model in the app. Both stores share one schema; placement is per record.
     static var models: [any PersistentModel.Type] {
@@ -47,7 +53,10 @@ struct AppServices: Sendable {
         deadlineNotifications: any NotificationScheduling = UserNotificationScheduler(),
         briefNotifications: any BriefNotificationScheduling = UserBriefNotificationScheduler(),
         donations: any IntentDonating = SystemIntentDonor(),
-        widgets: any WidgetPublishing = SystemWidgetPublisher()
+        widgets: any WidgetPublishing = SystemWidgetPublisher(),
+        trialReminders: any TrialReminderScheduling = UserTrialReminderScheduler(),
+        birthdayNotifications: any BirthdayNotificationScheduling = UserBirthdayNotificationScheduler(),
+        pendingImports: PendingTrialImportStore = .appGroup
     ) throws -> AppServices {
         let location: StoreLocation = inMemory
             ? .inMemory
@@ -68,7 +77,8 @@ struct AppServices: Sendable {
             secrets: secrets, catalog: catalog, policy: policy,
             eventStore: eventStore, calendarTags: CalendarTagStore(stores: stores), eventLog: EventLog(stores: stores),
             deadlineNotifications: deadlineNotifications, briefNotifications: briefNotifications,
-            sync: inMemory ? nil : makeSync(stores: stores), donations: donations, widgets: widgets
+            sync: inMemory ? nil : makeSync(stores: stores), donations: donations, widgets: widgets,
+            trialReminders: trialReminders, birthdayNotifications: birthdayNotifications, pendingImports: pendingImports
         )
     }
 

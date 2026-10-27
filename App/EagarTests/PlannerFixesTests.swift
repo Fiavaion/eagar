@@ -311,7 +311,7 @@ struct PlannerFixesTests {
         let planner = harness.planner
         let first = try await save(planner, title: "Form", due: at(7).addingTimeInterval(86_400))
         let second = try await save(planner, title: "Fees", due: at(7).addingTimeInterval(86_400))
-        let responder = NotificationResponder(planner: planner)
+        let responder = NotificationResponder(planner: planner, money: harness.model.money)
 
         await responder.handle(
             category: DeadlineNotificationPlan.categoryIdentifier,

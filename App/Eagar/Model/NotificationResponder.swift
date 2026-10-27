@@ -1,7 +1,14 @@
 import EagarBrief
 import EagarCalendar
+import EagarMoney
+import EagarPeople
 import Foundation
 import UserNotifications
+#if os(iOS)
+import UIKit
+#else
+import AppKit
+#endif
 
 /// A deadline notification's action button (FR-OS-05).
 enum DeadlineNotificationAction: Equatable {
@@ -23,8 +30,9 @@ enum DeadlineNotificationAction: Equatable {
     }
 }
 
-/// The notification categories Eagar registers at launch: the deadline category with Done and
-/// Snooze, and the brief category with Open.
+/// The notification categories Eagar registers at launch, all at once (D-021): the deadline
+/// category with Done and Snooze, the brief category with Open, the trial category with Cancel
+/// and "I've cancelled" (FR-TRIAL-05), and the birthday category (FR-PEOPLE-06).
 enum NotificationCategories {
     static let briefOpenActionIdentifier = "brief.open"
 
@@ -39,6 +47,16 @@ enum NotificationCategories {
                 intentIdentifiers: [],
                 options: []
             ),
+            UNNotificationCategory(
+                identifier: TrialReminderPlan.categoryIdentifier,
+                actions: [
+                    UNNotificationAction(identifier: TrialReminderPlan.cancelActionIdentifier, title: String(localized: "Cancel…"), options: [.foreground]),
+                    UNNotificationAction(identifier: TrialReminderPlan.confirmCancelledActionIdentifier, title: String(localized: "I've cancelled it"), options: [.authenticationRequired]),
+                ],
+                intentIdentifiers: [],
+                options: []
+            ),
+            UNNotificationCategory(identifier: BirthdayNotificationPlan.categoryIdentifier, actions: [], intentIdentifiers: [], options: []),
             UNNotificationCategory(
                 identifier: BriefNotificationContent.categoryIdentifier,
                 actions: [
@@ -56,9 +74,13 @@ enum NotificationCategories {
 @MainActor
 final class NotificationResponder: NSObject, UNUserNotificationCenterDelegate {
     private let planner: PlannerModel
+    private let money: MoneyModel
+    private let openURL: @MainActor (URL) -> Void
 
-    init(planner: PlannerModel) {
+    init(planner: PlannerModel, money: MoneyModel, openURL: @escaping @MainActor (URL) -> Void = ExternalURL.open) {
         self.planner = planner
+        self.money = money
+        self.openURL = openURL
     }
 
     /// Registers the categories and becomes the centre's delegate.
@@ -74,21 +96,36 @@ final class NotificationResponder: NSObject, UNUserNotificationCenterDelegate {
     }
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        let category = response.notification.request.content.categoryIdentifier
+        let content = response.notification.request.content
         let identifier = response.notification.request.identifier
         let action = response.actionIdentifier
-        await handle(category: category, requestIdentifier: identifier, actionIdentifier: action)
+        let cancelTarget = content.userInfo[UserTrialReminderScheduler.cancelTargetKey] as? String
+        await handle(category: content.categoryIdentifier, requestIdentifier: identifier, actionIdentifier: action, cancelTarget: cancelTarget)
     }
 
     /// Done marks the deadline done; Snooze snoozes it for an hour, like the in-app "In 1 hour".
     /// Tapping a brief notification, or its Open action, shows the Today tab.
-    func handle(category: String, requestIdentifier: String, actionIdentifier: String) async {
+    /// A trial's Cancel opens its cancel page (never changing the status); "I've cancelled it"
+    /// records the cancellation; tapping shows Subscriptions. Tapping a birthday shows Today.
+    func handle(category: String, requestIdentifier: String, actionIdentifier: String, cancelTarget: String? = nil) async {
         switch category {
         case DeadlineNotificationPlan.categoryIdentifier:
             guard let action = DeadlineNotificationAction(actionIdentifier: actionIdentifier),
                   let id = DeadlineNotificationAction.deadlineID(fromRequestIdentifier: requestIdentifier)
             else { return }
             await planner.handleNotificationAction(action, deadlineID: id)
+        case TrialReminderPlan.categoryIdentifier:
+            guard let id = TrialReminderSync.trialID(fromRequestIdentifier: requestIdentifier) else { return }
+            switch actionIdentifier {
+            case TrialReminderPlan.cancelActionIdentifier:
+                let fallback = money.cancelTarget(id)
+                openURL(cancelTarget.flatMap(URL.init(string:)).map { Self.safeCancelTarget($0) ?? fallback } ?? fallback)
+                NotificationCenter.default.post(name: .eagarShowTab, object: RootTab.subscriptions.rawValue)
+            case TrialReminderPlan.confirmCancelledActionIdentifier:
+                await money.handleConfirmCancelledAction(trialID: id)
+            default:
+                NotificationCenter.default.post(name: .eagarShowTab, object: RootTab.subscriptions.rawValue)
+            }
         case BriefNotificationContent.categoryIdentifier:
             if actionIdentifier == UNNotificationDefaultActionIdentifier || actionIdentifier == NotificationCategories.briefOpenActionIdentifier {
                 NotificationCenter.default.post(name: .eagarShowBrief, object: nil)
@@ -96,5 +133,25 @@ final class NotificationResponder: NSObject, UNUserNotificationCenterDelegate {
         default:
             break
         }
+    }
+}
+
+extension NotificationResponder {
+    /// Only web links are opened from a notification, as in `TrialCancelAction`.
+    static func safeCancelTarget(_ url: URL) -> URL? {
+        guard let scheme = url.scheme?.lowercased(), scheme == "https" || scheme == "http", url.host() != nil else { return nil }
+        return url
+    }
+}
+
+/// Opens a web page outside SwiftUI (notification actions).
+enum ExternalURL {
+    @MainActor
+    static func open(_ url: URL) {
+        #if os(iOS)
+        UIApplication.shared.open(url)
+        #else
+        NSWorkspace.shared.open(url)
+        #endif
     }
 }

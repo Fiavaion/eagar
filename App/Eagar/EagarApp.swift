@@ -19,7 +19,7 @@ struct EagarApp: App {
             let model = AppModel(services: services)
             // Set before launch finishes, so a notification action that launched the app is
             // delivered (FR-OS-05).
-            let responder = NotificationResponder(planner: model.planner)
+            let responder = NotificationResponder(planner: model.planner, money: model.money)
             responder.install()
             _notifications = State(initialValue: responder)
             _startup = State(initialValue: .success(model))

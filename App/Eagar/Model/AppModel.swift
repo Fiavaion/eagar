@@ -1,4 +1,5 @@
 import EagarAI
+import EagarBrief
 import EagarCore
 import EagarLedger
 import EagarSecurity
@@ -19,6 +20,8 @@ final class AppModel {
 
     let services: AppServices
     let planner: PlannerModel
+    /// Trials and subscriptions (M2).
+    let money: MoneyModel
     private(set) var maskedKey: String?
     private(set) var keyTestState: KeyTestState = .idle
     private(set) var records: [LedgerRecord] = []
@@ -35,9 +38,36 @@ final class AppModel {
         self.services = services
         self.defaults = defaults
         planner = PlannerModel(services: services, defaults: defaults, clock: clock, calendar: calendar)
+        money = MoneyModel(services: services, clock: clock, calendar: calendar)
         let cap = defaults.object(forKey: Self.capKey) as? Int64
         services.policy.setMonthlyCap(microUSD: cap)
         loadKeyState()
+        money.onChange = { [weak self] in self?.applySources() }
+    }
+
+    // MARK: Activation and the brief's sources (M2)
+
+    /// Launch and scene activation: calendars, deadlines and the brief first, then trials, then
+    /// the brief again with their sections.
+    func appBecameActive() async {
+        await planner.appBecameActive()
+        await money.refresh()
+        applySources()
+        await planner.scheduleBriefNotifications()
+    }
+
+    /// A calendar change or pull to refresh.
+    func refresh() async {
+        await planner.refresh()
+        await money.load()
+        applySources()
+    }
+
+    /// Hands trials (and their cancel-by deadlines) to the planner and recomposes the brief.
+    func applySources() {
+        planner.trialDeadlines = money.deadlineRows
+        planner.sources = BriefSources(trials: money.briefTrials, subscriptionSummary: money.briefSummary)
+        planner.composeBrief()
     }
 
     var catalog: ModelCatalog { services.catalog }

@@ -82,6 +82,13 @@ final class PlannerModel {
     /// Today's events from every calendar, classified by tag.
     private(set) var todayEvents: [ClassifiedEvent] = []
     private(set) var deadlines: [DeadlineRow] = []
+    /// Trial cancel-by dates shown as deadlines with origin `trial` (FR-DL-01). Set by
+    /// ``AppModel`` from ``MoneyModel``; never stored or notified as deadlines, because the
+    /// trial's own reminders cover them (FR-TRIAL-02).
+    var trialDeadlines: [DeadlineRow] = []
+    /// Trials, the subscription summary and keep-in-touch nudges for the brief (M2). Set by
+    /// ``AppModel``; call ``composeBrief()`` afterwards.
+    var sources = BriefSources.none
     private(set) var brief: Brief?
     /// Optional AI phrasing per section; empty until it arrives, or when off or failed.
     private(set) var phrasing: [BriefSectionKind: PhrasedSection] = [:]
@@ -177,7 +184,9 @@ final class PlannerModel {
         todayEvents = await classifiedEvents(in: today)
     }
 
-    private func classifiedEvents(in interval: DateInterval) async -> [ClassifiedEvent] {
+    /// Events from every calendar in `interval`, classified by tag (unknown calendars are
+    /// college, D-021). Keep-in-touch uses it for free slots and inference.
+    func classifiedEvents(in interval: DateInterval) async -> [ClassifiedEvent] {
         guard services.eventStore.access(for: .event) == .fullAccess else { return [] }
         do {
             let events = try await services.eventStore.events(in: interval, calendarIDs: nil)
@@ -255,7 +264,7 @@ final class PlannerModel {
                 end: $0.event.end, isAllDay: $0.event.isAllDay, dataClass: $0.dataClass
             )
         }
-        let due = deadlines.filter { $0.snapshot.status == .open && today.contains($0.snapshot.dueAt) }.map {
+        let due = (deadlines + trialDeadlines).filter { $0.snapshot.status == .open && today.contains($0.snapshot.dueAt) }.map {
             TimelineItem(
                 id: "timeline.deadline.\($0.id.uuidString)", kind: .deadline, title: $0.snapshot.title, start: $0.snapshot.dueAt,
                 end: nil, isAllDay: $0.snapshot.isAllDay, dataClass: $0.snapshot.dataClass
@@ -285,9 +294,14 @@ final class PlannerModel {
         return deadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt < now }
     }
 
+    /// Open deadlines still ahead, with trial cancel-by days (which are all-day, so a trial
+    /// due today counts as upcoming until the day ends).
     var upcomingDeadlines: [DeadlineRow] {
         let now = clock.now()
-        return deadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt >= now }
+        let today = calendar.startOfDay(for: now)
+        let trials = trialDeadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt >= today }
+        return (deadlines.filter { $0.snapshot.status == .open && $0.snapshot.dueAt >= now } + trials)
+            .sorted { ($0.snapshot.dueAt, $0.id.uuidString) < ($1.snapshot.dueAt, $1.id.uuidString) }
     }
 
     var completedDeadlines: [DeadlineRow] {
@@ -631,7 +645,7 @@ final class PlannerModel {
         let now = clock.now()
         let composed = BriefComposer.compose(
             slot: currentSlot(at: now), now: now, events: todayEvents.filter(isIncludedInBrief),
-            deadlines: briefDeadlines(at: now), preferences: settings.preferences, calendar: calendar
+            deadlines: briefDeadlines(at: now), sources: sources, preferences: settings.preferences, calendar: calendar
         )
         if composed.id != brief?.id {
             session = BriefSession(brief: composed, log: services.eventLog, clock: clock)
@@ -718,7 +732,8 @@ final class PlannerModel {
         }
     }
 
-    private func record(_ action: BriefAction, on item: BriefItem) async {
+    /// Logs an action on a brief item (content-free) and remembers its state for the view.
+    func record(_ action: BriefAction, on item: BriefItem) async {
         if action.dealsWithItem { itemStates[item.id] = action }
         do {
             if sessionItemIDs.contains(item.id), let session {
@@ -780,7 +795,7 @@ final class PlannerModel {
                 guard time > now else { continue }
                 let brief = BriefComposer.compose(
                     slot: slot, now: time, events: events.filter(isIncludedInBrief),
-                    deadlines: briefDeadlines(at: time), preferences: settings.preferences, calendar: calendar
+                    deadlines: briefDeadlines(at: time), sources: sources, preferences: settings.preferences, calendar: calendar
                 )
                 let identifier = BriefNotificationID.make(slot: slot.kind, day: interval.start, calendar: calendar)
                 do {

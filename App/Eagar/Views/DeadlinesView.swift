@@ -1,16 +1,21 @@
 import EagarCalendar
 import EagarCore
+import EagarMoney
 import SwiftUI
 
-/// Deadlines, overdue first (FR-DL-01..04).
+/// Deadlines, overdue first (FR-DL-01..04), with trial cancel-by days (origin `trial`).
 struct DeadlinesView: View {
     let planner: PlannerModel
+    let money: MoneyModel
     @State private var editing: DeadlineDraft?
     @State private var rescheduling: DeadlineRow?
+    @State private var editingTrial: TrialEditorDraft?
+    @State private var confirmingCancel: TrialSnapshot?
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         List {
-            if planner.deadlines.isEmpty {
+            if planner.deadlines.isEmpty && planner.trialDeadlines.isEmpty {
                 ContentUnavailableView {
                     Label("No deadlines", systemImage: "flag")
                 } description: {
@@ -35,6 +40,18 @@ struct DeadlinesView: View {
             }
         }
         .sheet(item: $editing) { DeadlineEditor(planner: planner, draft: $0) }
+        .sheet(item: $editingTrial) { TrialEditor(money: money, draft: $0) }
+        .confirmationDialog(
+            Text("Did you cancel \(confirmingCancel?.service ?? "")?"),
+            isPresented: Binding(get: { confirmingCancel != nil }, set: { if !$0 { confirmingCancel = nil } }),
+            titleVisibility: .visible,
+            presenting: confirmingCancel
+        ) { trial in
+            Button("Yes, I cancelled it") { Task { await money.confirmCancelled(trial.id) } }
+            Button("Not yet", role: .cancel) {}
+        } message: { _ in
+            Text("Eagar records a cancellation only when you confirm it.")
+        }
         .sheet(item: $rescheduling) { row in
             RescheduleSheet(initial: row.snapshot.dueAt) { date in
                 Task { await planner.reschedule(row.id, to: date) }
@@ -47,16 +64,69 @@ struct DeadlinesView: View {
         if !rows.isEmpty {
             Section {
                 ForEach(rows) { row in
-                    DeadlineRowView(
-                        planner: planner, row: row,
-                        onEdit: { editing = DeadlineDraft(row) },
-                        onReschedule: { rescheduling = row }
-                    )
+                    if row.snapshot.origin == .trial, let trial = money.trial(row.id) {
+                        TrialDeadlineRowView(
+                            row: row,
+                            onEdit: { editingTrial = money.editDraft(trial.id) },
+                            onCancel: {
+                                openURL(money.cancelTarget(trial.id))
+                                confirmingCancel = trial
+                            },
+                            onConfirmCancelled: { Task { await money.confirmCancelled(trial.id) } }
+                        )
+                    } else {
+                        DeadlineRowView(
+                            planner: planner, row: row,
+                            onEdit: { editing = DeadlineDraft(row) },
+                            onReschedule: { rescheduling = row }
+                        )
+                    }
                 }
             } header: {
                 Text(header)
             }
         }
+    }
+}
+
+/// A trial's cancel-by day among the deadlines (FR-DL-01). Its reminders are the trial's
+/// own, so it has no reminder or snooze actions; Cancel and "I've cancelled" act on the trial.
+private struct TrialDeadlineRowView: View {
+    let row: DeadlineRow
+    let onEdit: () -> Void
+    let onCancel: () -> Void
+    let onConfirmCancelled: () -> Void
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            Button(action: onEdit) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(row.snapshot.title)
+                    Text("Due \(row.snapshot.dueAt, format: .dateTime.weekday(.wide).day().month())")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Label("Subscription", systemImage: "creditcard")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("Edit subscription"))
+            Menu {
+                Button("Open the cancel page", action: onCancel)
+                Button("I've cancelled it", action: onConfirmCancelled)
+                Button("Edit subscription", action: onEdit)
+            } label: {
+                Image(systemName: "ellipsis.circle").frame(minWidth: 44, minHeight: 44)
+            }
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityLabel(Text("More actions for \(row.snapshot.title)"))
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("deadline.trialRow")
     }
 }
 
