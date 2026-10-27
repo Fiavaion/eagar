@@ -45,6 +45,9 @@ targets:
       - target: EagarWidgets
         embed: true
         codeSign: true
+      - target: EagarShare
+        embed: true
+        codeSign: true
       - package: EagarCore
       - package: EagarStore
       - package: EagarSecurity
@@ -110,6 +113,42 @@ targets:
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_ENTITLEMENTS: $(EAGAR_WIDGET_ENTITLEMENTS)
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks @executable_path/../../../../Frameworks"
+  # FR-TRIAL-03: share a receipt screenshot or text to propose a trial. Parser only (no router,
+  # no model calls); the proposal is handed to the app through the App Group.
+  EagarShare:
+    type: app-extension
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: EagarShare
+    dependencies:
+      - package: EagarCore
+      - package: EagarMoney
+      - sdk: SwiftUI.framework
+    info:
+      path: EagarShare/Info.plist
+      properties:
+        CFBundleDisplayName: Eagar
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(EAGAR_BUNDLE_PREFIX).eagarapp.share
+        PRODUCT_NAME: EagarShare
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        # EagarShare.entitlements unsigned/CI; EagarShareSigned.entitlements adds the App Group.
+        CODE_SIGN_ENTITLEMENTS: $(EAGAR_SHARE_ENTITLEMENTS)
         CODE_SIGN_STYLE: Automatic
         TARGETED_DEVICE_FAMILY: "1,2"
         SKIP_INSTALL: YES

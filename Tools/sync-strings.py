@@ -22,6 +22,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 CATALOGS = {
     "Eagar": ROOT / "App/Eagar/Localizable.xcstrings",
     "EagarWidgets": ROOT / "App/EagarWidgets/Localizable.xcstrings",
+    "EagarShare": ROOT / "App/EagarShare/Localizable.xcstrings",
 }
 ACCENTS = str.maketrans(
     "aeiouAEIOUcnCNyY",
