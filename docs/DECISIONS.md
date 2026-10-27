@@ -431,7 +431,7 @@ Refs: NFR-L10N-01, NFR-L10N-02, D-008
 Context: On iPhone, every brief row had about 150 pt of empty space and icon-only actions. `.fixedSize()` on borderless buttons and menus inside an iOS 26 List row makes the control report an oversized height, and the automatic label style drops the title when its ideal width is requested.
 Decision: Fix the label's width (not the button's), set `.labelStyle(.titleAndIcon)` on one line, and draw menus as borderless buttons; `ViewThatFits` falls back to two lines. 44 pt targets and VoiceOver labels are unchanged.
 Alternatives: Replacing `ViewThatFits` (made no difference).
-Consequences: Apply the same pattern to new row actions; checked by simulator screenshots, not a unit test.
+Consequences: The rule covers every List-row control in the app (Today, People, Deadlines, Subscriptions): menus use `.menuStyle(.button)` with `.buttonStyle(.borderless)`; pickers in a Form may be fixed horizontally only. Checked by simulator screenshots, not a unit test.
 Refs: FR-BRIEF-03, NFR-A11Y-01
 
 ## Parked
