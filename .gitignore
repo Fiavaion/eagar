@@ -25,3 +25,7 @@ PushServer/.wrangler/
 # Source bundle of the specs (duplicates the files in the repo)
 eagar-docs.zip
 build/
+
+# Claude Code: personal permissions and agent worktrees
+.claude/settings.local.json
+.claude/worktrees/
