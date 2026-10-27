@@ -50,6 +50,8 @@ struct EagarShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: ShowBriefIntent(), phrases: ["Show my \(.applicationName) brief"], shortTitle: "Brief", systemImageName: "sun.horizon")
         AppShortcut(intent: AddDeadlineIntent(), phrases: ["Add a deadline in \(.applicationName)"], shortTitle: "Add deadline", systemImageName: "flag")
+        AppShortcut(intent: AddTrialIntent(), phrases: ["Add a trial in \(.applicationName)"], shortTitle: "Add trial", systemImageName: "creditcard")
+        AppShortcut(intent: LogContactIntent(), phrases: ["Log contact in \(.applicationName)"], shortTitle: "Log contact", systemImageName: "checkmark.bubble")
         AppShortcut(intent: SetKillSwitchIntent(value: true), phrases: ["Stop \(.applicationName) AI"], shortTitle: "Stop AI", systemImageName: "stop.circle")
     }
 }

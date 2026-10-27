@@ -30,8 +30,8 @@ struct BriefSettings: Codable, Equatable {
         slots.filter(\.enabled).map(\.slot).sorted { ($0.hour, $0.minute) < ($1.hour, $1.minute) }
     }
 
-    /// The sections M1 fills, in Mark's order. Overdue is always shown first (FR-DL-04).
-    static let steerableSections: [BriefSectionKind] = [.today, .deadlines]
+    /// The sections filled so far (M1, M2), in Mark's order. Overdue is always shown first (FR-DL-04).
+    static let steerableSections: [BriefSectionKind] = [.today, .deadlines, .trials, .keepInTouch]
 
     var orderedSteerableSections: [BriefSectionKind] {
         let ordered = preferences.order.filter(Self.steerableSections.contains)

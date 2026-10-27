@@ -212,3 +212,52 @@ struct PeopleModelTests {
         #expect(model.people.logs(for: id).count == 1)
     }
 }
+
+/// FR-OS-03: "Add a trial" and "Log contact" create records; people offered to Shortcuts are
+/// never college.
+@MainActor
+struct KeepInTouchAndTrialIntentTests {
+    private func services(trials: SpyTrialReminders) throws -> AppServices {
+        try AppServices.make(
+            inMemory: true, secrets: MemorySecrets(), eventStore: DemoEventStore(), deadlineNotifications: SpyDeadlineNotifications(),
+            trialReminders: trials, birthdayNotifications: SpyBirthdays(), pendingImports: PendingTrialImportStore(directory: nil)
+        )
+    }
+
+    @Test func FR_OS_03_addTrialCreatesATrialWithReminders() async throws {
+        let reminders = SpyTrialReminders()
+        let services = try services(trials: reminders)
+        let now = Date()
+        let draft = TrialDraft(service: "Streamly", price: 9.99, renewsAt: now.addingTimeInterval(20 * 86_400))
+        try await AddTrialIntent.add(try #require(draft.confirmed()), services: services, now: now)
+        let trials = try await TrialRepository(stores: services.stores).all()
+        #expect(trials.map(\.service) == ["Streamly"])
+        #expect(trials.first?.dataClass == .personal)
+        #expect(!reminders.pending.withLock { $0.isEmpty })
+    }
+
+    @Test func FR_OS_03_logContactRecordsALog() async throws {
+        let services = try services(trials: SpyTrialReminders())
+        let repository = PeopleRepository(stores: services.stores)
+        let id = try await repository.insert(name: "Niamh", now: Date())
+        try await LogContactIntent.log(id, services: services, now: Date())
+        #expect(try await repository.logs().map(\.personID) == [id])
+        #expect(try await PersonEntityQuery.people(services).map(\.name) == ["Niamh"])
+    }
+}
+
+@MainActor
+struct PilotMetricsTests {
+    @Test func FR_GOV_01_weeklyEntriesReplaceAndPersist() {
+        let defaults = UserDefaults(suiteName: "eagar.pilot.\(UUID().uuidString)")!
+        let now = Date()
+        let model = PilotMetricsModel(defaults: defaults, clock: FixedClock(date: now), calendar: .current)
+        model.record(week: model.lastWeekStart, minutes: 300, pickups: 90)
+        model.record(week: model.lastWeekStart.addingTimeInterval(3600), minutes: 280, pickups: nil)
+        #expect(model.entries.count == 1)
+        #expect(model.entries.first?.minutes == 280)
+        let reloaded = PilotMetricsModel(defaults: defaults, clock: FixedClock(date: now), calendar: .current)
+        #expect(reloaded.entries == model.entries)
+        #expect(reloaded.averageMinutes == 280)
+    }
+}

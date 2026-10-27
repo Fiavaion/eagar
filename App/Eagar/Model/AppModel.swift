@@ -24,6 +24,8 @@ final class AppModel {
     let money: MoneyModel
     /// Keep in touch (M2).
     let people: PeopleModel
+    /// Manual Screen Time entries (FR-GOV-01).
+    let pilotMetrics: PilotMetricsModel
     private(set) var maskedKey: String?
     private(set) var keyTestState: KeyTestState = .idle
     private(set) var records: [LedgerRecord] = []
@@ -42,6 +44,7 @@ final class AppModel {
         planner = PlannerModel(services: services, defaults: defaults, clock: clock, calendar: calendar)
         money = MoneyModel(services: services, clock: clock, calendar: calendar)
         people = PeopleModel(services: services, planner: planner, defaults: defaults, clock: clock, calendar: calendar)
+        pilotMetrics = PilotMetricsModel(defaults: defaults, clock: clock, calendar: calendar)
         let cap = defaults.object(forKey: Self.capKey) as? Int64
         services.policy.setMonthlyCap(microUSD: cap)
         loadKeyState()
